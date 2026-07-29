@@ -4,7 +4,12 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<!--
+  iOS 26.5.2 standalone 在 black-translucent 下會把頂部狀態列高度
+  從 100dvh 扣除，卻將不可繪製的缺口留在畫面底部。改用 opaque
+  black 狀態列，讓 WebKit 的可用 viewport 從狀態列下方一路到螢幕底端。
+-->
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
 <meta name="theme-color" content="#08051C">
 <meta name="application-name" content="Venus Card System">
 <meta name="apple-mobile-web-app-title" content="Venus Card">
@@ -388,8 +393,10 @@
 html{height:100%;overflow:hidden;width:100%;background:#08051C}
 body{height:100%;overflow:hidden;width:100%;padding-bottom:0;background:#08051C;color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Noto Sans TC",sans-serif;font-size:14px;line-height:1.5}
 /*
- * 只使用 WebKit 實際可繪製的 viewport。不能用 screen.height 強行放大：
- * iOS 26.5.2 的 standalone 模式會把超出的內容裁掉，導致底部按鍵消失。
+ * 只使用 WebKit 實際可繪製的 viewport。opaque status bar 讓 iOS
+ * standalone 的 viewport 從狀態列下緣延伸到螢幕底端，不再把頂部
+ * 狀態列高度錯留成底部空白。不能用 screen.height 強行放大，否則
+ * 超出的底部按鍵仍會被 WebKit 裁掉。
  */
 .app{display:flex;flex-direction:column;height:100vh;height:100dvh;min-height:0;position:relative;overflow:hidden;background:var(--bg)}
 
@@ -1363,7 +1370,7 @@ tr:hover td{background:var(--accent-light)}
 // ══════════════════════════════════════════
 // Firebase 設定
 // ══════════════════════════════════════════
-const APP_VERSION='2.7.0';
+const APP_VERSION='2.7.1';
 const FB_CONFIG = {
   apiKey: "AIzaSyAqgA9pYvOduWypEE5kxVNlq9fEfrEMV0c",
   authDomain: "attendance-pwa-9fa73.firebaseapp.com",
