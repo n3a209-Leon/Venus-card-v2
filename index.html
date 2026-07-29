@@ -36,11 +36,14 @@
   --safe-top:env(safe-area-inset-top,0px);
   --safe-bottom:env(safe-area-inset-bottom,0px);
   /*
-   * iOS 26.5.2 的 Home Screen Web App 會保留一段 DOM 無法觸及的系統區。
-   * 導覽列只使用瀏覽器真正可見的範圍，避免被推到畫面外。
+   * 與 LIMU v20.19 相同：固定導覽只吸收最多 4px，
+   * body 不再重複保留完整 safe-area。
    */
-  --safe-bottom-ui:0px;
-  --header-h:52px;--tabar-h:48px;
+  --dock-safe-bottom:min(var(--safe-bottom),4px);
+  --dock-control-height:52px;
+  --safe-bottom-ui:var(--dock-safe-bottom);
+  --header-h:52px;
+  --tabar-h:calc(var(--dock-control-height) + var(--dock-safe-bottom));
 }
 
 /* ══ NERV THEME ══ */
@@ -71,6 +74,213 @@
 [data-theme="nerv"] .stu-cell.ready{border-color:#FFCC00;background:rgba(255,204,0,.08)}
 [data-theme="nerv"] input,[data-theme="nerv"] select,[data-theme="nerv"] textarea{background:#0a0400;border-color:rgba(255,102,0,.3);color:#FF6600}
 [data-theme="nerv"] .class-chip{background:rgba(255,102,0,.1);border-color:rgba(255,102,0,.4);color:#FF6600}
+
+/* ══ MUCHA THEME（移植自 LIMU・藍紫鳶尾）══ */
+[data-theme="mucha"]{
+  --bg:#F2E8D8;--bg2:#FBF6ED;--bg3:#EEE4D4;--bg4:#E3D6C1;
+  --accent:#355A50;--accent2:#294B44;--accent-light:rgba(117,131,107,.14);
+  --green:#4E745F;--green-light:rgba(78,116,95,.12);
+  --orange:#9A6334;--orange-light:rgba(154,99,52,.12);
+  --red:#A64B43;--red-light:rgba(166,75,67,.11);
+  --gold:#B28A45;--gold-light:rgba(178,138,69,.14);
+  --purple:#5D50B4;--purple-light:rgba(93,80,180,.11);
+  --text:#39312C;--text2:#554B42;--text3:#776B60;--text4:#94877A;
+  --border:rgba(139,99,47,.22);--border2:rgba(139,99,47,.38);
+  color:#39312C;
+}
+[data-theme="mucha"] .app{
+  background:
+    radial-gradient(circle at 50% -9rem,rgba(210,179,109,.25),transparent 27rem),
+    radial-gradient(circle at -10% 34%,rgba(117,131,107,.12),transparent 25rem),
+    radial-gradient(circle at 110% 78%,rgba(59,49,152,.08),transparent 23rem),
+    repeating-linear-gradient(0deg,rgba(91,71,48,.018) 0 1px,transparent 1px 5px),
+    linear-gradient(180deg,#F7F0E5 0%,#F2E8D8 48%,#EEE2D0 100%);
+}
+[data-theme="mucha"] .app-header{
+  overflow:hidden;
+  background:
+    radial-gradient(circle at 50% 125%,rgba(226,201,135,.26),transparent 53%),
+    linear-gradient(135deg,#294B44 0%,#355F55 53%,#294A43 100%);
+  border-bottom:2px solid rgba(210,179,109,.78);
+  box-shadow:0 9px 28px rgba(45,60,48,.20),inset 0 -1px 0 rgba(255,244,214,.23);
+}
+[data-theme="mucha"] .app-header::before{
+  content:"";position:absolute;inset:0 0 auto;height:56px;z-index:0;
+  background:linear-gradient(180deg,rgba(226,201,135,.16),transparent);
+  pointer-events:none;
+}
+[data-theme="mucha"] .app-header::after{
+  content:"";position:absolute;left:8px;right:8px;bottom:-1px;height:9px;z-index:0;
+  background:
+    url("./assets/mucha-divider-left.webp") left bottom/auto 14px no-repeat,
+    url("./assets/mucha-divider-right.webp") right bottom/auto 14px no-repeat,
+    linear-gradient(90deg,transparent,rgba(224,201,135,.72) 18%,rgba(224,201,135,.72) 82%,transparent);
+  opacity:.62;pointer-events:none;
+}
+[data-theme="mucha"] .app-header>*{position:relative;z-index:1}
+[data-theme="mucha"] .ver-badge{color:rgba(248,236,210,.76)}
+[data-theme="mucha"] .theme-select-bar,
+[data-theme="mucha"] .user-btn{
+  color:#F8ECD2;background:rgba(255,248,229,.12);
+  border-color:rgba(226,201,135,.48);
+}
+[data-theme="mucha"] .class-chip{
+  color:#FFF5DF;background:rgba(255,248,229,.11);
+  border-color:rgba(226,201,135,.55);
+}
+[data-theme="mucha"] .class-dropdown{
+  color:#39312C;background:rgba(250,244,234,.98);
+  border-color:rgba(139,99,47,.42);
+  box-shadow:0 18px 42px rgba(66,48,29,.28),inset 0 0 0 2px rgba(255,252,242,.6);
+}
+[data-theme="mucha"] .cd-item:hover,
+[data-theme="mucha"] .cd-item.active{background:rgba(117,131,107,.13)}
+[data-theme="mucha"] .scroll-area{position:relative;isolation:isolate}
+[data-theme="mucha"] .scroll-area::before{
+  content:"";position:absolute;inset:2px 2px 0;z-index:3;min-height:calc(100% - 2px);
+  border:24px solid transparent;
+  border-image-source:url("./assets/mucha-master-frame.webp");
+  border-image-slice:13% 16%;
+  border-image-width:36px 19px 32px;
+  border-image-repeat:stretch;
+  opacity:.84;
+  filter:saturate(1.03) contrast(1.05) drop-shadow(0 2px 3px rgba(78,55,30,.16));
+  pointer-events:none;user-select:none;
+}
+[data-theme="mucha"] .scroll-area::after{
+  content:"";position:fixed;right:-34px;bottom:calc(var(--tabar-h) + 8px);
+  width:150px;height:150px;z-index:1;
+  background:url("./assets/signature-blue-iris.webp") center/contain no-repeat;
+  opacity:.075;filter:saturate(1.08);pointer-events:none;user-select:none;
+}
+[data-theme="mucha"] .panel{padding-inline:18px}
+[data-theme="mucha"] .panel>*{position:relative;z-index:2}
+[data-theme="mucha"] .card,
+[data-theme="mucha"] .stat{
+  color:#39312C;
+  background:
+    radial-gradient(circle at 50% -35%,rgba(210,179,109,.14),transparent 48%),
+    linear-gradient(180deg,rgba(255,251,242,.96),rgba(244,235,221,.96));
+  border-color:rgba(139,99,47,.26);
+  box-shadow:0 7px 18px rgba(82,63,39,.09),inset 0 1px 0 rgba(255,255,255,.75);
+}
+[data-theme="mucha"] .card{position:relative;isolation:isolate}
+[data-theme="mucha"] .card::after{
+  content:"";position:absolute;inset:3px;z-index:3;border-radius:inherit;
+  border:14px solid transparent;
+  border-image-source:url("./assets/mucha-card-frame.webp");
+  border-image-slice:17% 12%;
+  border-image-width:10px 7px;
+  border-image-repeat:stretch;
+  opacity:.76;pointer-events:none;
+}
+[data-theme="mucha"] .card>*{position:relative;z-index:2}
+[data-theme="mucha"] .card-title{color:#355A50;letter-spacing:.2px}
+[data-theme="mucha"] .stu-cell{
+  background:rgba(255,251,241,.72);
+  border-color:rgba(139,99,47,.19);
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.55);
+}
+[data-theme="mucha"] .stu-cell.ready{
+  background:linear-gradient(145deg,#FBF4E8,#F2E5D8);
+  border-color:rgba(178,138,69,.65);
+}
+[data-theme="mucha"] .stu-no-circle{
+  background:linear-gradient(135deg,#355A50,#557467);
+  border:1px solid rgba(210,179,109,.62);
+}
+[data-theme="mucha"] .stu-cell.ready .stu-no-circle{background:linear-gradient(135deg,#B28A45,#8F6830)}
+[data-theme="mucha"] input,
+[data-theme="mucha"] select,
+[data-theme="mucha"] textarea{
+  color:#39312C;background:#FBF6ED;border-color:rgba(139,99,47,.35);
+}
+[data-theme="mucha"] .tip,
+[data-theme="mucha"] .quality-report{
+  color:#355A50;background:rgba(117,131,107,.11);border:1px solid rgba(53,90,80,.15);
+}
+[data-theme="mucha"] .tip.orange{color:#8C572F;background:rgba(178,138,69,.13);border-color:rgba(178,138,69,.22)}
+[data-theme="mucha"] .tip.green{color:#355A50;background:rgba(117,131,107,.13)}
+[data-theme="mucha"] .sx,
+[data-theme="mucha"] .score-input-area,
+[data-theme="mucha"] .upload-area,
+[data-theme="mucha"] .stab-row{
+  background:rgba(244,235,221,.84);border-color:rgba(139,99,47,.24);
+}
+[data-theme="mucha"] th{
+  color:#F5E6C7;
+  background:linear-gradient(135deg,#355A50,#496B60);
+  border-color:rgba(226,201,135,.34);
+}
+[data-theme="mucha"] td{border-color:rgba(139,99,47,.15)}
+[data-theme="mucha"] tr:hover td{background:rgba(117,131,107,.08)}
+[data-theme="mucha"] .stab.active{
+  color:#355A50;background:#FBF6ED;
+  box-shadow:inset 0 0 0 1px rgba(178,138,69,.25),0 2px 6px rgba(82,63,39,.08);
+}
+[data-theme="mucha"] .btn-primary,
+[data-theme="mucha"] .btn-green{
+  color:#FFF5DF;background:linear-gradient(135deg,#355A50,#557467);
+  border:1px solid rgba(210,179,109,.62);
+  box-shadow:0 5px 14px rgba(53,90,80,.18),inset 0 1px 0 rgba(255,255,255,.1);
+}
+[data-theme="mucha"] .btn-ghost{
+  color:#355A50;background:linear-gradient(180deg,#FBF6ED,#EEE4D4);
+  border-color:rgba(139,99,47,.34);
+}
+[data-theme="mucha"] .btn-orange{background:linear-gradient(135deg,#B28A45,#8F6830);border-color:#B28A45}
+[data-theme="mucha"] .btn-red{background:linear-gradient(135deg,#A64B43,#843B36);border-color:#A64B43}
+[data-theme="mucha"] .more-item{border-color:rgba(139,99,47,.17)}
+[data-theme="mucha"] .more-item:active{background:rgba(117,131,107,.09)}
+[data-theme="mucha"] .modal-bg{background:rgba(45,39,31,.67)}
+[data-theme="mucha"] .modal{
+  position:relative;isolation:isolate;color:#39312C;
+  background:
+    radial-gradient(circle at 50% -30%,rgba(210,179,109,.18),transparent 46%),
+    linear-gradient(180deg,#FAF4EA,#F1E6D6);
+  border:1px solid rgba(139,99,47,.46);
+  box-shadow:0 -16px 54px rgba(66,48,29,.30),inset 0 0 0 3px rgba(255,252,242,.55);
+}
+[data-theme="mucha"] .modal::before{
+  content:"";position:absolute;inset:4px;z-index:3;border-radius:inherit;
+  border:14px solid transparent;
+  border-image-source:url("./assets/mucha-card-frame.webp");
+  border-image-slice:17% 12%;
+  border-image-width:11px 8px;
+  border-image-repeat:stretch;
+  opacity:.66;pointer-events:none;
+}
+[data-theme="mucha"] .modal>*{position:relative;z-index:4}
+[data-theme="mucha"] .empty{
+  min-height:126px;padding:96px 12px 12px;
+  color:#897B6C;
+  background:url("./assets/mucha-empty-ornament.webp") center 1px/auto 102px no-repeat;
+}
+[data-theme="mucha"] .tab-bar{
+  border-color:rgba(139,99,47,.45);
+  background:rgba(247,240,229,.97);
+  box-shadow:0 -8px 26px rgba(72,55,35,.18),inset 0 1px 0 rgba(255,255,255,.68);
+}
+[data-theme="mucha"] .tab-bar::before{
+  content:"";position:absolute;left:8px;right:8px;top:-2px;height:12px;pointer-events:none;
+  background:
+    url("./assets/mucha-divider-left.webp") left center/auto 17px no-repeat,
+    url("./assets/mucha-divider-right.webp") right center/auto 17px no-repeat;
+  opacity:.58;
+}
+[data-theme="mucha"] .tab-btn{color:#71665A}
+[data-theme="mucha"] .tab-btn.active{
+  color:#355A50;background:rgba(117,131,107,.13);
+  border:1px solid rgba(178,138,69,.28);
+  border-radius:18px 18px 13px 13px;
+  box-shadow:inset 0 2px 0 rgba(226,201,135,.35);
+}
+[data-theme="mucha"] .tab-btn.active::before{background:#B28A45}
+[data-theme="mucha"] .undo-fab{background:#355A50;color:#FFF5DF;border:1px solid rgba(210,179,109,.55)}
+@media(max-width:480px){
+  [data-theme="mucha"] .scroll-area::before{border-image-width:32px 18px 28px;opacity:.82}
+  [data-theme="mucha"] .panel{padding-inline:17px}
+}
 
 /* ══ NEBULA THEME（同 Venus OS Deep Space Edition）══ */
 @keyframes purple-glow-pulse{0%,100%{box-shadow:0 0 6px rgba(160,80,255,.6),0 0 14px rgba(120,60,220,.3)}50%{box-shadow:0 0 14px rgba(180,100,255,.9),0 0 30px rgba(140,70,240,.5)}}
@@ -176,7 +386,7 @@
 
 /* ══ BODY ══ */
 html{height:100%;overflow:hidden;width:100%;background:#08051C}
-body{height:100%;overflow:hidden;width:100%;background:#08051C;color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Noto Sans TC",sans-serif;font-size:14px;line-height:1.5}
+body{height:100%;overflow:hidden;width:100%;padding-bottom:0;background:#08051C;color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Noto Sans TC",sans-serif;font-size:14px;line-height:1.5}
 /*
  * 只使用 WebKit 實際可繪製的 viewport。不能用 screen.height 強行放大：
  * iOS 26.5.2 的 standalone 模式會把超出的內容裁掉，導致底部按鍵消失。
@@ -255,7 +465,7 @@ body{height:100%;overflow:hidden;width:100%;background:#08051C;color:var(--text)
 [data-theme="nerv"] .class-chip{background:rgba(255,102,0,.1);border-color:rgba(255,102,0,.4);color:#FF6600}
 
 /* ══ SCROLL AREA ══ */
-.scroll-area{flex:1;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch}
+.scroll-area{flex:1;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;padding-bottom:calc(var(--tabar-h) + 8px)}
 .scroll-area::-webkit-scrollbar{width:3px}
 .scroll-area::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
 .panel{display:none;padding:12px 10px;max-width:900px;margin:0 auto}
@@ -265,21 +475,25 @@ body{height:100%;overflow:hidden;width:100%;background:#08051C;color:var(--text)
 .tab-bar{
   background:var(--bg2);border-top:1px solid var(--border);
   display:flex;align-items:stretch;
-  /* 最小 48px 導覽列，固定留在 WebKit 真正可見的底端 */
+  /* 與 LIMU v20.19 相同：52px 操作區 + 最多 4px 安全緩衝 */
   height:var(--tabar-h);
   min-height:var(--tabar-h);
   max-height:var(--tabar-h);
-  padding-bottom:0;
+  padding:3px 8px var(--dock-safe-bottom);
   flex:0 0 var(--tabar-h);
   overflow:hidden;
-  position:relative;z-index:150;
+  position:fixed;left:0;right:0;bottom:0;z-index:340;
+  border-radius:20px 20px 0 0;
+  box-shadow:0 -6px 24px rgba(20,42,74,.16);
+  backdrop-filter:blur(18px) saturate(1.2);
+  -webkit-backdrop-filter:blur(18px) saturate(1.2);
 }
 /* Tab 按鍵：維持至少 44px 的可點擊高度 */
 .tab-btn{
   flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
   gap:2px;border:none;background:transparent;color:var(--text4);
   cursor:pointer;font-family:inherit;font-size:10px;font-weight:600;
-  min-height:44px;padding:3px 4px 2px;
+  min-height:44px;padding:2px 4px 1px;
   transition:color .15s;position:relative;-webkit-appearance:none;
 }
 .tab-btn .icon{font-size:22px;line-height:1}
@@ -290,7 +504,7 @@ body{height:100%;overflow:hidden;width:100%;background:#08051C;color:var(--text)
 [data-theme="nerv"] .tab-btn.active{color:#FF6600}
 [data-theme="nebula"] .tab-bar{background:rgba(4,3,14,.95);border-top-color:rgba(100,60,220,.3)}
 [data-theme="nebula"] .tab-bar::after{display:none}
-[data-theme="nebula"] .tab-bar{position:relative}
+[data-theme="nebula"] .tab-bar{position:fixed}
 [data-theme="nerv"] .tab-bar{background:#080200;border-top-color:rgba(255,102,0,.3)}
 
 /* ══ CARDS ══ */
@@ -418,7 +632,7 @@ tr:hover td{background:var(--accent-light)}
 /* ══ MODAL ══ */
 .modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:200;display:none;align-items:flex-end;justify-content:center;padding:0}
 .modal-bg.show{display:flex}
-.modal{background:var(--bg2);border-radius:20px 20px 0 0;padding:20px;width:100%;max-height:85vh;overflow-y:auto;box-shadow:0 -8px 40px rgba(0,0,0,.2)}
+.modal{background:var(--bg2);border-radius:20px 20px 0 0;padding:20px 20px max(20px,calc(16px + var(--safe-bottom)));width:100%;max-height:85vh;overflow-y:auto;box-shadow:0 -8px 40px rgba(0,0,0,.2)}
 .modal h3{font-size:15px;font-weight:700;margin-bottom:14px}
 .modal-center{align-items:center}
 .modal.center-modal{border-radius:16px;max-width:440px;margin:auto}
@@ -438,9 +652,9 @@ tr:hover td{background:var(--accent-light)}
 #offline-banner.show{display:block}
 
 /* ══ TOAST ══ */
-#toast{position:fixed;bottom:calc(60px + var(--safe-bottom-ui));left:50%;transform:translateX(-50%);background:var(--text);color:var(--bg2);padding:9px 18px;border-radius:20px;font-size:13px;opacity:0;transition:opacity .3s;pointer-events:none;z-index:999;font-weight:600;white-space:nowrap;max-width:85vw;text-align:center}
+#toast{position:fixed;bottom:calc(var(--tabar-h) + 8px);left:50%;transform:translateX(-50%);background:var(--text);color:var(--bg2);padding:9px 18px;border-radius:20px;font-size:13px;opacity:0;transition:opacity .3s;pointer-events:none;z-index:999;font-weight:600;white-space:nowrap;max-width:85vw;text-align:center}
 #toast.show{opacity:1}
-.undo-fab{position:fixed;right:12px;bottom:calc(56px + var(--safe-bottom-ui));z-index:180;display:none;align-items:center;gap:5px;min-height:40px;padding:8px 13px;border-radius:22px;background:var(--text);color:var(--bg2);box-shadow:0 6px 22px rgba(0,0,0,.25);font-size:12px}
+.undo-fab{position:fixed;right:12px;bottom:calc(var(--tabar-h) + 8px);z-index:350;display:none;align-items:center;gap:5px;min-height:40px;padding:8px 13px;border-radius:22px;background:var(--text);color:var(--bg2);box-shadow:0 6px 22px rgba(0,0,0,.25);font-size:12px}
 .undo-fab.show{display:inline-flex}
 [data-theme="nebula"] .undo-fab{background:#6d3bd8;color:#fff;box-shadow:0 0 18px rgba(150,100,255,.45)}
 [data-theme="nerv"] .undo-fab{background:#180500;color:#ff8800;border:1px solid #ff6600;border-radius:3px}
@@ -609,6 +823,7 @@ tr:hover td{background:var(--accent-light)}
         <option value="default">☀️ 日間</option>
         <option value="nerv">🔴 NERV</option>
         <option value="nebula">🌌 星雲</option>
+        <option value="mucha">❧ 慕夏</option>
       </select>
       <!-- 登入後顯示使用者名稱，可點選登出 -->
       <button class="user-btn" id="user-btn" onclick="showUserMenu()" style="display:none">
@@ -1148,7 +1363,7 @@ tr:hover td{background:var(--accent-light)}
 // ══════════════════════════════════════════
 // Firebase 設定
 // ══════════════════════════════════════════
-const APP_VERSION='2.6.4';
+const APP_VERSION='2.7.0';
 const FB_CONFIG = {
   apiKey: "AIzaSyAqgA9pYvOduWypEE5kxVNlq9fEfrEMV0c",
   authDomain: "attendance-pwa-9fa73.firebaseapp.com",
@@ -5293,13 +5508,22 @@ function fallbackCopy(text,successMsg){
 }
 
 // ══ 主題切換 ══
-const THEMES=['default','nerv','nebula'];
-const THEME_LABELS={default:'☀️ 日間',nerv:'🔴 NERV',nebula:'🌌 星雲'};
+const THEMES=['default','nerv','nebula','mucha'];
+const THEME_LABELS={default:'☀️ 日間',nerv:'🔴 NERV',nebula:'🌌 星雲',mucha:'❧ 慕夏・藍紫鳶尾'};
 let _theme=safeGet('vc2:theme')||'default';
 
 function applyTheme(t){
+  if(!THEMES.includes(t))t='default';
   _theme=t;
   document.documentElement.setAttribute('data-theme',t==='default'?'':t);
+  const edgeColors={default:'#FFFFFF',nerv:'#080200',nebula:'#04030E',mucha:'#F7F0E5'};
+  const metaColors={default:'#FFFFFF',nerv:'#120400',nebula:'#08051C',mucha:'#355A50'};
+  const edge=edgeColors[t]||edgeColors.default;
+  document.documentElement.style.backgroundColor=edge;
+  document.body.style.backgroundColor=edge;
+  document.documentElement.style.colorScheme=(t==='nerv'||t==='nebula')?'dark':'light';
+  const themeMeta=document.querySelector('meta[name="theme-color"]');
+  if(themeMeta)themeMeta.setAttribute('content',metaColors[t]||metaColors.default);
   const sel=document.getElementById('theme-select');
   if(sel)sel.value=t;
   safeSet('vc2:theme',t);
@@ -5338,7 +5562,7 @@ function showUpdateBar(worker){
   if(existing)return;
   const bar=document.createElement('div');
   bar.id='app-update-bar';
-  bar.style.cssText='position:fixed;bottom:0;left:0;right:0;background:#1e3a5f;color:#fff;padding:8px 18px calc(6px + var(--safe-bottom-ui));font-size:13px;font-weight:700;z-index:99999;display:flex;gap:12px;align-items:center;justify-content:space-between;font-family:sans-serif';
+  bar.style.cssText='position:fixed;bottom:0;left:0;right:0;background:#1e3a5f;color:#fff;padding:8px 18px calc(6px + var(--safe-bottom));font-size:13px;font-weight:700;z-index:99999;display:flex;gap:12px;align-items:center;justify-content:space-between;font-family:sans-serif';
   bar.innerHTML='<span style="flex:1">📦 新版本已準備好，不會自動重新整理</span><div style="display:flex;gap:7px;flex-shrink:0"><button onclick="dismissUpdateBar()" style="background:transparent;border:1px solid rgba(255,255,255,.55);border-radius:8px;padding:6px 10px;font-size:13px;font-weight:700;cursor:pointer;color:#fff;min-height:36px">稍後</button><button id="app-update-now" onclick="activateUpdate()" style="background:#4fc3f7;border:none;border-radius:8px;padding:6px 14px;font-size:13px;font-weight:700;cursor:pointer;color:#0d2137;min-height:36px">立即更新</button></div>';
   document.body.appendChild(bar);
 }

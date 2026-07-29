@@ -8,7 +8,7 @@
    - 其他同源資源走「快取優先、背景更新」
    - 跨來源請求（Firebase / gstatic 等）完全不攔截
 */
-const CACHE_VERSION = 'vcard-v2.6.4';
+const CACHE_VERSION = 'vcard-v2.7.0';
 const CACHE_NAME = CACHE_VERSION;
 const OWNED_CACHE_PREFIXES = ['vcard-', 'venus-card-'];
 const CORE = [
@@ -19,7 +19,13 @@ const CORE = [
   './splash-v2.6.1.jpg',
   './venus-icon-180-v2.6.1.png',
   './venus-icon-192-v2.6.1.png',
-  './venus-icon-512-v2.6.1.png'
+  './venus-icon-512-v2.6.1.png',
+  './assets/mucha-master-frame.webp',
+  './assets/mucha-card-frame.webp',
+  './assets/mucha-empty-ornament.webp',
+  './assets/mucha-divider-left.webp',
+  './assets/mucha-divider-right.webp',
+  './assets/signature-blue-iris.webp'
 ];
 
 self.addEventListener('install', (e) => {
