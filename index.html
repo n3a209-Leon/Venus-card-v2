@@ -35,10 +35,12 @@
   --shadow-md:0 4px 12px rgba(0,0,0,.08),0 2px 4px rgba(0,0,0,.05);
   --safe-top:env(safe-area-inset-top,0px);
   --safe-bottom:env(safe-area-inset-bottom,0px);
-  /* 導覽列直接延伸到螢幕底；只留 4px 內部緩衝，不再疊加完整 iOS safe-area */
-  --safe-bottom-ui:4px;
-  --app-viewport-h:100vh;
-  --header-h:52px;--tabar-h:52px;
+  /*
+   * iOS 26.5.2 的 Home Screen Web App 會保留一段 DOM 無法觸及的系統區。
+   * 導覽列只使用瀏覽器真正可見的範圍，避免被推到畫面外。
+   */
+  --safe-bottom-ui:0px;
+  --header-h:52px;--tabar-h:48px;
 }
 
 /* ══ NERV THEME ══ */
@@ -173,14 +175,13 @@
 [data-theme="nebula"] .stab-row{background:rgba(8,5,24,.5)}
 
 /* ══ BODY ══ */
-html,body{height:100%;min-height:100%;overflow:hidden;width:100%;background:var(--bg)}
-body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Noto Sans TC",sans-serif;font-size:14px;line-height:1.5}
+html{height:100%;overflow:hidden;width:100%;background:#08051C}
+body{height:100%;overflow:hidden;width:100%;background:#08051C;color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Noto Sans TC",sans-serif;font-size:14px;line-height:1.5}
 /*
- * iOS 主畫面模式中 100dvh 會少算頂部 safe-area（本機實測正好 59px），
- * 造成 .app 提早結束、同等高度的 body 背景留在最底部。
- * 改由啟動程式寫入完整螢幕高度；尚未執行 JS 時以 100vh 回退。
+ * 只使用 WebKit 實際可繪製的 viewport。不能用 screen.height 強行放大：
+ * iOS 26.5.2 的 standalone 模式會把超出的內容裁掉，導致底部按鍵消失。
  */
-.app{display:flex;flex-direction:column;height:var(--app-viewport-h);min-height:var(--app-viewport-h);max-height:var(--app-viewport-h);position:relative;overflow:hidden}
+.app{display:flex;flex-direction:column;height:100vh;height:100dvh;min-height:0;position:relative;overflow:hidden;background:var(--bg)}
 
 /* ══ HEADER ══ */
 .app-header{
@@ -264,13 +265,14 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
 .tab-bar{
   background:var(--bg2);border-top:1px solid var(--border);
   display:flex;align-items:stretch;
-  /* 鎖定總高 52px：48px 觸控區 + 4px 最小底部緩衝 */
+  /* 最小 48px 導覽列，固定留在 WebKit 真正可見的底端 */
   height:var(--tabar-h);
   min-height:var(--tabar-h);
   max-height:var(--tabar-h);
-  padding-bottom:var(--safe-bottom-ui);
+  padding-bottom:0;
   flex:0 0 var(--tabar-h);
   overflow:hidden;
+  position:relative;z-index:150;
 }
 /* Tab 按鍵：維持至少 44px 的可點擊高度 */
 .tab-btn{
@@ -1146,7 +1148,7 @@ tr:hover td{background:var(--accent-light)}
 // ══════════════════════════════════════════
 // Firebase 設定
 // ══════════════════════════════════════════
-const APP_VERSION='2.6.3';
+const APP_VERSION='2.6.4';
 const FB_CONFIG = {
   apiKey: "AIzaSyAqgA9pYvOduWypEE5kxVNlq9fEfrEMV0c",
   authDomain: "attendance-pwa-9fa73.firebaseapp.com",
@@ -5325,26 +5327,6 @@ function renderAll(){
 }
 
 // ══ 初始化 ══
-/*
- * iPhone「加入主畫面」後，100dvh 可能只回傳扣掉狀態列的高度；
- * portrait PWA 改取 screen.height，讓 App 底端真正貼齊實體螢幕。
- * 一般瀏覽器仍使用 innerHeight，避免 Safari 工具列或其他裝置被放大。
- */
-function syncAppViewportHeight(){
-  const standalone=(navigator.standalone===true)||
-    (window.matchMedia&&window.matchMedia('(display-mode: standalone)').matches);
-  let h=window.innerHeight||document.documentElement.clientHeight||0;
-  if(standalone&&window.screen&&screen.height){
-    const portrait=!screen.orientation||String(screen.orientation.type||'').indexOf('portrait')===0||
-      window.innerHeight>=window.innerWidth;
-    if(portrait)h=Math.max(h,screen.height);
-  }
-  if(h>0)document.documentElement.style.setProperty('--app-viewport-h',Math.round(h)+'px');
-}
-syncAppViewportHeight();
-window.addEventListener('orientationchange',()=>setTimeout(syncAppViewportHeight,120),{passive:true});
-window.addEventListener('pageshow',syncAppViewportHeight,{passive:true});
-
 const _splashStartTime=Date.now();
 let _waitingWorker=null;
 let _swRefreshing=false;
