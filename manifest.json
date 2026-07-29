@@ -1,0 +1,26 @@
+{
+  "name": "Venus Card System",
+  "short_name": "Venus Card",
+  "description": "班級獎卡、成績點數、兌換與給卡管理",
+  "lang": "zh-TW",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#08051C",
+  "theme_color": "#08051C",
+  "icons": [
+    {
+      "src": "./venus-icon-192-v2.6.1.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./venus-icon-512-v2.6.1.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
