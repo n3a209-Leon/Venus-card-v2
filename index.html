@@ -35,9 +35,10 @@
   --shadow-md:0 4px 12px rgba(0,0,0,.08),0 2px 4px rgba(0,0,0,.05);
   --safe-top:env(safe-area-inset-top,0px);
   --safe-bottom:env(safe-area-inset-bottom,0px);
-  /* 保留 iPhone Home 指示條的必要距離，但避免完整 34px 安全區撐高介面 */
-  --safe-bottom-ui:min(var(--safe-bottom),14px);
-  --header-h:52px;--tabar-h:60px;
+  /* 導覽列直接延伸到螢幕底；只留 4px 內部緩衝，不再疊加完整 iOS safe-area */
+  --safe-bottom-ui:4px;
+  --app-viewport-h:100vh;
+  --header-h:52px;--tabar-h:52px;
 }
 
 /* ══ NERV THEME ══ */
@@ -172,9 +173,14 @@
 [data-theme="nebula"] .stab-row{background:rgba(8,5,24,.5)}
 
 /* ══ BODY ══ */
-html,body{height:100%;overflow:hidden;width:100%;background:var(--bg)}
+html,body{height:100%;min-height:100%;overflow:hidden;width:100%;background:var(--bg)}
 body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Noto Sans TC",sans-serif;font-size:14px;line-height:1.5}
-.app{display:flex;flex-direction:column;height:100%;height:100dvh;position:relative}
+/*
+ * iOS 主畫面模式中 100dvh 會少算頂部 safe-area（本機實測正好 59px），
+ * 造成 .app 提早結束、同等高度的 body 背景留在最底部。
+ * 改由啟動程式寫入完整螢幕高度；尚未執行 JS 時以 100vh 回退。
+ */
+.app{display:flex;flex-direction:column;height:var(--app-viewport-h);min-height:var(--app-viewport-h);max-height:var(--app-viewport-h);position:relative;overflow:hidden}
 
 /* ══ HEADER ══ */
 .app-header{
@@ -248,7 +254,7 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
 [data-theme="nerv"] .class-chip{background:rgba(255,102,0,.1);border-color:rgba(255,102,0,.4);color:#FF6600}
 
 /* ══ SCROLL AREA ══ */
-.scroll-area{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch}
+.scroll-area{flex:1;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch}
 .scroll-area::-webkit-scrollbar{width:3px}
 .scroll-area::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
 .panel{display:none;padding:12px 10px;max-width:900px;margin:0 auto}
@@ -258,21 +264,23 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
 .tab-bar{
   background:var(--bg2);border-top:1px solid var(--border);
   display:flex;align-items:stretch;
-  /* 56px 按鍵區 + 精簡 Home 指示條保護區 */
-  height:calc(56px + var(--safe-bottom-ui));
+  /* 鎖定總高 52px：48px 觸控區 + 4px 最小底部緩衝 */
+  height:var(--tabar-h);
+  min-height:var(--tabar-h);
+  max-height:var(--tabar-h);
   padding-bottom:var(--safe-bottom-ui);
-  flex-shrink:0;
+  flex:0 0 var(--tabar-h);
+  overflow:hidden;
 }
-/* Tab 按鍵：觸控區撐到 56px，icon/文字不變 */
+/* Tab 按鍵：維持至少 44px 的可點擊高度 */
 .tab-btn{
   flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
   gap:2px;border:none;background:transparent;color:var(--text4);
   cursor:pointer;font-family:inherit;font-size:10px;font-weight:600;
-  /* min-height 44px 符合 Apple HIG 最小觸控標準，實際高 56px */
-  min-height:44px;padding:6px 4px 4px;
+  min-height:44px;padding:3px 4px 2px;
   transition:color .15s;position:relative;-webkit-appearance:none;
 }
-.tab-btn .icon{font-size:24px;line-height:1}
+.tab-btn .icon{font-size:22px;line-height:1}
 .tab-btn.active{color:var(--accent)}
 .tab-btn.active::before{content:"";position:absolute;top:0;left:15%;right:15%;height:2.5px;background:var(--accent);border-radius:0 0 3px 3px}
 [data-theme="nebula"] .tab-btn.active{color:#c8a0ff;text-shadow:0 0 8px rgba(192,132,252,.6)}
@@ -428,9 +436,9 @@ tr:hover td{background:var(--accent-light)}
 #offline-banner.show{display:block}
 
 /* ══ TOAST ══ */
-#toast{position:fixed;bottom:calc(80px + var(--safe-bottom-ui));left:50%;transform:translateX(-50%);background:var(--text);color:var(--bg2);padding:9px 18px;border-radius:20px;font-size:13px;opacity:0;transition:opacity .3s;pointer-events:none;z-index:999;font-weight:600;white-space:nowrap;max-width:85vw;text-align:center}
+#toast{position:fixed;bottom:calc(60px + var(--safe-bottom-ui));left:50%;transform:translateX(-50%);background:var(--text);color:var(--bg2);padding:9px 18px;border-radius:20px;font-size:13px;opacity:0;transition:opacity .3s;pointer-events:none;z-index:999;font-weight:600;white-space:nowrap;max-width:85vw;text-align:center}
 #toast.show{opacity:1}
-.undo-fab{position:fixed;right:12px;bottom:calc(68px + var(--safe-bottom-ui));z-index:180;display:none;align-items:center;gap:5px;min-height:40px;padding:8px 13px;border-radius:22px;background:var(--text);color:var(--bg2);box-shadow:0 6px 22px rgba(0,0,0,.25);font-size:12px}
+.undo-fab{position:fixed;right:12px;bottom:calc(56px + var(--safe-bottom-ui));z-index:180;display:none;align-items:center;gap:5px;min-height:40px;padding:8px 13px;border-radius:22px;background:var(--text);color:var(--bg2);box-shadow:0 6px 22px rgba(0,0,0,.25);font-size:12px}
 .undo-fab.show{display:inline-flex}
 [data-theme="nebula"] .undo-fab{background:#6d3bd8;color:#fff;box-shadow:0 0 18px rgba(150,100,255,.45)}
 [data-theme="nerv"] .undo-fab{background:#180500;color:#ff8800;border:1px solid #ff6600;border-radius:3px}
@@ -1138,7 +1146,7 @@ tr:hover td{background:var(--accent-light)}
 // ══════════════════════════════════════════
 // Firebase 設定
 // ══════════════════════════════════════════
-const APP_VERSION='2.6.1';
+const APP_VERSION='2.6.3';
 const FB_CONFIG = {
   apiKey: "AIzaSyAqgA9pYvOduWypEE5kxVNlq9fEfrEMV0c",
   authDomain: "attendance-pwa-9fa73.firebaseapp.com",
@@ -5317,6 +5325,26 @@ function renderAll(){
 }
 
 // ══ 初始化 ══
+/*
+ * iPhone「加入主畫面」後，100dvh 可能只回傳扣掉狀態列的高度；
+ * portrait PWA 改取 screen.height，讓 App 底端真正貼齊實體螢幕。
+ * 一般瀏覽器仍使用 innerHeight，避免 Safari 工具列或其他裝置被放大。
+ */
+function syncAppViewportHeight(){
+  const standalone=(navigator.standalone===true)||
+    (window.matchMedia&&window.matchMedia('(display-mode: standalone)').matches);
+  let h=window.innerHeight||document.documentElement.clientHeight||0;
+  if(standalone&&window.screen&&screen.height){
+    const portrait=!screen.orientation||String(screen.orientation.type||'').indexOf('portrait')===0||
+      window.innerHeight>=window.innerWidth;
+    if(portrait)h=Math.max(h,screen.height);
+  }
+  if(h>0)document.documentElement.style.setProperty('--app-viewport-h',Math.round(h)+'px');
+}
+syncAppViewportHeight();
+window.addEventListener('orientationchange',()=>setTimeout(syncAppViewportHeight,120),{passive:true});
+window.addEventListener('pageshow',syncAppViewportHeight,{passive:true});
+
 const _splashStartTime=Date.now();
 let _waitingWorker=null;
 let _swRefreshing=false;
@@ -5328,7 +5356,7 @@ function showUpdateBar(worker){
   if(existing)return;
   const bar=document.createElement('div');
   bar.id='app-update-bar';
-  bar.style.cssText='position:fixed;bottom:0;left:0;right:0;background:#1e3a5f;color:#fff;padding:10px 18px calc(10px + var(--safe-bottom-ui));font-size:13px;font-weight:700;z-index:99999;display:flex;gap:12px;align-items:center;justify-content:space-between;font-family:sans-serif';
+  bar.style.cssText='position:fixed;bottom:0;left:0;right:0;background:#1e3a5f;color:#fff;padding:8px 18px calc(6px + var(--safe-bottom-ui));font-size:13px;font-weight:700;z-index:99999;display:flex;gap:12px;align-items:center;justify-content:space-between;font-family:sans-serif';
   bar.innerHTML='<span style="flex:1">📦 新版本已準備好，不會自動重新整理</span><div style="display:flex;gap:7px;flex-shrink:0"><button onclick="dismissUpdateBar()" style="background:transparent;border:1px solid rgba(255,255,255,.55);border-radius:8px;padding:6px 10px;font-size:13px;font-weight:700;cursor:pointer;color:#fff;min-height:36px">稍後</button><button id="app-update-now" onclick="activateUpdate()" style="background:#4fc3f7;border:none;border-radius:8px;padding:6px 14px;font-size:13px;font-weight:700;cursor:pointer;color:#0d2137;min-height:36px">立即更新</button></div>';
   document.body.appendChild(bar);
 }
