@@ -36,9 +36,12 @@
   --shadow-md:0 4px 12px rgba(0,0,0,.08),0 2px 4px rgba(0,0,0,.05);
   --safe-top:env(safe-area-inset-top,0px);
   --safe-bottom:env(safe-area-inset-bottom,0px);
-  /* 常駐導覽只留最小緩衝；完整 safe-area 僅供彈窗使用。 */
-  --dock-safe-bottom:min(var(--safe-bottom),2px);
-  --dock-control-height:48px;
+  /*
+   * 常駐導覽採「54px 完整按鍵 + 最多 8px Home 指示條緩衝」。
+   * 不恢復過去整段 34px 空白，但讓圖示、文字與手指離系統手勢區更遠。
+   */
+  --dock-safe-bottom:min(var(--safe-bottom),8px);
+  --dock-control-height:54px;
   --safe-bottom-ui:var(--dock-safe-bottom);
   --header-h:52px;
   --tabar-h:calc(var(--dock-control-height) + var(--dock-safe-bottom));
@@ -135,29 +138,35 @@
 [data-theme="mucha"] .cd-item.active{background:rgba(117,131,107,.13)}
 [data-theme="mucha"] .scroll-area{position:relative;isolation:isolate}
 [data-theme="mucha"] .scroll-area::before{
-  content:"";position:absolute;inset:2px 3px 0;z-index:3;min-height:calc(100% - 2px);
+  content:"";position:absolute;inset:7px 7px 0;z-index:0;min-height:calc(100% - 7px);
   /*
-   * 原始主框為 862×1825 直式作品。以原比例置頂，不再切片拉長；
-   * 長頁面則由細金線自然延續，不複製人物、鳶尾或角花。
+   * 總覽不再鋪 862×1825 的完整人物花框。
+   * 改用 CSS 細金線與四角小型玫瑰窗，只留在頁面外緣且永遠位於內容後方。
    */
   background:
-    url("./assets/mucha-master-frame.webp") center top/min(100%,862px) auto no-repeat,
-    linear-gradient(180deg,rgba(178,138,69,.52),rgba(117,131,107,.20) 62%,rgba(178,138,69,.42))
-      left 5px top/1px 100% no-repeat,
-    linear-gradient(180deg,rgba(178,138,69,.52),rgba(117,131,107,.20) 62%,rgba(178,138,69,.42))
-      right 5px top/1px 100% no-repeat;
-  box-shadow:inset 0 0 0 1px rgba(255,249,232,.34);
-  opacity:.82;
-  filter:saturate(1.03) contrast(1.05) drop-shadow(0 2px 3px rgba(78,55,30,.16));
+    radial-gradient(circle at left top,rgba(255,248,225,.96) 0 3px,rgba(178,138,69,.62) 4px 5px,rgba(53,90,80,.28) 6px 8px,transparent 9px),
+    radial-gradient(circle at right top,rgba(255,248,225,.96) 0 3px,rgba(178,138,69,.62) 4px 5px,rgba(53,90,80,.28) 6px 8px,transparent 9px),
+    radial-gradient(circle at left bottom,rgba(255,248,225,.92) 0 3px,rgba(178,138,69,.52) 4px 5px,rgba(53,90,80,.22) 6px 8px,transparent 9px),
+    radial-gradient(circle at right bottom,rgba(255,248,225,.92) 0 3px,rgba(178,138,69,.52) 4px 5px,rgba(53,90,80,.22) 6px 8px,transparent 9px),
+    linear-gradient(90deg,transparent,rgba(178,138,69,.55) 9%,rgba(117,131,107,.26) 50%,rgba(178,138,69,.55) 91%,transparent)
+      center top/100% 1px no-repeat,
+    linear-gradient(90deg,transparent,rgba(178,138,69,.38) 12%,rgba(117,131,107,.18) 50%,rgba(178,138,69,.38) 88%,transparent)
+      center bottom/100% 1px no-repeat,
+    linear-gradient(180deg,rgba(178,138,69,.50),rgba(117,131,107,.14) 55%,rgba(178,138,69,.34))
+      left top/1px 100% no-repeat,
+    linear-gradient(180deg,rgba(178,138,69,.50),rgba(117,131,107,.14) 55%,rgba(178,138,69,.34))
+      right top/1px 100% no-repeat;
+  box-shadow:inset 0 0 0 1px rgba(255,249,232,.25);
+  opacity:.72;
   pointer-events:none;user-select:none;
 }
 [data-theme="mucha"] .scroll-area::after{
-  content:"";position:fixed;right:-34px;bottom:calc(var(--tabar-h) + 8px);
-  width:150px;height:150px;z-index:1;
+  content:"";position:fixed;right:-20px;bottom:calc(var(--tabar-h) + 12px);
+  width:92px;height:92px;z-index:0;
   background:url("./assets/signature-blue-iris.webp") center/contain no-repeat;
-  opacity:.075;filter:saturate(1.08);pointer-events:none;user-select:none;
+  opacity:.045;filter:saturate(1.05);pointer-events:none;user-select:none;
 }
-[data-theme="mucha"] .panel{padding-inline:18px}
+[data-theme="mucha"] .panel{padding-inline:14px}
 [data-theme="mucha"] .panel>*{position:relative;z-index:2}
 [data-theme="mucha"] .card,
 [data-theme="mucha"] .stat{
@@ -170,21 +179,20 @@
 }
 [data-theme="mucha"] .card{position:relative;isolation:isolate}
 [data-theme="mucha"] .card::after{
-  content:"";position:absolute;inset:3px;z-index:3;border-radius:inherit;
+  content:"";position:absolute;inset:3px;z-index:0;border-radius:inherit;
   /*
-   * 卡片寬高會隨功能改變，因此改用左右獨立花飾與 CSS 金線。
-   * 每張圖只以原比例出現一次，不再把 960×640 完整畫框壓扁或拉長。
+   * 小型角花只守在卡片四角並位於內容後方，不侵入按鍵或資料欄位。
    */
   background:
-    url("./assets/mucha-divider-left.webp") left -24px top -17px/96px auto no-repeat,
-    url("./assets/mucha-divider-right.webp") right -24px top -17px/96px auto no-repeat,
+    url("./assets/mucha-divider-left.webp") left -12px top -7px/52px auto no-repeat,
+    url("./assets/mucha-divider-right.webp") right -12px top -7px/52px auto no-repeat,
     linear-gradient(90deg,transparent,rgba(178,138,69,.48) 18%,rgba(178,138,69,.48) 82%,transparent)
-      center top 5px/calc(100% - 112px) 1px no-repeat,
+      center top 5px/calc(100% - 72px) 1px no-repeat,
     linear-gradient(90deg,transparent,rgba(117,131,107,.24) 24%,rgba(117,131,107,.24) 76%,transparent)
       center bottom 5px/calc(100% - 48px) 1px no-repeat;
   border:1px solid rgba(178,138,69,.24);
   box-shadow:inset 0 0 0 2px rgba(255,252,241,.34);
-  opacity:.72;pointer-events:none;
+  opacity:.42;pointer-events:none;
 }
 [data-theme="mucha"] .card>*{position:relative;z-index:2}
 [data-theme="mucha"] .card-title{color:#355A50;letter-spacing:.2px}
@@ -278,11 +286,9 @@
   box-shadow:0 -8px 26px rgba(72,55,35,.18),inset 0 1px 0 rgba(255,255,255,.68);
 }
 [data-theme="mucha"] .tab-bar::before{
-  content:"";position:absolute;left:8px;right:8px;top:-2px;height:12px;pointer-events:none;
-  background:
-    url("./assets/mucha-divider-left.webp") left center/auto 17px no-repeat,
-    url("./assets/mucha-divider-right.webp") right center/auto 17px no-repeat;
-  opacity:.58;
+  content:"";position:absolute;left:12px;right:12px;top:0;height:1px;pointer-events:none;
+  background:linear-gradient(90deg,transparent,rgba(178,138,69,.78) 12%,rgba(117,131,107,.35) 50%,rgba(178,138,69,.78) 88%,transparent);
+  opacity:.72;
 }
 [data-theme="mucha"] .tab-btn{color:#71665A}
 [data-theme="mucha"] .tab-btn.active{
@@ -295,11 +301,10 @@
 [data-theme="mucha"] .undo-fab{background:#355A50;color:#FFF5DF;border:1px solid rgba(210,179,109,.55)}
 @media(max-width:480px){
   [data-theme="mucha"] .scroll-area::before{
-    inset-inline:2px;
-    background-size:calc(100% - 2px) auto,1px 100%,1px 100%;
-    opacity:.80;
+    inset-inline:7px;
+    opacity:.66;
   }
-  [data-theme="mucha"] .panel{padding-inline:17px}
+  [data-theme="mucha"] .panel{padding-inline:14px}
 }
 
 /* ══ NEBULA THEME（同 Venus OS Deep Space Edition）══ */
@@ -574,11 +579,11 @@ body{min-height:100%;width:100%;overflow-x:hidden;overflow-y:auto;overscroll-beh
 .tab-bar{
   background:var(--bg2);border-top:1px solid var(--border);
   display:flex;align-items:stretch;
-  /* 48px 操作區 + 最多 2px 緩衝；按鍵本身仍至少 44px */
+  /* 54px 完整操作區 + 最多 8px 手勢緩衝；五欄從頂端到底部皆可點擊。 */
   height:var(--tabar-h);
   min-height:var(--tabar-h);
   max-height:var(--tabar-h);
-  padding:2px 8px var(--dock-safe-bottom);
+  padding:0 6px var(--dock-safe-bottom);
   flex:0 0 var(--tabar-h);
   overflow:hidden;
   position:fixed;left:0;right:0;bottom:0;z-index:340;
@@ -587,15 +592,23 @@ body{min-height:100%;width:100%;overflow-x:hidden;overflow-y:auto;overscroll-beh
   backdrop-filter:blur(18px) saturate(1.2);
   -webkit-backdrop-filter:blur(18px) saturate(1.2);
 }
-/* Tab 按鍵：維持至少 44px 的可點擊高度 */
+/* Tab 按鍵：整格 54px 可點，並把命中區延伸到下方手勢緩衝內。 */
 .tab-btn{
   flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
   gap:2px;border:none;background:transparent;color:var(--text4);
-  cursor:pointer;font-family:inherit;font-size:10px;font-weight:600;
-  min-height:44px;padding:1px 4px 0;
-  transition:color .15s;position:relative;-webkit-appearance:none;
+  cursor:pointer;font-family:inherit;font-size:11px;font-weight:650;
+  height:var(--dock-control-height);min-height:var(--dock-control-height);
+  padding:4px 4px 3px;
+  transition:color .15s,background-color .12s,transform .08s;
+  position:relative;-webkit-appearance:none;
+  touch-action:manipulation;-webkit-tap-highlight-color:rgba(37,99,235,.12);
 }
-.tab-btn .icon{font-size:19px;line-height:1}
+.tab-btn::after{
+  content:"";position:absolute;inset:-2px -1px calc(0px - var(--dock-safe-bottom));
+}
+.tab-btn .icon{font-size:21px;line-height:1}
+.tab-btn:active{background:var(--accent-light);transform:translateY(1px)}
+.tab-btn:focus-visible{outline:2px solid var(--accent);outline-offset:-3px;border-radius:12px}
 .tab-btn.active{color:var(--accent)}
 .tab-btn.active::before{content:"";position:absolute;top:0;left:15%;right:15%;height:2.5px;background:var(--accent);border-radius:0 0 3px 3px}
 [data-theme="nebula"] .tab-btn.active{color:#c8a0ff;text-shadow:0 0 8px rgba(192,132,252,.6)}
@@ -1520,7 +1533,7 @@ tr:hover td{background:var(--accent-light)}
 // ══════════════════════════════════════════
 // Firebase 設定
 // ══════════════════════════════════════════
-const APP_VERSION='2.8.1';
+const APP_VERSION='2.8.2';
 const FB_CONFIG = {
   apiKey: "AIzaSyAqgA9pYvOduWypEE5kxVNlq9fEfrEMV0c",
   authDomain: "attendance-pwa-9fa73.firebaseapp.com",
