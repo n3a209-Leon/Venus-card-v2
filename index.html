@@ -4,12 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<!--
-  iOS 26.5.2 standalone 在 black-translucent 下會把頂部狀態列高度
-  從 100dvh 扣除，卻將不可繪製的缺口留在畫面底部。改用 opaque
-  black 狀態列，讓 WebKit 的可用 viewport 從狀態列下方一路到螢幕底端。
--->
-<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<!-- 與 LIMU v20.19 相同：由頁面根層自然延伸，狀態列使用主題背景。 -->
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#08051C">
 <meta name="application-name" content="Venus Card System">
 <meta name="apple-mobile-web-app-title" content="Venus Card">
@@ -40,12 +36,9 @@
   --shadow-md:0 4px 12px rgba(0,0,0,.08),0 2px 4px rgba(0,0,0,.05);
   --safe-top:env(safe-area-inset-top,0px);
   --safe-bottom:env(safe-area-inset-bottom,0px);
-  /*
-   * 與 LIMU v20.19 相同：固定導覽只吸收最多 4px，
-   * body 不再重複保留完整 safe-area。
-   */
-  --dock-safe-bottom:min(var(--safe-bottom),4px);
-  --dock-control-height:52px;
+  /* 常駐導覽只留最小緩衝；完整 safe-area 僅供彈窗使用。 */
+  --dock-safe-bottom:min(var(--safe-bottom),2px);
+  --dock-control-height:48px;
   --safe-bottom-ui:var(--dock-safe-bottom);
   --header-h:52px;
   --tabar-h:calc(var(--dock-control-height) + var(--dock-safe-bottom));
@@ -80,7 +73,7 @@
 [data-theme="nerv"] input,[data-theme="nerv"] select,[data-theme="nerv"] textarea{background:#0a0400;border-color:rgba(255,102,0,.3);color:#FF6600}
 [data-theme="nerv"] .class-chip{background:rgba(255,102,0,.1);border-color:rgba(255,102,0,.4);color:#FF6600}
 
-/* ══ MUCHA THEME（移植自 LIMU・藍紫鳶尾）══ */
+/* ══ MUCHA THEME（依 Venus Card 版面重新配置・保持素材原始比例）══ */
 [data-theme="mucha"]{
   --bg:#F2E8D8;--bg2:#FBF6ED;--bg3:#EEE4D4;--bg4:#E3D6C1;
   --accent:#355A50;--accent2:#294B44;--accent-light:rgba(117,131,107,.14);
@@ -142,13 +135,19 @@
 [data-theme="mucha"] .cd-item.active{background:rgba(117,131,107,.13)}
 [data-theme="mucha"] .scroll-area{position:relative;isolation:isolate}
 [data-theme="mucha"] .scroll-area::before{
-  content:"";position:absolute;inset:2px 2px 0;z-index:3;min-height:calc(100% - 2px);
-  border:24px solid transparent;
-  border-image-source:url("./assets/mucha-master-frame.webp");
-  border-image-slice:13% 16%;
-  border-image-width:36px 19px 32px;
-  border-image-repeat:stretch;
-  opacity:.84;
+  content:"";position:absolute;inset:2px 3px 0;z-index:3;min-height:calc(100% - 2px);
+  /*
+   * 原始主框為 862×1825 直式作品。以原比例置頂，不再切片拉長；
+   * 長頁面則由細金線自然延續，不複製人物、鳶尾或角花。
+   */
+  background:
+    url("./assets/mucha-master-frame.webp") center top/min(100%,862px) auto no-repeat,
+    linear-gradient(180deg,rgba(178,138,69,.52),rgba(117,131,107,.20) 62%,rgba(178,138,69,.42))
+      left 5px top/1px 100% no-repeat,
+    linear-gradient(180deg,rgba(178,138,69,.52),rgba(117,131,107,.20) 62%,rgba(178,138,69,.42))
+      right 5px top/1px 100% no-repeat;
+  box-shadow:inset 0 0 0 1px rgba(255,249,232,.34);
+  opacity:.82;
   filter:saturate(1.03) contrast(1.05) drop-shadow(0 2px 3px rgba(78,55,30,.16));
   pointer-events:none;user-select:none;
 }
@@ -172,12 +171,20 @@
 [data-theme="mucha"] .card{position:relative;isolation:isolate}
 [data-theme="mucha"] .card::after{
   content:"";position:absolute;inset:3px;z-index:3;border-radius:inherit;
-  border:14px solid transparent;
-  border-image-source:url("./assets/mucha-card-frame.webp");
-  border-image-slice:17% 12%;
-  border-image-width:10px 7px;
-  border-image-repeat:stretch;
-  opacity:.76;pointer-events:none;
+  /*
+   * 卡片寬高會隨功能改變，因此改用左右獨立花飾與 CSS 金線。
+   * 每張圖只以原比例出現一次，不再把 960×640 完整畫框壓扁或拉長。
+   */
+  background:
+    url("./assets/mucha-divider-left.webp") left -24px top -17px/96px auto no-repeat,
+    url("./assets/mucha-divider-right.webp") right -24px top -17px/96px auto no-repeat,
+    linear-gradient(90deg,transparent,rgba(178,138,69,.48) 18%,rgba(178,138,69,.48) 82%,transparent)
+      center top 5px/calc(100% - 112px) 1px no-repeat,
+    linear-gradient(90deg,transparent,rgba(117,131,107,.24) 24%,rgba(117,131,107,.24) 76%,transparent)
+      center bottom 5px/calc(100% - 48px) 1px no-repeat;
+  border:1px solid rgba(178,138,69,.24);
+  box-shadow:inset 0 0 0 2px rgba(255,252,241,.34);
+  opacity:.72;pointer-events:none;
 }
 [data-theme="mucha"] .card>*{position:relative;z-index:2}
 [data-theme="mucha"] .card-title{color:#355A50;letter-spacing:.2px}
@@ -248,12 +255,16 @@
 }
 [data-theme="mucha"] .modal::before{
   content:"";position:absolute;inset:4px;z-index:3;border-radius:inherit;
-  border:14px solid transparent;
-  border-image-source:url("./assets/mucha-card-frame.webp");
-  border-image-slice:17% 12%;
-  border-image-width:11px 8px;
-  border-image-repeat:stretch;
-  opacity:.66;pointer-events:none;
+  background:
+    url("./assets/mucha-divider-left.webp") left -34px top -22px/124px auto no-repeat,
+    url("./assets/mucha-divider-right.webp") right -34px top -22px/124px auto no-repeat,
+    linear-gradient(90deg,transparent,rgba(178,138,69,.52) 20%,rgba(178,138,69,.52) 80%,transparent)
+      center top 7px/calc(100% - 138px) 1px no-repeat,
+    linear-gradient(90deg,transparent,rgba(117,131,107,.28) 18%,rgba(117,131,107,.28) 82%,transparent)
+      center bottom 7px/calc(100% - 54px) 1px no-repeat;
+  border:1px solid rgba(178,138,69,.30);
+  box-shadow:inset 0 0 0 2px rgba(255,252,241,.36);
+  opacity:.68;pointer-events:none;
 }
 [data-theme="mucha"] .modal>*{position:relative;z-index:4}
 [data-theme="mucha"] .empty{
@@ -283,7 +294,11 @@
 [data-theme="mucha"] .tab-btn.active::before{background:#B28A45}
 [data-theme="mucha"] .undo-fab{background:#355A50;color:#FFF5DF;border:1px solid rgba(210,179,109,.55)}
 @media(max-width:480px){
-  [data-theme="mucha"] .scroll-area::before{border-image-width:32px 18px 28px;opacity:.82}
+  [data-theme="mucha"] .scroll-area::before{
+    inset-inline:2px;
+    background-size:calc(100% - 2px) auto,1px 100%,1px 100%;
+    opacity:.80;
+  }
   [data-theme="mucha"] .panel{padding-inline:17px}
 }
 
@@ -389,16 +404,91 @@
 [data-theme="nebula"] .stab.active{background:rgba(80,40,180,.4);color:#c8b0ff}
 [data-theme="nebula"] .stab-row{background:rgba(8,5,24,.5)}
 
-/* ══ BODY ══ */
-html{height:100%;overflow:hidden;width:100%;background:#08051C}
-body{height:100%;overflow:hidden;width:100%;padding-bottom:0;background:#08051C;color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Noto Sans TC",sans-serif;font-size:14px;line-height:1.5}
 /*
- * 只使用 WebKit 實際可繪製的 viewport。opaque status bar 讓 iOS
- * standalone 的 viewport 從狀態列下緣延伸到螢幕底端，不再把頂部
- * 狀態列高度錯留成底部空白。不能用 screen.height 強行放大，否則
- * 超出的底部按鍵仍會被 WebKit 裁掉。
+ * 星雲主題的非重複點綴框。
+ * 所有裝飾都畫在既有元件內側、pointer-events:none，
+ * 不增加 padding、不改按鍵尺寸，也不覆蓋任何操作區。
  */
-.app{display:flex;flex-direction:column;height:100vh;height:100dvh;min-height:0;position:relative;overflow:hidden;background:var(--bg)}
+[data-theme="nebula"] .scroll-area{isolation:isolate}
+[data-theme="nebula"] .scroll-area::before{
+  content:"";position:absolute;inset:5px 4px 2px;z-index:0;border-radius:18px;
+  background:
+    linear-gradient(180deg,rgba(192,132,252,.72),rgba(96,165,250,.12) 34%,transparent 76%)
+      left top/1px 56% no-repeat,
+    linear-gradient(0deg,rgba(96,165,250,.62),rgba(192,132,252,.10) 38%,transparent 78%)
+      right bottom/1px 50% no-repeat,
+    linear-gradient(90deg,rgba(192,132,252,.68),rgba(96,165,250,.13),transparent)
+      left top/42% 1px no-repeat,
+    linear-gradient(270deg,rgba(96,165,250,.58),rgba(192,132,252,.12),transparent)
+      right bottom/38% 1px no-repeat;
+  box-shadow:inset 0 0 34px rgba(96,80,210,.035);
+  pointer-events:none;user-select:none;
+}
+[data-theme="nebula"] .panel{position:relative;z-index:1}
+[data-theme="nebula"] .app-header::after{
+  content:"";position:absolute;left:14px;right:14px;bottom:2px;height:1px;
+  background:linear-gradient(90deg,transparent 0%,rgba(192,132,252,.62) 24%,rgba(96,165,250,.36) 68%,transparent 100%);
+  pointer-events:none;
+}
+[data-theme="nebula"] .card{position:relative;isolation:isolate}
+[data-theme="nebula"] .card::before{
+  content:"";position:absolute;inset:2px;z-index:0;border-radius:11px;
+  border:1px solid rgba(160,120,255,.20);
+  background:
+    linear-gradient(90deg,rgba(216,180,254,.82),rgba(96,165,250,.12),transparent)
+      left 9px top/34% 1px no-repeat,
+    linear-gradient(270deg,rgba(147,197,253,.64),rgba(192,132,252,.10),transparent)
+      right 9px bottom/28% 1px no-repeat;
+  box-shadow:inset 0 0 18px rgba(108,72,220,.035);
+  pointer-events:none;
+}
+[data-theme="nebula"] .card::after{
+  content:"";position:absolute;inset:0;z-index:0;border-radius:inherit;
+  background:
+    radial-gradient(circle,rgba(255,255,255,.96) 0 1px,rgba(192,132,252,.56) 1.5px,transparent 3.5px)
+      left 8px top 8px/7px 7px no-repeat,
+    radial-gradient(circle,rgba(219,234,254,.94) 0 1px,rgba(96,165,250,.48) 1.5px,transparent 3.5px)
+      right 8px bottom 8px/7px 7px no-repeat;
+  filter:drop-shadow(0 0 4px rgba(168,85,247,.60));
+  pointer-events:none;
+}
+[data-theme="nebula"] .card>*{position:relative;z-index:1}
+[data-theme="nebula"] .stat{position:relative;isolation:isolate}
+[data-theme="nebula"] .stat::before{
+  content:"";position:absolute;inset:2px;z-index:0;border-radius:9px;
+  border:1px solid rgba(96,165,250,.16);
+  background:linear-gradient(90deg,rgba(96,165,250,.56),rgba(192,132,252,.08),transparent)
+    left 8px top/40% 1px no-repeat;
+  pointer-events:none;
+}
+[data-theme="nebula"] .stat>*{position:relative;z-index:1}
+[data-theme="nebula"] .modal{position:relative;isolation:isolate}
+[data-theme="nebula"] .modal::before{
+  content:"";position:absolute;inset:4px;z-index:0;border-radius:inherit;
+  border:1px solid rgba(192,132,252,.28);
+  background:
+    linear-gradient(90deg,transparent,rgba(216,180,254,.72),rgba(96,165,250,.10),transparent)
+      center top 5px/62% 1px no-repeat,
+    linear-gradient(270deg,transparent,rgba(147,197,253,.54),rgba(192,132,252,.08),transparent)
+      center bottom 5px/46% 1px no-repeat;
+  pointer-events:none;
+}
+[data-theme="nebula"] .modal>*{position:relative;z-index:1}
+[data-theme="nebula"] .tab-bar::before{
+  content:"";position:absolute;left:14px;right:14px;top:0;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(192,132,252,.64) 25%,rgba(96,165,250,.32) 70%,transparent);
+  pointer-events:none;
+}
+
+/* ══ BODY ══ */
+html{min-height:100%;width:100%;overflow-x:hidden;background:#08051C}
+body{min-height:100%;width:100%;overflow-x:hidden;overflow-y:auto;overscroll-behavior-y:none;padding-bottom:0;background:#08051C;color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Noto Sans TC",sans-serif;font-size:14px;line-height:1.5}
+/*
+ * 與 LIMU v20.19 相同：App 採自然頁面高度，不再用 100dvh + hidden
+ * 把整個介面鎖進較短的 WebKit layout viewport。底部導覽獨立 fixed，
+ * 頁面只預留一次導覽高度。
+ */
+.app{display:flex;flex-direction:column;min-height:100vh;min-height:100dvh;width:100%;position:relative;overflow:visible;background:var(--bg)}
 
 /* ══ HEADER ══ */
 .app-header{
@@ -408,7 +498,7 @@ body{height:100%;overflow:hidden;width:100%;padding-bottom:0;background:#08051C;
   height:calc(52px + var(--safe-top));
   padding-top:var(--safe-top);
   display:flex;align-items:center;gap:8px;
-  position:relative;z-index:100;flex-shrink:0;
+  position:sticky;top:0;z-index:100;flex-shrink:0;
   overflow:visible;
 }
 .header-right{display:flex;align-items:center;gap:8px;flex-shrink:0;margin-left:auto}
@@ -457,7 +547,7 @@ body{height:100%;overflow:hidden;width:100%;padding-bottom:0;background:#08051C;
 }
 .class-chip .arrow{font-size:10px;opacity:.7;transition:transform .2s}
 .class-chip.open .arrow{transform:rotate(180deg)}
-.class-dropdown{position:fixed;top:58px;left:12px;min-width:220px;max-width:80vw;background:var(--bg2);border:1px solid var(--border2);border-radius:12px;box-shadow:var(--shadow-md),0 8px 32px rgba(0,0,0,.25);z-index:99999;overflow:hidden;animation:drop-in .15s ease}
+.class-dropdown{position:fixed;top:58px;left:12px;min-width:240px;max-width:88vw;max-height:min(70vh,520px);background:var(--bg2);border:1px solid var(--border2);border-radius:12px;box-shadow:var(--shadow-md),0 8px 32px rgba(0,0,0,.25);z-index:99999;overflow-y:auto;overscroll-behavior:contain;animation:drop-in .15s ease}
 @keyframes drop-in{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
 .cd-hdr{padding:8px 12px 4px;font-size:10px;font-weight:700;color:var(--text4);letter-spacing:2px}
 .cd-item{display:flex;align-items:center;gap:10px;padding:12px 14px;cursor:pointer;border-bottom:1px solid var(--border);transition:background .1s}
@@ -466,13 +556,15 @@ body{height:100%;overflow:hidden;width:100%;padding-bottom:0;background:#08051C;
 .cd-name{font-size:13px;font-weight:700;flex:1}
 .cd-sub{font-size:11px;color:var(--text4)}
 .cd-badge{font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px;background:var(--green-light);color:var(--green)}
+.cd-source{font-size:9px;font-weight:700;padding:2px 6px;border-radius:10px;background:var(--accent-light);color:var(--accent);white-space:nowrap}
+.cd-manage{position:sticky;bottom:0;width:100%;display:flex;align-items:center;justify-content:center;gap:6px;border-radius:0;background:var(--bg2);color:var(--accent);border-top:1px solid var(--border);font-size:12px;min-height:44px}
 [data-theme="nebula"] .class-chip{background:rgba(100,50,200,.2);border-color:rgba(150,100,255,.45);color:#c8b0ff}
 [data-theme="nebula"] .class-dropdown{background:rgba(6,3,20,.95);border-color:rgba(120,80,255,.35);backdrop-filter:blur(20px)}
 [data-theme="nebula"] .cd-item:hover,[data-theme="nebula"] .cd-item.active{background:rgba(100,60,200,.2)}
 [data-theme="nerv"] .class-chip{background:rgba(255,102,0,.1);border-color:rgba(255,102,0,.4);color:#FF6600}
 
 /* ══ SCROLL AREA ══ */
-.scroll-area{flex:1;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;padding-bottom:calc(var(--tabar-h) + 8px)}
+.scroll-area{flex:1;min-height:0;overflow:visible;padding-bottom:calc(var(--tabar-h) + 6px)}
 .scroll-area::-webkit-scrollbar{width:3px}
 .scroll-area::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
 .panel{display:none;padding:12px 10px;max-width:900px;margin:0 auto}
@@ -482,16 +574,16 @@ body{height:100%;overflow:hidden;width:100%;padding-bottom:0;background:#08051C;
 .tab-bar{
   background:var(--bg2);border-top:1px solid var(--border);
   display:flex;align-items:stretch;
-  /* 與 LIMU v20.19 相同：52px 操作區 + 最多 4px 安全緩衝 */
+  /* 48px 操作區 + 最多 2px 緩衝；按鍵本身仍至少 44px */
   height:var(--tabar-h);
   min-height:var(--tabar-h);
   max-height:var(--tabar-h);
-  padding:3px 8px var(--dock-safe-bottom);
+  padding:2px 8px var(--dock-safe-bottom);
   flex:0 0 var(--tabar-h);
   overflow:hidden;
   position:fixed;left:0;right:0;bottom:0;z-index:340;
-  border-radius:20px 20px 0 0;
-  box-shadow:0 -6px 24px rgba(20,42,74,.16);
+  border-radius:16px 16px 0 0;
+  box-shadow:0 -4px 18px rgba(20,42,74,.14);
   backdrop-filter:blur(18px) saturate(1.2);
   -webkit-backdrop-filter:blur(18px) saturate(1.2);
 }
@@ -500,10 +592,10 @@ body{height:100%;overflow:hidden;width:100%;padding-bottom:0;background:#08051C;
   flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
   gap:2px;border:none;background:transparent;color:var(--text4);
   cursor:pointer;font-family:inherit;font-size:10px;font-weight:600;
-  min-height:44px;padding:2px 4px 1px;
+  min-height:44px;padding:1px 4px 0;
   transition:color .15s;position:relative;-webkit-appearance:none;
 }
-.tab-btn .icon{font-size:22px;line-height:1}
+.tab-btn .icon{font-size:19px;line-height:1}
 .tab-btn.active{color:var(--accent)}
 .tab-btn.active::before{content:"";position:absolute;top:0;left:15%;right:15%;height:2.5px;background:var(--accent);border-radius:0 0 3px 3px}
 [data-theme="nebula"] .tab-btn.active{color:#c8a0ff;text-shadow:0 0 8px rgba(192,132,252,.6)}
@@ -518,6 +610,12 @@ body{height:100%;overflow:hidden;width:100%;padding-bottom:0;background:#08051C;
 .card{background:var(--bg2);border-radius:14px;padding:14px;margin-bottom:10px;box-shadow:0 2px 8px rgba(0,0,0,.06);border:1px solid var(--border)}
 .card-title{font-weight:700;font-size:13px;color:var(--text);margin-bottom:12px;display:flex;align-items:center;gap:6px}
 .card-title .ct-right{margin-left:auto}
+.overview-card-head{display:flex;align-items:flex-start;gap:8px;margin-bottom:10px}
+.overview-card-copy{flex:1;min-width:0}
+.overview-card-copy .card-title{margin-bottom:2px}
+.overview-card-hint{font-size:10px;color:var(--text4)}
+.overview-card-actions{display:flex;gap:6px;flex-shrink:0}
+.overview-card-actions button{padding-inline:10px}
 
 /* ══ STAT ROW ══ */
 .stat-row{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:10px}
@@ -644,6 +742,15 @@ tr:hover td{background:var(--accent-light)}
 .modal-center{align-items:center}
 .modal.center-modal{border-radius:16px;max-width:440px;margin:auto}
 .modal-bg.center .modal{border-radius:16px;max-width:440px;margin:auto;padding-bottom:20px}
+.class-manager-list{display:flex;flex-direction:column;gap:8px;margin-top:12px}
+.class-manager-row{display:flex;align-items:center;gap:10px;padding:10px 11px;border:1px solid var(--border);border-radius:11px;background:var(--bg3)}
+.class-manager-info{flex:1;min-width:0}
+.class-manager-name{font-size:13px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.class-manager-meta{font-size:10px;color:var(--text4);margin-top:2px}
+.class-manager-actions{display:flex;gap:5px;flex-shrink:0}
+.class-manager-actions button{min-height:36px;padding:5px 9px;font-size:11px}
+.class-manager-section{font-size:10px;font-weight:800;letter-spacing:1.5px;color:var(--text4);margin:16px 0 6px}
+.class-manager-note{font-size:11px;color:var(--text3);line-height:1.6;padding:9px 10px;border-radius:9px;background:var(--accent-light);margin-bottom:12px}
 .ropt{border:1px solid var(--border);border-radius:10px;cursor:pointer;transition:border-color .12s,background .12s}
 .ropt.ropt-on{border-color:var(--accent);background:var(--accent-light)}
 .ropt:active{background:var(--bg3)}
@@ -704,6 +811,9 @@ tr:hover td{background:var(--accent-light)}
   .overview-tools{grid-template-columns:minmax(0,1fr) 112px}
   .theme-select-bar{min-width:64px;max-width:76px;padding:0 5px}
   .class-chip{max-width:42vw;overflow:hidden;text-overflow:ellipsis}
+  .overview-card-head{align-items:center}
+  .overview-card-actions{gap:4px}
+  .overview-card-actions button{min-width:44px;padding:7px;font-size:11px}
 }
 /* ══ SPLASH SCREEN ══ */
 #splash{
@@ -849,9 +959,15 @@ tr:hover td{background:var(--accent-light)}
     <div class="panel active" id="tab-overview">
       <div class="stat-row" id="stat-row"></div>
       <div class="card">
-        <div class="card-title">👥 全班點數
-          <span style="font-size:11px;font-weight:400;color:var(--text4)">橘色可換卡</span>
-          <button class="btn-ghost btn-sm ct-right" onclick="goTab('more');setTimeout(()=>goMore('settings'),50);setTimeout(()=>switchStab('nos'),100)">✏️ 修改人數</button>
+        <div class="overview-card-head">
+          <div class="overview-card-copy">
+            <div class="card-title">👥 全班點數</div>
+            <div class="overview-card-hint">橘色表示已達兌換門檻；座號卡內容維持原樣</div>
+          </div>
+          <div class="overview-card-actions">
+            <button class="btn-ghost btn-sm" onclick="showClassManager()" title="班級管理">🏫 班級</button>
+            <button class="btn-ghost btn-sm" onclick="goTab('more');setTimeout(()=>goMore('settings'),50);setTimeout(()=>switchStab('nos'),100)" title="修改人數">✏️ 人數</button>
+          </div>
         </div>
         <div class="overview-tools">
           <input id="student-search" type="search" inputmode="numeric" placeholder="搜尋座號" aria-label="搜尋座號" oninput="setOverviewFilter()">
@@ -1028,6 +1144,11 @@ tr:hover td{background:var(--accent-light)}
           <span>設定</span>
           <span class="mi-arr">›</span>
         </div>
+        <div class="more-item" style="padding:14px 16px" onclick="showClassManager()">
+          <span class="mi-icon">🏫</span>
+          <span>班級管理</span>
+          <span class="mi-arr">›</span>
+        </div>
         <div class="more-item" style="padding:14px 16px" onclick="exportCSV()">
           <span class="mi-icon">📤</span>
           <span>匯出 CSV</span>
@@ -1181,8 +1302,8 @@ tr:hover td{background:var(--accent-light)}
           </div>
           <hr class="sep">
           <div style="font-size:12px;color:var(--text4);line-height:1.7">
-            班級清單與分組從 Venus OS（作業 App）自動同步。<br>
-            獎卡資料存在此 App 獨立空間，不影響作業 App。<br>
+            Venus OS 班級與分組僅供讀取，不會由此 App 修改。<br>
+            也可建立 Venus Card 專用班級；獎卡資料皆存於獨立空間。<br>
             <span id="app-version-label">版本載入中</span>
           </div>
         </div>
@@ -1223,6 +1344,35 @@ tr:hover td{background:var(--accent-light)}
   <button class="undo-fab" id="undo-fab" onclick="undoLastAction()" aria-label="撤銷最近操作">↶ <span id="undo-label">撤銷</span></button>
 
 </div><!-- /app -->
+
+<!-- MODAL: Venus Card 班級管理（不寫入 Venus OS） -->
+<div class="modal-bg" id="class-manager-modal">
+  <div class="modal">
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
+      <h3 style="margin:0">🏫 班級管理</h3>
+      <button class="btn-ghost btn-sm" style="margin-left:auto" onclick="closeModal('class-manager-modal')">✕</button>
+    </div>
+    <div class="class-manager-note">
+      Venus OS 班級維持唯讀：在這裡只能隱藏或恢復，不會刪除、改名或回寫 Venus OS。新建班級只屬於 Venus Card。
+    </div>
+    <div class="form-row">
+      <div class="fg" style="min-width:150px">
+        <label>班級名稱</label>
+        <input type="text" id="card-class-name" maxlength="30" placeholder="例：六年五班">
+      </div>
+      <div class="fg" style="max-width:92px">
+        <label>學年度</label>
+        <input type="text" id="card-class-year" maxlength="8" inputmode="numeric" placeholder="115">
+      </div>
+      <div class="fg" style="min-width:120px">
+        <label>學校（選填）</label>
+        <input type="text" id="card-class-school" maxlength="40" placeholder="例：○○國小">
+      </div>
+    </div>
+    <button class="btn-primary btn-block" onclick="createCardClass()">＋ 新增 Venus Card 班級</button>
+    <div id="class-manager-list" class="class-manager-list"></div>
+  </div>
+</div>
 
 <!-- MODAL: 新增 Google Sheets 連結 -->
 <div class="modal-bg" id="add-sheet-modal">
@@ -1370,7 +1520,7 @@ tr:hover td{background:var(--accent-light)}
 // ══════════════════════════════════════════
 // Firebase 設定
 // ══════════════════════════════════════════
-const APP_VERSION='2.7.1';
+const APP_VERSION='2.8.1';
 const FB_CONFIG = {
   apiKey: "AIzaSyAqgA9pYvOduWypEE5kxVNlq9fEfrEMV0c",
   authDomain: "attendance-pwa-9fa73.firebaseapp.com",
@@ -1529,14 +1679,124 @@ async function doLogout(){
 }
 
 // ══ App State ══
-// classes/groups 從 Venus OS Firestore 讀取（只讀）
-let _classes=[];      // [{id,year,school,className,createdAt}]
+// Venus OS 班級永遠只讀；Card 自建班級另存於 vc-card-users 命名空間。
+let _osClasses=[];    // Venus OS 來源（只讀）
+let _cardClasses=[];  // Venus Card 自建班級（可封存／恢復）
+let _hiddenOsClassIds=[];
+let _classIndexUpdatedAt=0;
+let _classes=[];      // 目前可見班級（上述兩個來源合併）
 let _groups=[];       // [{id,label,members,leader,secretary}]
 let _curClassId='';   // 目前選取的班級 id
 let _chartCur=null;   // {no,subj} 目前圖表視窗顯示中的座號/科目
 function curClassName(){
   const c=_classes.find(x=>x.id===_curClassId);
   return c?(c.className||c.id):'';
+}
+function isOsClass(id){return _osClasses.some(c=>String(c.id)===String(id));}
+function normalizeClassRecord(c,source){
+  if(!c||!c.id)return null;
+  return{
+    id:String(c.id),className:String(c.className||c.name||c.id).trim(),
+    year:String(c.year||'').trim(),school:String(c.school||'').trim(),
+    createdAt:Number(c.createdAt)||Date.now(),archived:!!c.archived,source
+  };
+}
+function mergeClassSources(){
+  const hidden=new Set(_hiddenOsClassIds.map(String));
+  const seen=new Set();
+  const next=[];
+  _osClasses.forEach(raw=>{
+    const c=normalizeClassRecord(raw,'venus-os');
+    if(!c||hidden.has(c.id)||seen.has(c.id))return;
+    seen.add(c.id);next.push(c);
+  });
+  _cardClasses.forEach(raw=>{
+    const c=normalizeClassRecord(raw,'venus-card');
+    if(!c||c.archived||seen.has(c.id))return;
+    seen.add(c.id);next.push(c);
+  });
+  _classes=next;
+  renderClassDD();
+  const cur=_classes.find(c=>c.id===_curClassId);
+  const chip=document.getElementById('chip-text');
+  if(chip)chip.textContent=cur?(cur.className||cur.id):(_classes.length?'選擇班級':'尚無班級');
+}
+function defaultAcademicYear(){
+  const now=new Date();
+  return String(now.getMonth()>=7?now.getFullYear()-1911:now.getFullYear()-1912);
+}
+function cardClassIndexKey(uid){return'card-class-index:'+String(uid||'offline');}
+function cardClassIndexRef(uid){
+  return _db.collection('vc-card-users').doc(uid).collection('classes').doc('_venus_card_class_index');
+}
+function normalizeClassIndex(raw){
+  raw=raw&&typeof raw==='object'?raw:{};
+  return{
+    cardClasses:(Array.isArray(raw.cardClasses)?raw.cardClasses:[]).map(c=>normalizeClassRecord(c,'venus-card')).filter(Boolean),
+    hiddenOsClassIds:[...new Set((Array.isArray(raw.hiddenOsClassIds)?raw.hiddenOsClassIds:[]).map(String))],
+    clientUpdatedAt:Number(raw.clientUpdatedAt)||0
+  };
+}
+function applyClassIndex(raw){
+  const data=normalizeClassIndex(raw);
+  _cardClasses=data.cardClasses;
+  _hiddenOsClassIds=data.hiddenOsClassIds;
+  _classIndexUpdatedAt=data.clientUpdatedAt;
+  mergeClassSources();
+}
+async function loadCardClassIndex(uid){
+  const key=cardClassIndexKey(uid);
+  const local=normalizeClassIndex(await storeGet(key));
+  let best=local;
+  if(uid&&_db&&navigator.onLine){
+    try{
+      const doc=await cardClassIndexRef(uid).get();
+      if(doc.exists){
+        const cloud=normalizeClassIndex(doc.data());
+        if(cloud.clientUpdatedAt>=best.clientUpdatedAt)best=cloud;
+      }
+    }catch(e){console.warn('Card class index read fail',e);}
+    try{
+      const legacy=await legacyCloudRef(uid).get();
+      if(legacy.exists){
+        const raw=legacy.data()['class-index:v1'];
+        const cloud=normalizeClassIndex(typeof raw==='string'?JSON.parse(raw):raw);
+        if(cloud.clientUpdatedAt>=best.clientUpdatedAt)best=cloud;
+      }
+    }catch(e){console.warn('Card class index fallback read fail',e);}
+  }
+  applyClassIndex(best);
+  await storeSet(key,best);
+}
+async function persistCardClassIndex(){
+  const uid=firebaseUidRef.current;
+  const payload={
+    schema:1,
+    cardClasses:_cardClasses.map(c=>({
+      id:c.id,className:c.className,year:c.year,school:c.school,
+      createdAt:c.createdAt,archived:!!c.archived
+    })),
+    hiddenOsClassIds:[...new Set(_hiddenOsClassIds.map(String))],
+    clientUpdatedAt:Date.now(),
+    appVersion:APP_VERSION
+  };
+  _classIndexUpdatedAt=payload.clientUpdatedAt;
+  await storeSet(cardClassIndexKey(uid),payload);
+  if(uid&&_db&&navigator.onLine){
+    try{
+      await cardClassIndexRef(uid).set({
+        ...payload,updatedAt:firebase.firestore.FieldValue.serverTimestamp()
+      },{merge:true});
+      return true;
+    }catch(e){
+      console.warn('Card class index cloud write fail',e);
+      try{
+        await legacyCloudRef(uid).set({'class-index:v1':JSON.stringify(payload)},{merge:true});
+        return true;
+      }catch(fallbackErr){console.warn('Card class index fallback write fail',fallbackErr);}
+    }
+  }
+  return false;
 }
 // 以下資料是此 App 自己的，用 vc:{classId}:key 存
 let _nos=[];          // 存在的座號 [1,2,3,5,...]
@@ -2108,65 +2368,67 @@ async function loadFromFirestore(){
   if(!uid||!_db)return;
   setSyncDot('ing');
   try{
+    // 先讀 Venus Card 自己的班級索引；此來源不屬於 Venus OS。
+    await loadCardClassIndex(uid);
+
     // Venus OS 資料結構：users/{uid}/data/{key} → {value: ..., updatedAt: ...}
     const dataCol=_db.collection('users').doc(uid).collection('data');
-    // 讀 Venus OS 的 settings:main（含 classes）
-    const settingsDoc=await dataCol.doc('settings:main').get();
-    if(!settingsDoc.exists){
-      toast('⚠️ 找不到 Venus OS 設定資料，請確認已用同一帳號在 Venus OS 登入過');
-      setSyncDot('ok');
-      return;
-    }
-    const raw=settingsDoc.data().value;
-    const parsed=typeof raw==='string'?JSON.parse(raw):raw;
-    if(!parsed||!parsed.classes||!Array.isArray(parsed.classes)||!parsed.classes.length){
-      toast('⚠️ Venus OS 尚未建立任何班級');
-      setSyncDot('ok');
-      return;
-    }
-    _classes=parsed.classes;
-    renderClassDD();
-    toast(`✅ 讀到 ${_classes.length} 個班級`);
-    // 如果已有 _curClassId（離線恢復），確保顯示正確的班級名稱
-    if(_curClassId){
-      const curCls=_classes.find(c=>c.id===_curClassId);
-      if(curCls)document.getElementById('chip-text').textContent=curCls.className||curCls.id;
-      await loadCardClassFromFirestore(_curClassId);
-      // 背景讀取分組與作業抵免，不阻擋畫面
-      loadGroupsForClass(_curClassId);
-      loadExemptFromVenusOS(_curClassId);
-    }
-    // 如果還沒選班級，優先用上次使用的班級，找不到才用第一個
-    if(!_curClassId&&_classes.length){
-      const lastClassId=safeGet('vc2:lastClass');
-      const preferCls=(lastClassId&&_classes.find(c=>c.id===lastClassId))||_classes[0];
-      document.getElementById('chip-text').textContent=preferCls.className||preferCls.id;
-      await loadClass(preferCls.id);
-      await loadCardClassFromFirestore(preferCls.id);
-      await loadGroupsForClass(preferCls.id);
-      loadExemptFromVenusOS(preferCls.id);  // 背景讀取，不 await（180天資料較多）
-      if(!_nos.length){
-        toast(`⚠ 「${preferCls.className||preferCls.id}」尚未設定座號，請先設定`);
-        setTimeout(()=>{
-          goTab('more');
-          setTimeout(()=>goMore('settings'),50);
-          setTimeout(()=>switchStab('nos'),100);
-        },800);
+    let parsed={};
+    const cachedOsClasses=await storeGet('os-class-cache:'+uid);
+    _osClasses=Array.isArray(cachedOsClasses)?cachedOsClasses:[];
+    try{
+      // 只讀 Venus OS 的 settings:main；本 App 不對這個路徑執行 set/update/delete。
+      const settingsDoc=await dataCol.doc('settings:main').get();
+      if(settingsDoc.exists){
+        const raw=settingsDoc.data().value;
+        parsed=typeof raw==='string'?JSON.parse(raw):raw||{};
+        _osClasses=Array.isArray(parsed.classes)?parsed.classes:[];
+        await storeSet('os-class-cache:'+uid,_osClasses);
       }
+    }catch(osErr){
+      console.warn('Venus OS class read fail',osErr);
     }
-    if(parsed.groups&&Array.isArray(parsed.groups)){
-      _groups=parsed.groups;
+    mergeClassSources();
+
+    if(!_classes.length){
+      renderAll();
+      toast('尚無班級；可由左上角開啟班級管理新增 Venus Card 專用班級',4500);
+      setSyncDot('ok');
+      return;
     }
-    // 讀該班級的分組（Venus OS 用 hw5ren:groups:{classId} 當 key）
-    if(_curClassId){
+
+    // 優先保留目前／上次班級；若已隱藏或封存，再改用第一個可見班級。
+    const lastClassId=safeGet('vc2:lastClass');
+    const preferCls=_classes.find(c=>c.id===_curClassId)||
+      (lastClassId&&_classes.find(c=>c.id===lastClassId))||_classes[0];
+    document.getElementById('chip-text').textContent=preferCls.className||preferCls.id;
+    if(_curClassId!==preferCls.id)await loadClass(preferCls.id);
+    await loadCardClassFromFirestore(preferCls.id);
+
+    if(isOsClass(preferCls.id)){
+      if(parsed.groups&&Array.isArray(parsed.groups))_groups=parsed.groups;
+      loadGroupsForClass(preferCls.id);
+      loadExemptFromVenusOS(preferCls.id);  // 背景讀取，不阻擋畫面
       try{
-        const grpDoc=await dataCol.doc('hw5ren:groups:'+_curClassId).get();
+        const grpDoc=await dataCol.doc('hw5ren:groups:'+preferCls.id).get();
         if(grpDoc.exists){
           const raw2=grpDoc.data().value;
           const parsed2=typeof raw2==='string'?JSON.parse(raw2):raw2;
           if(Array.isArray(parsed2))_groups=parsed2;
         }
       }catch{}
+    }else{
+      _groups=[];_exemptMap={};renderExemptSummary();
+    }
+
+    toast(`✅ 已載入 ${_classes.length} 個可見班級（Venus OS ${_osClasses.length}、Card ${_cardClasses.filter(c=>!c.archived).length}）`);
+    if(!_nos.length){
+      toast(`⚠ 「${preferCls.className||preferCls.id}」尚未設定座號，請先設定`);
+      setTimeout(()=>{
+        goTab('more');
+        setTimeout(()=>goMore('settings'),50);
+        setTimeout(()=>switchStab('nos'),100);
+      },800);
     }
     setSyncDot('ok');
   }catch(e){setSyncDot('off');toast('❌ 讀取失敗：'+e.message);console.warn('Firestore read fail',e);}
@@ -2382,19 +2644,160 @@ document.addEventListener('click',e=>{
 
 function renderClassDD(){
   const dd=document.getElementById('class-dd');
+  if(!dd)return;
   if(!_classes.length){
-    dd.innerHTML='<div class="cd-hdr">CLASSES</div><div style="padding:12px 14px;font-size:12px;color:var(--text4)">請先登入並在 Venus OS 新增班級</div>';
+    dd.innerHTML='<div class="cd-hdr">CLASSES</div><div style="padding:12px 14px;font-size:12px;color:var(--text4)">尚無可見班級</div>'+
+      '<button class="cd-manage" onclick="showClassManager()">🏫 新增／管理班級</button>';
     return;
   }
   dd.innerHTML='<div class="cd-hdr">CLASSES</div>'+
     _classes.map(cls=>`
-    <div class="cd-item${cls.id===_curClassId?' active':''}" onclick="switchClass('${cls.id}')">
-      <div>
+    <div class="cd-item${cls.id===_curClassId?' active':''}" onclick="switchClass(decodeURIComponent('${uriArg(cls.id)}'))">
+      <div style="flex:1;min-width:0">
         <div class="cd-name">${esc(cls.className||cls.id)}</div>
         <div class="cd-sub">${esc(cls.year||'')} ${esc(cls.school||'')}</div>
       </div>
+      <span class="cd-source">${cls.source==='venus-os'?'OS 唯讀':'CARD'}</span>
       ${cls.id===_curClassId?'<span class="cd-badge">✓ 使用中</span>':''}
-    </div>`).join('');
+    </div>`).join('')+
+    '<button class="cd-manage" onclick="showClassManager()">⚙️ 新增／管理班級</button>';
+}
+
+function showClassManager(){
+  _ddOpen=false;
+  const dd=document.getElementById('class-dd');
+  const chip=document.getElementById('class-chip');
+  if(dd)dd.style.display='none';
+  if(chip)chip.classList.remove('open');
+  const year=document.getElementById('card-class-year');
+  if(year&&!year.value)year.value=defaultAcademicYear();
+  renderClassManager();
+  document.getElementById('class-manager-modal').classList.add('show');
+}
+
+function renderClassManager(){
+  const host=document.getElementById('class-manager-list');
+  if(!host)return;
+  const visibleOs=_osClasses.filter(c=>!_hiddenOsClassIds.includes(String(c.id)));
+  const hiddenOs=_osClasses.filter(c=>_hiddenOsClassIds.includes(String(c.id)));
+  const activeCard=_cardClasses.filter(c=>!c.archived);
+  const archivedCard=_cardClasses.filter(c=>c.archived);
+  const row=(c,kind,archived)=>{
+    const id=uriArg(c.id);
+    const meta=[c.year,c.school].filter(Boolean).map(esc).join('・')||'未填學年度／學校';
+    let actions='';
+    if(kind==='os'){
+      actions=archived?
+        `<button class="btn-green" onclick="restoreOsClass(decodeURIComponent('${id}'))">恢復</button>`:
+        `<button class="btn-ghost" onclick="hideOsClass(decodeURIComponent('${id}'))">隱藏</button>`;
+    }else{
+      actions=archived?
+        `<button class="btn-green" onclick="restoreCardClass(decodeURIComponent('${id}'))">恢復</button>`:
+        `<button class="btn-ghost" onclick="renameCardClass(decodeURIComponent('${id}'))">改名</button><button class="btn-red" onclick="archiveCardClass(decodeURIComponent('${id}'))">封存</button>`;
+    }
+    return`<div class="class-manager-row">
+      <div class="class-manager-info">
+        <div class="class-manager-name">${esc(c.className||c.id)}</div>
+        <div class="class-manager-meta">${kind==='os'?'Venus OS・唯讀':'Venus Card 專用'}｜${meta}</div>
+      </div>
+      <div class="class-manager-actions">${actions}</div>
+    </div>`;
+  };
+  let html='<div class="class-manager-section">目前顯示</div>';
+  const activeRows=[
+    ...visibleOs.map(c=>row(c,'os',false)),
+    ...activeCard.map(c=>row(c,'card',false))
+  ];
+  html+=activeRows.length?activeRows.join(''):'<div class="empty" style="padding:14px">目前沒有顯示中的班級</div>';
+  if(hiddenOs.length||archivedCard.length){
+    html+='<div class="class-manager-section">已隱藏／封存</div>'+
+      hiddenOs.map(c=>row(c,'os',true)).join('')+
+      archivedCard.map(c=>row(c,'card',true)).join('');
+  }
+  host.innerHTML=html;
+}
+
+async function createCardClass(){
+  const nameEl=document.getElementById('card-class-name');
+  const yearEl=document.getElementById('card-class-year');
+  const schoolEl=document.getElementById('card-class-school');
+  const className=String(nameEl.value||'').trim();
+  const year=String(yearEl.value||'').trim();
+  const school=String(schoolEl.value||'').trim();
+  if(!className){toast('請輸入班級名稱');nameEl.focus();return;}
+  if([..._osClasses,..._cardClasses].some(c=>String(c.className||c.name||c.id).trim()===className&&String(c.year||'')===year)){
+    toast('已有相同名稱與學年度的班級');return;
+  }
+  const id='card-'+Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,7);
+  const created={id,className,year:year||defaultAcademicYear(),school,createdAt:Date.now(),archived:false,source:'venus-card'};
+  _cardClasses.push(created);
+  mergeClassSources();
+  const cloudSaved=await persistCardClassIndex();
+  nameEl.value='';schoolEl.value='';
+  renderClassManager();
+  await switchClass(id);
+  document.getElementById('class-manager-modal').classList.add('show');
+  toast(cloudSaved?'✅ 班級已新增並同步':'✅ 班級已新增；目前先保存在此裝置');
+}
+
+async function renameCardClass(id){
+  const cls=_cardClasses.find(c=>c.id===id&&!c.archived);
+  if(!cls)return;
+  const next=prompt('新的班級名稱',cls.className||'');
+  if(next===null)return;
+  const name=next.trim();
+  if(!name){toast('班級名稱不能空白');return;}
+  cls.className=name;
+  mergeClassSources();
+  await persistCardClassIndex();
+  renderClassManager();
+  toast('✅ 班級名稱已更新');
+}
+
+async function hideOsClass(id){
+  const cls=_osClasses.find(c=>String(c.id)===String(id));
+  if(!cls)return;
+  if(id===_curClassId&&_classes.length<=1){toast('請先新增或恢復另一個班級，再隱藏目前班級');return;}
+  if(!confirm(`只在 Venus Card 隱藏「${cls.className||id}」？\n\nVenus OS 的班級與資料完全不會變更。`))return;
+  if(!_hiddenOsClassIds.includes(String(id)))_hiddenOsClassIds.push(String(id));
+  mergeClassSources();
+  await persistCardClassIndex();
+  renderClassManager();
+  if(id===_curClassId&&_classes.length)await switchClass(_classes[0].id);
+  document.getElementById('class-manager-modal').classList.add('show');
+  toast('已在 Venus Card 隱藏；Venus OS 未變更');
+}
+
+async function restoreOsClass(id){
+  _hiddenOsClassIds=_hiddenOsClassIds.filter(x=>String(x)!==String(id));
+  mergeClassSources();
+  await persistCardClassIndex();
+  renderClassManager();
+  toast('✅ 已恢復顯示');
+}
+
+async function archiveCardClass(id){
+  const cls=_cardClasses.find(c=>c.id===id&&!c.archived);
+  if(!cls)return;
+  if(id===_curClassId&&_classes.length<=1){toast('請先新增或恢復另一個班級，再封存目前班級');return;}
+  if(!confirm(`封存「${cls.className||id}」？\n\n班級資料不會刪除，可隨時在此恢復。`))return;
+  cls.archived=true;
+  mergeClassSources();
+  await persistCardClassIndex();
+  renderClassManager();
+  if(id===_curClassId&&_classes.length)await switchClass(_classes[0].id);
+  document.getElementById('class-manager-modal').classList.add('show');
+  toast('班級已封存，資料仍完整保留');
+}
+
+async function restoreCardClass(id){
+  const cls=_cardClasses.find(c=>c.id===id);
+  if(!cls)return;
+  cls.archived=false;
+  mergeClassSources();
+  await persistCardClassIndex();
+  renderClassManager();
+  toast('✅ 班級已恢復');
 }
 
 async function switchClass(id){
@@ -2408,9 +2811,13 @@ async function switchClass(id){
   await loadClass(id);
   await loadCardClassFromFirestore(id);
   if(id!==_curClassId)return;
-  // 切班後從 Firestore 讀該班分組 + 作業抵免
-  loadGroupsForClass(id);
-  loadExemptFromVenusOS(id);
+  // 只有 Venus OS 班級讀取 OS 分組與作業抵免；Card 自建班級完全獨立。
+  if(isOsClass(id)){
+    loadGroupsForClass(id);
+    loadExemptFromVenusOS(id);
+  }else{
+    _groups=[];_exemptMap={};renderExemptSummary();
+  }
   if(!_nos.length){
     // 這個班還沒設定座號 → 強制導向座號管理，不能略過
     toast(`⚠ 「${cls?cls.className||id:id}」尚未設定座號，請先設定`);
