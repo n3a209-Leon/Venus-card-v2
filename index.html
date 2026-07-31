@@ -1554,7 +1554,7 @@ tr:hover td{background:var(--accent-light)}
 // ══════════════════════════════════════════
 // Firebase 設定
 // ══════════════════════════════════════════
-const APP_VERSION='2.8.4';
+const APP_VERSION='2.8.5';
 const FB_CONFIG = {
   apiKey: "AIzaSyAqgA9pYvOduWypEE5kxVNlq9fEfrEMV0c",
   authDomain: "attendance-pwa-9fa73.firebaseapp.com",
@@ -3113,19 +3113,41 @@ async function scanVenusOsDocs(){
   const END='\uf8ff';
   const seen=new Map();      // docId -> 最上層欄位
   const dayBuckets=new Map();// 前綴 -> 份數（day 文件太多，收合顯示）
+  // v2.8.5：往下再挖一層。陣列列出第一筆物件的欄位，物件列出子鍵，
+  // 否則只知道最上層叫什麼、看不到裡面有沒有幹部職稱。
+  const describe=v=>{
+    if(v===null||v===undefined)return 'null';
+    if(Array.isArray(v)){
+      const first=v.find(x=>x&&typeof x==='object'&&!Array.isArray(x));
+      return `陣列 ${v.length} 筆`+(first?' → '+Object.keys(first).join(','):'');
+    }
+    if(typeof v==='object'){
+      const ks=Object.keys(v);
+      return `物件 {${ks.slice(0,12).join(',')}${ks.length>12?',…':''}}`;
+    }
+    return typeof v+'：'+String(v).slice(0,40);
+  };
+  const deepLines=(obj,indent)=>{
+    const out=[];
+    Object.keys(obj).slice(0,20).forEach(k=>{out.push(indent+k+'：'+describe(obj[k]));});
+    if(Object.keys(obj).length>20)out.push(indent+'…另有 '+(Object.keys(obj).length-20)+' 個欄位');
+    return out;
+  };
   const record=doc=>{
     const id=doc.id;
     if(seen.has(id))return;
-    let keys='(無法解析)';
+    let keys='(無法解析)',obj=null;
     try{
       const v=parseStored(doc.data().value,null);
-      if(v&&typeof v==='object')keys=Array.isArray(v)?`陣列 ${v.length} 筆`+(v[0]&&typeof v[0]==='object'?'：'+Object.keys(v[0]).join(','):''):Object.keys(v).join(',');
-      else keys=typeof v;
+      obj=v&&typeof v==='object'&&!Array.isArray(v)?v:null;
+      keys=describe(v);
     }catch{}
     const m=id.match(/^(.*:day:)\d{4}-\d{2}-\d{2}$/);
     if(m){
-      const b=dayBuckets.get(m[1])||{n:0,keys:new Set()};
-      b.n++;String(keys).split(',').forEach(k=>b.keys.add(k));
+      const b=dayBuckets.get(m[1])||{n:0,keys:new Set(),sample:null,sampleId:''};
+      b.n++;
+      if(obj)Object.keys(obj).forEach(k=>b.keys.add(k));
+      if(!b.sample&&obj){b.sample=obj;b.sampleId=id;}
       dayBuckets.set(m[1],b);
       return;
     }
@@ -3150,9 +3172,40 @@ async function scanVenusOsDocs(){
     lines.push('（若為權限問題，代表 Firestore 規則不允許 list 查詢）');
     alert(lines.join('\n'));return;
   }
+  // 3) v2.8.5：settings:main 是 Venus OS 的全域設定，_groups 就是從這裡讀的
+  //    （不是 hw5ren:groups:）。它不符合上面任何前綴，必須單獨讀取。
+  lines.push('── settings:main（全域）──');
+  try{
+    const sDoc=await dataCol.doc('settings:main').get();
+    if(!sDoc.exists)lines.push('（不存在）');
+    else{
+      const sv=parseStored(sDoc.data().value,null);
+      if(!sv||typeof sv!=='object')lines.push('內容：'+describe(sv));
+      else{
+        deepLines(sv,'  ').forEach(l=>lines.push(l));
+        // 班級與分組再往下挖一層，幹部職稱最可能在這兩處
+        ['classes','groups','students','roster'].forEach(k=>{
+          const arr=sv[k];
+          if(!Array.isArray(arr)||!arr.length)return;
+          const first=arr.find(x=>x&&typeof x==='object');
+          if(!first)return;
+          lines.push('  ▸ '+k+'[0]：');
+          deepLines(first,'      ').forEach(l=>lines.push(l));
+        });
+      }
+    }
+  }catch(e){
+    lines.push('✖ 讀取失敗：'+(e.code||e.message));
+  }
   if(dayBuckets.size){
     lines.push('── 每日文件（收合）──');
-    [...dayBuckets].forEach(([pfx,b])=>lines.push(pfx+' × '+b.n+' 份｜欄位：'+[...b.keys].join(',')));
+    [...dayBuckets].forEach(([pfx,b])=>{
+      lines.push(pfx+' × '+b.n+' 份｜欄位：'+[...b.keys].join(','));
+      if(b.sample){
+        lines.push('  ▸ 範例 '+b.sampleId+'：');
+        deepLines(b.sample,'      ').forEach(l=>lines.push(l));
+      }
+    });
   }
   if(seen.size){
     lines.push('── 其他文件 '+seen.size+' 份 ──');
@@ -3162,8 +3215,12 @@ async function scanVenusOsDocs(){
   if(!dayBuckets.size&&!seen.size)lines.push('結果：找不到任何相關文件');
   lines.push('── 目前分組 ──');
   lines.push('_groups：'+_groups.length+' 組'+(_groups[0]?'｜欄位：'+Object.keys(_groups[0]).join(','):''));
+  if(_groups[0])deepLines(_groups[0],'  ').forEach(l=>lines.push(l));
   lines.push('組長 '+venusRoleNos('leader').length+' 人、秘書長 '+venusRoleNos('secretary').length+' 人');
-  alert(lines.join('\n'));
+  // v2.8.5：輸出變長了，直接複製到剪貼簿，不必再靠截圖。
+  const text=lines.join('\n');
+  copyToClipboard(text,'🔎 掃描結果已複製到剪貼簿');
+  alert(text);
 }
 function renderExemptSummary(){
   const area=document.getElementById('exempt-summary-card');
