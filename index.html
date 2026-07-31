@@ -1081,9 +1081,16 @@ tr:hover td{background:var(--accent-light)}
       <div class="card">
         <div class="card-title">⚡ 每週給卡</div>
         <div style="font-weight:600;font-size:12px;color:var(--text3);margin-bottom:8px">🏅 幹部（點一下×1綠，再點×2橘，第三下取消）</div>
+        <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-bottom:8px">
+          <span style="font-size:11px;color:var(--text4)">學期</span>
+          <button class="btn-ghost btn-sm" id="sem-btn-1" onclick="setOfficerSemester('1')">上學期</button>
+          <button class="btn-ghost btn-sm" id="sem-btn-2" onclick="setOfficerSemester('2')">下學期</button>
+          <span id="officer-src" style="font-size:10px;color:var(--text4);flex:1;text-align:right"></span>
+        </div>
         <div class="no-picker" id="cadre-picker"></div>
         <div style="display:flex;gap:8px;margin-top:8px;align-items:center;flex-wrap:wrap">
           <span id="cadre-hint" style="font-size:11px;color:var(--text4);flex:1"></span>
+          <button class="btn-ghost btn-sm" onclick="reseedOfficers()">↻ 重新帶入</button>
           <button class="btn-green btn-sm" onclick="giveWeekly('cadre')">🏅 幹部週給</button>
         </div>
         <hr class="sep">
@@ -1565,7 +1572,7 @@ tr:hover td{background:var(--accent-light)}
 // ══════════════════════════════════════════
 // Firebase 設定
 // ══════════════════════════════════════════
-const APP_VERSION='2.8.6';
+const APP_VERSION='2.8.8';
 const FB_CONFIG = {
   apiKey: "AIzaSyAqgA9pYvOduWypEE5kxVNlq9fEfrEMV0c",
   authDomain: "attendance-pwa-9fa73.firebaseapp.com",
@@ -1727,6 +1734,7 @@ let _hiddenOsClassIds=[];
 let _classIndexUpdatedAt=0;
 let _classes=[];      // 目前可見班級（上述兩個來源合併）
 let _groups=[];       // [{id,label,members,leader,secretary}]
+let _osSettings={};   // v2.8.8：Venus OS settings:main 的內容（校曆、學期起訖等，唯讀）
 let _curClassId='';   // 目前選取的班級 id
 let _chartCur=null;   // {no,subj} 目前圖表視窗顯示中的座號/科目
 function curClassName(){
@@ -2435,6 +2443,7 @@ async function loadFromFirestore(){
       if(settingsDoc.exists){
         const raw=settingsDoc.data().value;
         parsed=typeof raw==='string'?JSON.parse(raw):raw||{};
+        _osSettings=parsed&&typeof parsed==='object'?parsed:{};
         _osClasses=Array.isArray(parsed.classes)?parsed.classes:[];
         await storeSet('os-class-cache:'+uid,_osClasses);
       }
@@ -2461,6 +2470,7 @@ async function loadFromFirestore(){
     if(isOsClass(preferCls.id)){
       if(parsed.groups&&Array.isArray(parsed.groups))_groups=parsed.groups;
       loadGroupsForClass(preferCls.id);
+      loadOfficersForClass(preferCls.id);   // v2.8.8 幹部名單，唯讀
       loadExemptFromVenusOS(preferCls.id);  // 背景讀取，不阻擋畫面
       try{
         const grpDoc=await dataCol.doc('hw5ren:groups:'+preferCls.id).get();
@@ -2880,6 +2890,7 @@ async function switchClass(id){
   // 只有 Venus OS 班級讀取 OS 分組與作業抵免；Card 自建班級完全獨立。
   if(isOsClass(id)){
     loadGroupsForClass(id);
+    loadOfficersForClass(id);
     loadExemptFromVenusOS(id);
   }else{
     _groups=[];_exemptMap={};renderExemptSummary();
@@ -2895,6 +2906,102 @@ async function switchClass(id){
     goTab('overview');
     toast(`✅ 已切換到「${cls?cls.className||id:id}」`);
   }
+}
+
+// ══ v2.8.8 幹部名單（LIMU 教師工具寫入，Venus Card 只讀）══
+// 路徑：users/{uid}/data/officers:{classId}
+// value = { "1":[{role,seat},…], "2":[…] }，"1" 上學期、"2" 下學期。
+// 嚴格唯讀：本區只使用 .get()，絕不對 officers:* 或 classes 執行寫入，
+// 以免打亂 LIMU 的 revision 版本比對、觸發跨裝置衝突。
+let _officers={};        // { 座號: [職稱, …] }（目前學期）
+let _officersRaw=null;   // 原始 value，切學期時不必重讀
+let _officerSem='';      // '1' | '2'
+let _officerMeta={docId:'',updatedAt:'',revision:null,found:false};
+
+// 依校曆判斷目前學期；抓不到就用月份粗估（2–7 月為下學期）。
+function currentSemester(){
+  const s=_osSettings||{};
+  const today=new Date().toISOString().slice(0,10);
+  if(s.semStart2&&today>=s.semStart2)return '2';
+  if(s.semStart1&&today>=s.semStart1&&s.semEnd1&&today<=s.semEnd1)return '1';
+  if(s.semStart1&&today<s.semStart1)return '1';
+  const m=new Date().getMonth()+1;
+  return (m>=2&&m<=7)?'2':'1';
+}
+
+function applyOfficerSemester(){
+  const list=Array.isArray(_officersRaw&&_officersRaw[_officerSem])?_officersRaw[_officerSem]:[];
+  const map={};
+  list.forEach(o=>{
+    const seat=parseInt(o&&o.seat);
+    const role=String((o&&o.role)||'').trim();
+    if(isNaN(seat)||!role)return;
+    if(!map[seat])map[seat]=[];
+    // 同一座號可兼多職，同職稱也可能多筆；只避免同座號重複同一職稱。
+    if(!map[seat].includes(role))map[seat].push(role);
+  });
+  _officers=map;
+}
+
+async function loadOfficersForClass(classId){
+  const uid=firebaseUidRef.current;
+  _officers={};_officersRaw=null;
+  _officerMeta={docId:'',updatedAt:'',revision:null,found:false};
+  if(!uid||!_db||!classId)return;
+  try{
+    const dataCol=_db.collection('users').doc(uid).collection('data');
+    let doc=await dataCol.doc('officers:'+classId).get();
+    let docId='officers:'+classId;
+    // 備援：Venus Card 的 classId 與 LIMU 的可能不同源，改用班名對照
+    // users/{uid}/data/classes 的 value（[{id,name},…]）再試一次。
+    if(!doc.exists){
+      const name=curClassName();
+      try{
+        const clsDoc=await dataCol.doc('classes').get();
+        if(clsDoc.exists){
+          const arr=parseStored(clsDoc.data().value,null);
+          const hit=Array.isArray(arr)?arr.find(c=>c&&String(c.name||'').trim()===String(name||'').trim()):null;
+          if(hit&&hit.id&&hit.id!==classId){
+            docId='officers:'+hit.id;
+            doc=await dataCol.doc(docId).get();
+          }
+        }
+      }catch{}
+    }
+    if(classId!==_curClassId)return;
+    if(!doc||!doc.exists){renderNoPicker();return;}
+    const d=doc.data()||{};
+    const v=parseStored(d.value,null);
+    _officersRaw=v&&typeof v==='object'&&!Array.isArray(v)?v:null;
+    _officerMeta={docId,updatedAt:String(d.updatedAt||''),revision:d.revision,found:!!_officersRaw};
+    if(!_officerSem)_officerSem=currentSemester();
+    applyOfficerSemester();
+    renderNoPicker();
+  }catch(e){console.warn('officers read fail',e);}
+}
+
+function setOfficerSemester(sem){
+  if(sem!=='1'&&sem!=='2')return;
+  _officerSem=sem;
+  applyOfficerSemester();
+  renderNoPicker();
+  const n=Object.keys(_officers).length;
+  toast(n?`已切換到${sem==='1'?'上':'下'}學期幹部（${n} 人）`:`${sem==='1'?'上':'下'}學期尚未設定幹部`);
+}
+
+// 手動重新帶入幹部名單（覆蓋前先確認，可撤銷）
+function reseedOfficers(){
+  ensureFixed();
+  const seats=Object.keys(_officers).map(Number).filter(n=>_nos.includes(n)).sort((a,b)=>a-b);
+  if(!seats.length){toast('尚未設定幹部');return;}
+  const had=Object.keys(_fixed.cadre).length;
+  if(had&&!confirm(`重新帶入會覆蓋目前的幹部名單（${had} 人）。\n\n改成${_officerSem==='1'?'上':'下'}學期的 ${seats.length} 人，每人 ×1？`))return;
+  pushUndo('重新帶入幹部');
+  _fixed.cadre={};
+  seats.forEach(no=>{_fixed.cadre[no]=1;});
+  sched('fixed');scheduleSync();
+  renderNoPicker();
+  toast(`✅ 幹部已帶入 ${seats.length} 人`);
 }
 
 async function loadGroupsForClass(id){
@@ -3133,8 +3240,6 @@ async function scanVenusOsDocs(){
   }
   toast('🔎 正在掃描 Venus OS 資料…');
   const dataCol=_db.collection('users').doc(uid).collection('data');
-  const fid=firebase.firestore.FieldPath.documentId();
-  const END='\uf8ff';
   const seen=new Map();      // docId -> 最上層欄位
   const dayBuckets=new Map();// 前綴 -> 份數（day 文件太多，收合顯示）
   // v2.8.6：改成遞迴展開。任何陣列都會展開第一筆，任何物件都會往下挖，
@@ -3201,22 +3306,15 @@ async function scanVenusOsDocs(){
       dayBuckets.set(m[1],b);
       return;
     }
-    seen.set(id,keys);
-  };
-  const runRange=async(lo,hi,limit)=>{
-    let q=dataCol.where(fid,'>=',lo).where(fid,'<=',hi);
-    if(limit)q=q.limit(limit);
-    const snap=await q.get();
-    snap.forEach(record);
-    return snap.size;
+    seen.set(id,{keys,obj});
   };
   try{
-    // 1) 以 classId 開頭的文件（day、fixed、settings…）
-    await runRange(classId,classId+END,500);
-    // 2) hw5ren: 開頭的文件，再挑出跟這個班有關的
-    const snap2=await dataCol.where(fid,'>=','hw5ren:').where(fid,'<=','hw5ren:'+END).limit(500).get();
-    snap2.forEach(d=>{if(d.id.includes(classId))record(d);});
-    lines.push('（hw5ren: 命名空間共 '+snap2.size+' 份，僅列出含本班代碼者）');
+    // v2.8.7：改成列出整個集合。先前只查 classId 與 hw5ren: 兩種前綴，
+    // 任何不符合前綴的文件（例如 settings:main）都會整份漏掉。
+    const LIMIT=600;
+    const all=await dataCol.limit(LIMIT).get();
+    all.forEach(record);
+    lines.push('集合內共讀取 '+all.size+' 份文件'+(all.size>=LIMIT?'（已達上限 '+LIMIT+'，可能還有更多）':'（全部）'));
   }catch(e){
     lines.push('✖ 查詢失敗：'+(e.code||e.message));
     lines.push('（若為權限問題，代表 Firestore 規則不允許 list 查詢）');
@@ -3247,15 +3345,31 @@ async function scanVenusOsDocs(){
     });
   }
   if(seen.size){
+    // v2.8.7：全部列出並展開內容；settings:main 已在上方單獨印過，這裡略過避免重複。
     lines.push('── 其他文件 '+seen.size+' 份 ──');
-    [...seen].slice(0,25).forEach(([id,keys])=>lines.push(id+'\n    欄位：'+String(keys).slice(0,120)));
-    if(seen.size>25)lines.push('…另有 '+(seen.size-25)+' 份未列出');
+    [...seen].forEach(([id,info])=>{
+      lines.push(id+'\n    '+info.keys);
+      if(id==='settings:main')return;
+      if(info.obj)deepLines(info.obj,'      ',2).forEach(l=>lines.push(l));
+    });
   }
   if(!dayBuckets.size&&!seen.size)lines.push('結果：找不到任何相關文件');
   lines.push('── 目前分組 ──');
   lines.push('_groups：'+_groups.length+' 組'+(_groups[0]?'｜欄位：'+Object.keys(_groups[0]).join(','):''));
   if(_groups[0])deepLines(_groups[0],'  ',2).forEach(l=>lines.push(l));
   lines.push('組長 '+venusRoleNos('leader').length+' 人、秘書長 '+venusRoleNos('secretary').length+' 人');
+  // v2.8.8：幹部名單（LIMU，唯讀）
+  lines.push('── 幹部名單（LIMU officers，唯讀）──');
+  lines.push('文件：'+(_officerMeta.docId||'(未讀取)')+(_officerMeta.found?'':'｜不存在或內容為空'));
+  if(_officerMeta.updatedAt)lines.push('updatedAt：'+_officerMeta.updatedAt+'｜revision：'+_officerMeta.revision);
+  if(_officersRaw){
+    ['1','2'].forEach(sem=>{
+      const arr=Array.isArray(_officersRaw[sem])?_officersRaw[sem]:[];
+      lines.push((sem==='1'?'上':'下')+'學期：'+arr.length+' 筆'+(_officerSem===sem?'（目前顯示中）':''));
+      arr.slice(0,30).forEach(o=>lines.push('    '+(o&&o.seat)+' 號 → '+(o&&o.role)));
+      if(arr.length>30)lines.push('    …另有 '+(arr.length-30)+' 筆');
+    });
+  }
   // v2.8.5：輸出變長了，直接複製到剪貼簿，不必再靠截圖。
   showDiag('🔎 Venus OS 資料掃描',lines.join('\n'));
 }
@@ -4243,15 +4357,22 @@ function venusRoleNos(role){
 function seedRolesFromVenusOS(){
   ensureFixed();
   if(_fixed.roleSeeded)return false;
-  if(!_groups.length||!_nos.length)return false;
+  if(!_nos.length)return false;
+  const hasOfficers=Object.keys(_officers).length>0;
+  if(!_groups.length&&!hasOfficers)return false;
   let n=0;
+  // v2.8.8：幹部名單改由 LIMU 的 officers 帶入。一人可兼多職，
+  // 但卡片一律以「人」為單位 ×1，不因兼職而加倍。
+  if(hasOfficers&&!Object.keys(_fixed.cadre).length){
+    Object.keys(_officers).map(Number).filter(no=>_nos.includes(no)).forEach(no=>{_fixed.cadre[no]=1;n++;});
+  }
   ['leader','secretary'].forEach(role=>{
     if(Object.keys(_fixed[role]).length)return;
     venusRoleNos(role).forEach(no=>{_fixed[role][no]=1;n++;});
   });
   _fixed.roleSeeded=Date.now();
   sched('fixed');scheduleSync();
-  if(n)toast(`✅ 已從 Venus OS 帶入組長／秘書長共 ${n} 人`);
+  if(n)toast(`✅ 已從 Venus OS 帶入幹部名單共 ${n} 人次`);
   return true;
 }
 
@@ -4272,15 +4393,28 @@ function reseedRole(role){
   toast(`✅ ${label}已帶入 ${nos.length} 人`);
 }
 
+// 幹部按鈕的小字：優先顯示 LIMU 的職稱，其次才是 Venus OS 的組長／秘書長。
+// 職稱是使用者自訂字串，一律經過 esc() 才能進 HTML。
+function roleHintHtml(role,no,leaderNos,secNos){
+  if(role!=='cadre')return '';
+  const titles=_officers[no]||[];
+  if(titles.length){
+    const first=esc(titles[0]);
+    const more=titles.length>1?`+${titles.length-1}`:'';
+    return `<br><span style="font-size:8px">${first}${more}</span>`;
+  }
+  if(leaderNos.has(no))return '<br><span style="font-size:8px">組長</span>';
+  if(secNos.has(no))return '<br><span style="font-size:8px">秘書長</span>';
+  return '';
+}
+
 function roleBtnHtml(role,no,leaderNos,secNos){
   const cnt=_fixed[role][no]||0;
   const baseCls=cnt===1?'cadre1':cnt===2?'cadre2':'';
-  // 幹部區塊沿用原本的 Venus OS 角色小字提示；組長／秘書長區塊本身就是該角色，不重複標。
-  const hint=role!=='cadre'?'':
-    (leaderNos.has(no)?'<br><span style="font-size:8px">組長</span>':
-     secNos.has(no)?'<br><span style="font-size:8px">秘書長</span>':'');
+  const hint=roleHintHtml(role,no,leaderNos,secNos);
   const mul=cnt>0?`<br><span style="font-size:9px">×${cnt}</span>`:'';
-  return `<button class="no-btn${baseCls?' '+baseCls:''}" onclick="toggleRole('${role}',${no},this)" title="${no}號">${no}${mul}${hint}</button>`;
+  const titles=(role==='cadre'&&(_officers[no]||[]).length)?`${no}號｜${(_officers[no]||[]).join('、')}`:`${no}號`;
+  return `<button class="no-btn${baseCls?' '+baseCls:''}" onclick="toggleRole('${role}',${no},this)" title="${esc(titles)}">${no}${mul}${hint}</button>`;
 }
 
 function renderNoPicker(){
@@ -4312,9 +4446,7 @@ function toggleRole(role,no,btn){
   btn.className='no-btn'+(next===1?' cadre1':next===2?' cadre2':'');
   const leaderNos=new Set(_groups.map(g=>g.leader).filter(Boolean));
   const secNos=new Set(_groups.map(g=>g.secretary).filter(Boolean));
-  const hint=role!=='cadre'?'':
-    (leaderNos.has(no)?'<br><span style="font-size:8px">組長</span>':
-     secNos.has(no)?'<br><span style="font-size:8px">秘書長</span>':'');
+  const hint=roleHintHtml(role,no,leaderNos,secNos);
   btn.innerHTML=no+(next>0?`<br><span style="font-size:9px">×${next}</span>`:'')+hint;
   scheduleSync();updRoleHints();
 }
@@ -4343,6 +4475,19 @@ function updRoleHints(){
     const total=entries.reduce((a,[,v])=>a+v,0);
     el.textContent=`${entries.length} 人，本週共給 ${total} 張`;
   });
+  // v2.8.8：學期切換鈕與幹部名單來源
+  ['1','2'].forEach(sem=>{
+    const b=document.getElementById('sem-btn-'+sem);
+    if(b)b.className='btn-sm '+(_officerSem===sem?'btn-green':'btn-ghost');
+  });
+  const src=document.getElementById('officer-src');
+  if(src){
+    const n=Object.keys(_officers).map(Number).filter(no=>_nos.includes(no)).length;
+    if(!_officerMeta.docId)src.textContent='幹部名單：未載入';
+    else if(!_officerMeta.found)src.textContent='尚未設定幹部';
+    else if(!n)src.textContent=`${_officerSem==='1'?'上':'下'}學期尚未設定幹部`;
+    else src.textContent=`LIMU ${n} 人${_officerMeta.updatedAt?'｜'+String(_officerMeta.updatedAt).slice(0,10):''}`;
+  }
 }
 
 function isoWeekKey(date){
