@@ -1087,6 +1087,22 @@ tr:hover td{background:var(--accent-light)}
           <button class="btn-green btn-sm" onclick="giveWeekly('cadre')">🏅 幹部週給</button>
         </div>
         <hr class="sep">
+        <div style="font-weight:600;font-size:12px;color:var(--text3);margin-bottom:8px">👑 組長<span style="font-weight:400;color:var(--text4)">（自動帶入 Venus OS 分組組長）</span></div>
+        <div class="no-picker" id="leader-picker"></div>
+        <div style="display:flex;gap:8px;margin-top:8px;align-items:center;flex-wrap:wrap">
+          <span id="leader-hint" style="font-size:11px;color:var(--text4);flex:1"></span>
+          <button class="btn-ghost btn-sm" onclick="reseedRole('leader')">↻ 重新帶入</button>
+          <button class="btn-green btn-sm" onclick="giveWeekly('leader')">👑 組長週給</button>
+        </div>
+        <hr class="sep">
+        <div style="font-weight:600;font-size:12px;color:var(--text3);margin-bottom:8px">📋 秘書長<span style="font-weight:400;color:var(--text4)">（自動帶入 Venus OS 分組秘書長）</span></div>
+        <div class="no-picker" id="secretary-picker"></div>
+        <div style="display:flex;gap:8px;margin-top:8px;align-items:center;flex-wrap:wrap">
+          <span id="secretary-hint" style="font-size:11px;color:var(--text4);flex:1"></span>
+          <button class="btn-ghost btn-sm" onclick="reseedRole('secretary')">↻ 重新帶入</button>
+          <button class="btn-green btn-sm" onclick="giveWeekly('secretary')">📋 秘書長週給</button>
+        </div>
+        <hr class="sep">
         <div style="font-weight:600;font-size:12px;color:var(--text3);margin-bottom:8px">🚽 廁所（最多6人）</div>
         <div class="no-picker" id="toilet-picker"></div>
         <div style="display:flex;gap:8px;margin-top:8px;align-items:center;flex-wrap:wrap">
@@ -1175,6 +1191,11 @@ tr:hover td{background:var(--accent-light)}
         <div class="more-item" style="padding:14px 16px" onclick="diagExempt()">
           <span class="mi-icon">🩺</span>
           <span>抵免診斷</span>
+          <span class="mi-arr">›</span>
+        </div>
+        <div class="more-item" style="padding:14px 16px" onclick="scanVenusOsDocs()">
+          <span class="mi-icon">🔎</span>
+          <span>Venus OS 資料掃描</span>
           <span class="mi-arr">›</span>
         </div>
       </div>
@@ -1533,7 +1554,7 @@ tr:hover td{background:var(--accent-light)}
 // ══════════════════════════════════════════
 // Firebase 設定
 // ══════════════════════════════════════════
-const APP_VERSION='2.8.3';
+const APP_VERSION='2.8.4';
 const FB_CONFIG = {
   apiKey: "AIzaSyAqgA9pYvOduWypEE5kxVNlq9fEfrEMV0c",
   authDomain: "attendance-pwa-9fa73.firebaseapp.com",
@@ -1616,14 +1637,10 @@ async function initFirebase(){
       firebaseUidRef.current=user?user.uid:null;
       updateLoginUI(user);
       if(user)loadFromFirestore();
-      const authChecking=document.getElementById('auth-checking');
-      if(authChecking)authChecking.style.display='none';
     });
     _fbReady=true;
   }catch(e){
     console.warn('FB init fail',e);
-    const authChecking=document.getElementById('auth-checking');
-    if(authChecking)authChecking.style.display='none';
   }
 }
 
@@ -1815,7 +1832,15 @@ async function persistCardClassIndex(){
 let _nos=[];          // 存在的座號 [1,2,3,5,...]
 let _scores={};       // {subjLabel:[{label,date,nos:{1:85,2:90,...}}]}
 let _logs=[];         // [{id,t,no,k,v,c,note}]
-let _fixed={cadre:{},toilet:[]};
+let _fixed={cadre:{},leader:{},secretary:{},toilet:[]};
+// v2.8.4：幹部／組長／秘書長三份名單各自獨立，但發卡紀錄一律記為 k:'幹部'，
+// 以免 cardCounts() 漏算（它只認 幹部／廁所／特殊／兌換／調整 五種）。
+const ROLE_KEYS=['cadre','leader','secretary'];
+const ROLE_META={
+  cadre:{label:'幹部',icon:'🏅',pickerId:'cadre-picker',hintId:'cadre-hint'},
+  leader:{label:'組長',icon:'👑',pickerId:'leader-picker',hintId:'leader-hint'},
+  secretary:{label:'秘書長',icon:'📋',pickerId:'secretary-picker',hintId:'secretary-hint'}
+};
 let _settings={threshold:300};
 let _exemptMap={};    // {座號: 作業抵免張數} 從 Venus OS 讀取，每份作業=1張
 let _skipMap={};
@@ -1995,7 +2020,11 @@ function normalizeSnapshot(raw,fallbackStamp){
     return item;
   });
   if(Array.isArray(out.fixed.cadre)){const o={};out.fixed.cadre.forEach(n=>o[n]=1);out.fixed.cadre=o;}
-  if(!out.fixed.cadre||typeof out.fixed.cadre!=='object')out.fixed.cadre={};
+  // v2.8.4：cadre / leader / secretary 三份名單一律正規化成 {座號:張數}
+  ['cadre','leader','secretary'].forEach(r=>{
+    if(Array.isArray(out.fixed[r])){const o={};out.fixed[r].forEach(n=>o[n]=1);out.fixed[r]=o;}
+    if(!out.fixed[r]||typeof out.fixed[r]!=='object')out.fixed[r]={};
+  });
   if(!Array.isArray(out.fixed.toilet))out.fixed.toilet=[];
   return out;
 }
@@ -2068,7 +2097,7 @@ function snapshotFingerprint(raw){
   return JSON.stringify(s);
 }
 function currentSnapshot(){
-  const hasLocal=Object.keys(_scores||{}).some(k=>(_scores[k]||[]).length)||(_logs||[]).length||(_nos||[]).length||Object.keys((_fixed&&_fixed.cadre)||{}).length||((_fixed&&_fixed.toilet)||[]).length;
+  const hasLocal=Object.keys(_scores||{}).some(k=>(_scores[k]||[]).length)||(_logs||[]).length||(_nos||[]).length||ROLE_KEYS.some(r=>Object.keys((_fixed&&_fixed[r])||{}).length)||((_fixed&&_fixed.toilet)||[]).length;
   const stamp=_dataUpdatedAt||(hasLocal?Date.now():0);
   ensureDataIdentity(stamp||1);
   return{
@@ -2175,7 +2204,7 @@ async function loadClass(classId){
     if(!v3&&hasMeaningfulData(snap))await writeLocalSnapshot(classId,snap);
   }catch(e){
     if(token!==_classLoadToken)return;
-    _scores={};_logs=[];_fixed={cadre:{},toilet:[]};_settings={threshold:300};_nos=[];_deleted={scores:{},logs:{}};_fieldUpdatedAt={fixed:0,settings:0,nos:0};_revision=0;_dataUpdatedAt=0;_lastSyncedAt=0;_dirty=false;
+    _scores={};_logs=[];_fixed={cadre:{},leader:{},secretary:{},toilet:[]};_settings={threshold:300};_nos=[];_deleted={scores:{},logs:{}};_fieldUpdatedAt={fixed:0,settings:0,nos:0};_revision=0;_dataUpdatedAt=0;_lastSyncedAt=0;_dirty=false;
   }
   renderAll();
   renderStorageStatus();
@@ -2183,7 +2212,7 @@ async function loadClass(classId){
 
 function hasMeaningfulData(snap){
   const s=normalizeSnapshot(snap,0);
-  return Object.keys(s.scores).some(k=>(s.scores[k]||[]).length)||s.logs.length||s.nos.length||Object.keys(s.fixed.cadre||{}).length||(s.fixed.toilet||[]).length||Object.keys(s.deleted.scores).length||Object.keys(s.deleted.logs).length||Object.keys(s.settings||{}).some(k=>k!=='threshold'||Number(s.settings[k])!==300);
+  return Object.keys(s.scores).some(k=>(s.scores[k]||[]).length)||s.logs.length||s.nos.length||ROLE_KEYS.some(r=>Object.keys(s.fixed[r]||{}).length)||(s.fixed.toilet||[]).length||Object.keys(s.deleted.scores).length||Object.keys(s.deleted.logs).length||Object.keys(s.settings||{}).some(k=>k!=='threshold'||Number(s.settings[k])!==300);
 }
 
 function snapshotCounts(raw){
@@ -2195,7 +2224,7 @@ function snapshotCounts(raw){
       scoreValues+=Object.values((entry&&entry.nos)||{}).filter(v=>v!==null&&v!==undefined&&v!=='').length;
     });
   });
-  const fixedCount=Object.keys((s.fixed&&s.fixed.cadre)||{}).length+(((s.fixed&&s.fixed.toilet)||[]).length);
+  const fixedCount=ROLE_KEYS.reduce((a,r)=>a+Object.keys((s.fixed&&s.fixed[r])||{}).length,0)+(((s.fixed&&s.fixed.toilet)||[]).length);
   const settingCount=Object.keys(s.settings||{}).filter(k=>k!=='threshold'||Number(s.settings[k])!==300).length;
   return{scoreEntries,scoreValues,logs:s.logs.length,nos:s.nos.length,fixed:fixedCount,settings:settingCount};
 }
@@ -3066,7 +3095,76 @@ async function diagExempt(){
   alert(lines.join('\n'));
 }
 
-// 在總覽頁顯示「作業抵免統計」卡片
+// 🔎 v2.8.4 Venus OS 資料掃描：列出這個班在 users/{uid}/data 底下有哪些文件，
+// 以及每份文件最上層有哪些欄位。純唯讀，不寫入任何東西。
+// 用途：確認 Venus OS 除了 groups 的 leader/secretary 之外，還有沒有別的幹部紀錄。
+async function scanVenusOsDocs(){
+  const uid=firebaseUidRef.current;
+  const classId=_curClassId;
+  const lines=['🔎 Venus OS 資料掃描｜Venus Card v'+APP_VERSION];
+  lines.push('班級代碼：'+(classId||'(無)'));
+  if(!uid||!_db||!classId){
+    lines.push(!uid?'未登入':!_db?'資料庫未連線':'尚未選擇班級');
+    alert(lines.join('\n'));return;
+  }
+  toast('🔎 正在掃描 Venus OS 資料…');
+  const dataCol=_db.collection('users').doc(uid).collection('data');
+  const fid=firebase.firestore.FieldPath.documentId();
+  const END='\uf8ff';
+  const seen=new Map();      // docId -> 最上層欄位
+  const dayBuckets=new Map();// 前綴 -> 份數（day 文件太多，收合顯示）
+  const record=doc=>{
+    const id=doc.id;
+    if(seen.has(id))return;
+    let keys='(無法解析)';
+    try{
+      const v=parseStored(doc.data().value,null);
+      if(v&&typeof v==='object')keys=Array.isArray(v)?`陣列 ${v.length} 筆`+(v[0]&&typeof v[0]==='object'?'：'+Object.keys(v[0]).join(','):''):Object.keys(v).join(',');
+      else keys=typeof v;
+    }catch{}
+    const m=id.match(/^(.*:day:)\d{4}-\d{2}-\d{2}$/);
+    if(m){
+      const b=dayBuckets.get(m[1])||{n:0,keys:new Set()};
+      b.n++;String(keys).split(',').forEach(k=>b.keys.add(k));
+      dayBuckets.set(m[1],b);
+      return;
+    }
+    seen.set(id,keys);
+  };
+  const runRange=async(lo,hi,limit)=>{
+    let q=dataCol.where(fid,'>=',lo).where(fid,'<=',hi);
+    if(limit)q=q.limit(limit);
+    const snap=await q.get();
+    snap.forEach(record);
+    return snap.size;
+  };
+  try{
+    // 1) 以 classId 開頭的文件（day、fixed、settings…）
+    await runRange(classId,classId+END,500);
+    // 2) hw5ren: 開頭的文件，再挑出跟這個班有關的
+    const snap2=await dataCol.where(fid,'>=','hw5ren:').where(fid,'<=','hw5ren:'+END).limit(500).get();
+    snap2.forEach(d=>{if(d.id.includes(classId))record(d);});
+    lines.push('（hw5ren: 命名空間共 '+snap2.size+' 份，僅列出含本班代碼者）');
+  }catch(e){
+    lines.push('✖ 查詢失敗：'+(e.code||e.message));
+    lines.push('（若為權限問題，代表 Firestore 規則不允許 list 查詢）');
+    alert(lines.join('\n'));return;
+  }
+  if(dayBuckets.size){
+    lines.push('── 每日文件（收合）──');
+    [...dayBuckets].forEach(([pfx,b])=>lines.push(pfx+' × '+b.n+' 份｜欄位：'+[...b.keys].join(',')));
+  }
+  if(seen.size){
+    lines.push('── 其他文件 '+seen.size+' 份 ──');
+    [...seen].slice(0,25).forEach(([id,keys])=>lines.push(id+'\n    欄位：'+String(keys).slice(0,120)));
+    if(seen.size>25)lines.push('…另有 '+(seen.size-25)+' 份未列出');
+  }
+  if(!dayBuckets.size&&!seen.size)lines.push('結果：找不到任何相關文件');
+  lines.push('── 目前分組 ──');
+  lines.push('_groups：'+_groups.length+' 組'+(_groups[0]?'｜欄位：'+Object.keys(_groups[0]).join(','):''));
+  lines.push('組長 '+venusRoleNos('leader').length+' 人、秘書長 '+venusRoleNos('secretary').length+' 人');
+  alert(lines.join('\n'));
+}
 function renderExemptSummary(){
   const area=document.getElementById('exempt-summary-card');
   if(!area)return;
@@ -4028,42 +4126,103 @@ function revokeAllRedeem(){
 
 // ══ 給卡 ══
 function ensureFixed(){
-  if(!_fixed.cadre||Array.isArray(_fixed.cadre))_fixed.cadre={};
+  ROLE_KEYS.forEach(r=>{
+    if(!_fixed[r]||Array.isArray(_fixed[r])||typeof _fixed[r]!=='object')_fixed[r]={};
+  });
   if(!Array.isArray(_fixed.toilet))_fixed.toilet=[];
+}
+
+// v2.8.4：從 Venus OS 的 hw5ren:groups:{classId} 帶入組長／秘書長，一律 ×1。
+// 只回傳名單，不動狀態；由呼叫端決定要不要寫入。
+function venusRoleNos(role){
+  const field=role==='leader'?'leader':'secretary';
+  const set=new Set();
+  _groups.forEach(g=>{
+    const n=parseInt(g&&g[field]);
+    if(!isNaN(n)&&_nos.includes(n))set.add(n);
+  });
+  return [...set].sort((a,b)=>a-b);
+}
+
+// 首次載入時自動帶入一次，之後尊重老師的手動調整，不再覆蓋。
+// _fixed.roleSeeded 記錄已完成初次帶入，隨 fixed 欄位一起同步。
+function seedRolesFromVenusOS(){
+  ensureFixed();
+  if(_fixed.roleSeeded)return false;
+  if(!_groups.length||!_nos.length)return false;
+  let n=0;
+  ['leader','secretary'].forEach(role=>{
+    if(Object.keys(_fixed[role]).length)return;
+    venusRoleNos(role).forEach(no=>{_fixed[role][no]=1;n++;});
+  });
+  _fixed.roleSeeded=Date.now();
+  sched('fixed');scheduleSync();
+  if(n)toast(`✅ 已從 Venus OS 帶入組長／秘書長共 ${n} 人`);
+  return true;
+}
+
+// 手動重新帶入：會覆蓋該區塊目前的名單，所以要先確認。
+function reseedRole(role){
+  ensureFixed();
+  if(!_groups.length){toast('目前沒有 Venus OS 分組資料');return;}
+  const nos=venusRoleNos(role);
+  const label=ROLE_META[role].label;
+  if(!nos.length){toast(`Venus OS 分組裡沒有${label}`);return;}
+  const had=Object.keys(_fixed[role]).length;
+  if(had&&!confirm(`重新帶入會覆蓋目前的${label}名單（${had} 人）。\n\n改成 Venus OS 的 ${nos.length} 人，每人 ×1？`))return;
+  pushUndo(`重新帶入${label}`);
+  _fixed[role]={};
+  nos.forEach(no=>{_fixed[role][no]=1;});
+  sched('fixed');scheduleSync();
+  renderNoPicker();
+  toast(`✅ ${label}已帶入 ${nos.length} 人`);
+}
+
+function roleBtnHtml(role,no,leaderNos,secNos){
+  const cnt=_fixed[role][no]||0;
+  const baseCls=cnt===1?'cadre1':cnt===2?'cadre2':'';
+  // 幹部區塊沿用原本的 Venus OS 角色小字提示；組長／秘書長區塊本身就是該角色，不重複標。
+  const hint=role!=='cadre'?'':
+    (leaderNos.has(no)?'<br><span style="font-size:8px">組長</span>':
+     secNos.has(no)?'<br><span style="font-size:8px">秘書長</span>':'');
+  const mul=cnt>0?`<br><span style="font-size:9px">×${cnt}</span>`:'';
+  return `<button class="no-btn${baseCls?' '+baseCls:''}" onclick="toggleRole('${role}',${no},this)" title="${no}號">${no}${mul}${hint}</button>`;
 }
 
 function renderNoPicker(){
   ensureFixed();
+  seedRolesFromVenusOS();
   // 優先從 Venus OS groups 讀 leader/secretary
   const leaderNos=new Set(_groups.map(g=>g.leader).filter(Boolean));
   const secNos=new Set(_groups.map(g=>g.secretary).filter(Boolean));
-  const cadreEl=document.getElementById('cadre-picker');
-  cadreEl.innerHTML=_nos.map(no=>{
-    const cnt=_fixed.cadre[no]||0;
-    const isL=leaderNos.has(no);const isS=secNos.has(no);
-    const baseCls=cnt===1?'cadre1':cnt===2?'cadre2':'';
-    const hint=isL?'<br><span style="font-size:8px">組長</span>':isS?'<br><span style="font-size:8px">副</span>':'';
-    return `<button class="no-btn${baseCls?' '+baseCls:''}" onclick="toggleCadre(${no},this)" title="${no}號">${no}${hint}</button>`;
-  }).join('');
+  ROLE_KEYS.forEach(role=>{
+    const el=document.getElementById(ROLE_META[role].pickerId);
+    if(!el)return;
+    el.innerHTML=_nos.map(no=>roleBtnHtml(role,no,leaderNos,secNos)).join('');
+  });
   const toiletEl=document.getElementById('toilet-picker');
   toiletEl.innerHTML=_nos.map(no=>{
     const sel=_fixed.toilet.includes(no);
     return `<button class="no-btn${sel?' sel':''}" onclick="toggleToilet(${no},this)">${no}</button>`;
   }).join('');
-  updToiletCount();updCadreHint();
+  updToiletCount();updRoleHints();
 }
 
-function toggleCadre(no,btn){
+function toggleRole(role,no,btn){
   ensureFixed();
-  const cur=_fixed.cadre[no]||0;
+  if(!ROLE_META[role])return;
+  const cur=_fixed[role][no]||0;
   const next=(cur+1)%3;
-  if(next===0)delete _fixed.cadre[no];else _fixed.cadre[no]=next;
+  if(next===0)delete _fixed[role][no];else _fixed[role][no]=next;
   sched('fixed');
   btn.className='no-btn'+(next===1?' cadre1':next===2?' cadre2':'');
-  const isL=_groups.some(g=>g.leader===no);const isS=_groups.some(g=>g.secretary===no);
-  const hint=isL?'<br><span style="font-size:8px">組長</span>':isS?'<br><span style="font-size:8px">副</span>':'';
+  const leaderNos=new Set(_groups.map(g=>g.leader).filter(Boolean));
+  const secNos=new Set(_groups.map(g=>g.secretary).filter(Boolean));
+  const hint=role!=='cadre'?'':
+    (leaderNos.has(no)?'<br><span style="font-size:8px">組長</span>':
+     secNos.has(no)?'<br><span style="font-size:8px">秘書長</span>':'');
   btn.innerHTML=no+(next>0?`<br><span style="font-size:9px">×${next}</span>`:'')+hint;
-  scheduleSync();updCadreHint();
+  scheduleSync();updRoleHints();
 }
 
 function toggleToilet(no,btn){
@@ -4081,13 +4240,15 @@ function updToiletCount(){
   const el=document.getElementById('toilet-count');
   if(el)el.textContent=`已選 ${(_fixed.toilet||[]).length}/6`;
 }
-function updCadreHint(){
-  const entries=Object.entries(_fixed.cadre||{});
-  const el=document.getElementById('cadre-hint');
-  if(!el)return;
-  if(!entries.length){el.textContent='尚未設定幹部名單';return;}
-  const total=entries.reduce((a,[,v])=>a+v,0);
-  el.textContent=`${entries.length} 人，本週共給 ${total} 張`;
+function updRoleHints(){
+  ROLE_KEYS.forEach(role=>{
+    const el=document.getElementById(ROLE_META[role].hintId);
+    if(!el)return;
+    const entries=Object.entries(_fixed[role]||{});
+    if(!entries.length){el.textContent=`尚未設定${ROLE_META[role].label}名單`;return;}
+    const total=entries.reduce((a,[,v])=>a+v,0);
+    el.textContent=`${entries.length} 人，本週共給 ${total} 張`;
+  });
 }
 
 function isoWeekKey(date){
@@ -4101,28 +4262,32 @@ function isoWeekKey(date){
 function giveWeekly(type){
   ensureFixed();
   const d=new Date();const wk=`${d.getMonth()+1}/${d.getDate()}`;const weekKey=isoWeekKey(d);
-  const kind=type==='cadre'?'幹部':'廁所';
-  if(_logs.some(l=>l.k===kind&&l.weekKey===weekKey)){
-    if(!confirm(`⚠️ ${weekKey} 已經發過「${kind}週給」。\n確定要再發一次嗎？`))return;
+  const meta=ROLE_META[type];
+  const kind=meta?'幹部':'廁所';
+  const label=meta?meta.label:'廁所';
+  // v2.8.4：三個角色區塊都記成 k:'幹部'，所以重複發放的判斷不能只看 k，
+  // 必須看 wt（週給來源）。舊紀錄沒有 wt，一律視為 'cadre'。
+  if(_logs.some(l=>l.k===kind&&(l.wt||(l.k==='幹部'?'cadre':'toilet'))===type&&l.weekKey===weekKey)){
+    if(!confirm(`⚠️ ${weekKey} 已經發過「${label}週給」。\n確定要再發一次嗎？`))return;
   }
   const batchId=`weekly:${type}:${weekKey}:${genId()}`;
-  if(type==='cadre'){
-    const entries=Object.entries(_fixed.cadre||{});
-    if(!entries.length){toast('幹部名單是空的');return;}
+  if(meta){
+    const entries=Object.entries(_fixed[type]||{});
+    if(!entries.length){toast(`${label}名單是空的`);return;}
     const total=entries.reduce((a,[,v])=>a+v,0);
-    if(!confirm(`確定給幹部週給？共 ${entries.length} 人，發出 ${total} 張`))return;
-    pushUndo('幹部週給');
+    if(!confirm(`確定給${label}週給？共 ${entries.length} 人，發出 ${total} 張`))return;
+    pushUndo(`${label}週給`);
     entries.forEach(([no,cnt])=>{
-      _logs.push({id:genId(),batchId,weekKey,t:nowStr(),w:wk,no:parseInt(no),k:'幹部',v:0,c:cnt,note:`幹部週給×${cnt}`});
+      _logs.push({id:genId(),batchId,weekKey,wt:type,t:nowStr(),w:wk,no:parseInt(no),k:'幹部',v:0,c:cnt,note:`${label}週給×${cnt}`});
     });
-    toast(`✅ 幹部週給完成，共 ${total} 張`);
+    toast(`✅ ${label}週給完成，共 ${total} 張`);
   }else{
     const nos=_fixed.toilet||[];
     if(!nos.length){toast('廁所名單是空的');return;}
     if(!confirm(`確定給 ${nos.length} 位廁所學生各 1 張？`))return;
     pushUndo('廁所週給');
     nos.forEach(no=>{
-      _logs.push({id:genId(),batchId,weekKey,t:nowStr(),w:wk,no,k:'廁所',v:0,c:1,note:'廁所週給'});
+      _logs.push({id:genId(),batchId,weekKey,wt:'toilet',t:nowStr(),w:wk,no,k:'廁所',v:0,c:1,note:'廁所週給'});
     });
     toast(`✅ ${nos.length} 位廁所學生各獲 1 張`);
   }
@@ -4775,7 +4940,9 @@ function saveNos(){
   _nos=[..._draftNos].sort((a,b)=>a-b);
   ensureFixed();
   _fixed.toilet=_fixed.toilet.filter(n=>_nos.includes(n));
-  Object.keys(_fixed.cadre).forEach(n=>{if(!_nos.includes(parseInt(n)))delete _fixed.cadre[n];});
+  ROLE_KEYS.forEach(r=>{
+    Object.keys(_fixed[r]).forEach(n=>{if(!_nos.includes(parseInt(n)))delete _fixed[r][n];});
+  });
   _qgSel.clear();
   sched(['nos','fixed']);scheduleSync();
   toast(`✅ 已儲存 ${_nos.length} 個座號`);
@@ -5630,7 +5797,7 @@ function confirmReportExport(){
   generateReportWindow(targetNo,scope,colorMode,reportType);
 }
 
-let _reportBuildCancel=false,_reportBuildRun=0,_reportBuildPopup=null,_perf=null;
+let _reportBuildCancel=false,_reportBuildRun=0,_perf=null;
 function showReportProgress(total,reportType){
   _reportBuildCancel=false;
   const modal=document.getElementById('report-progress-modal');
@@ -5643,20 +5810,13 @@ function showReportProgress(total,reportType){
   if(cancel){cancel.disabled=false;cancel.textContent='取消產生';cancel.style.opacity='1';}
   if(modal)modal.classList.add('show');
 }
-function updateReportProgress(done,total,no,w){
+function updateReportProgress(done,total,no){
   const pct=total?Math.round(done/total*100):100;
   const label=document.getElementById('report-progress-label');
   const fill=document.getElementById('report-progress-fill');
   const detail=document.getElementById('report-progress-detail');
   if(label)label.textContent=pct+'%';if(fill)fill.style.width=pct+'%';
   if(detail)detail.textContent=done>=total?'正在完成 A4 版面…':`已完成 ${done}/${total} 份${no?`（目前 ${no}號）`:''}`;
-  try{
-    const p=w&&w.document.getElementById('popup-progress');
-    const t=w&&w.document.getElementById('popup-progress-text');
-    if(p)p.style.width=pct+'%';if(t)t.textContent=`${pct}%・${done}/${total} 份`;
-    const pf=w&&w.document.getElementById('popup-perf');
-    if(pf&&_perf){const el=Math.round((performance.now()-_perf.t0)/100)/10;pf.textContent=`經過 ${el}s｜學生運算 ${Math.round(_perf.studentCpu)}ms｜圖片 ${Math.round(_perf.tdu)}ms×${_perf.tduN}｜摘要 ${Math.round(_perf.summary)}ms`;}
-  }catch(e){}
 }
 function cancelReportBuild(){
   _reportBuildCancel=true;
@@ -5821,7 +5981,7 @@ async function generateReportWindow(targetNo,scope,colorMode,reportType){
       toast(`產生 ${studentNo}號報告時失敗：${e.message}`,5000);
       return;
     }
-    updateReportProgress(i+1,targets.length,studentNo,null);
+    updateReportProgress(i+1,targets.length,studentNo);
     if(i<targets.length-1)await yieldReportUI();
   }
   await yieldReportUI();
