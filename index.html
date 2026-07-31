@@ -1572,7 +1572,7 @@ tr:hover td{background:var(--accent-light)}
 // ══════════════════════════════════════════
 // Firebase 設定
 // ══════════════════════════════════════════
-const APP_VERSION='2.8.8';
+const APP_VERSION='2.8.9';
 const FB_CONFIG = {
   apiKey: "AIzaSyAqgA9pYvOduWypEE5kxVNlq9fEfrEMV0c",
   authDomain: "attendance-pwa-9fa73.firebaseapp.com",
@@ -2469,17 +2469,11 @@ async function loadFromFirestore(){
 
     if(isOsClass(preferCls.id)){
       if(parsed.groups&&Array.isArray(parsed.groups))_groups=parsed.groups;
+      // 座號必須在 loadClass() 之後才帶入，否則會用比雲端更新的時戳蓋掉既有名單。
+      seedNosFromVenusOS();
       loadGroupsForClass(preferCls.id);
       loadOfficersForClass(preferCls.id);   // v2.8.8 幹部名單，唯讀
       loadExemptFromVenusOS(preferCls.id);  // 背景讀取，不阻擋畫面
-      try{
-        const grpDoc=await dataCol.doc('hw5ren:groups:'+preferCls.id).get();
-        if(grpDoc.exists){
-          const raw2=grpDoc.data().value;
-          const parsed2=typeof raw2==='string'?JSON.parse(raw2):raw2;
-          if(Array.isArray(parsed2))_groups=parsed2;
-        }
-      }catch{}
     }else{
       _groups=[];_exemptMap={};renderExemptSummary();
     }
@@ -2889,6 +2883,7 @@ async function switchClass(id){
   if(id!==_curClassId)return;
   // 只有 Venus OS 班級讀取 OS 分組與作業抵免；Card 自建班級完全獨立。
   if(isOsClass(id)){
+    seedNosFromVenusOS();   // loadClass 已完成，此時帶入座號才不會蓋掉雲端名單
     loadGroupsForClass(id);
     loadOfficersForClass(id);
     loadExemptFromVenusOS(id);
@@ -2918,13 +2913,17 @@ let _officersRaw=null;   // 原始 value，切學期時不必重讀
 let _officerSem='';      // '1' | '2'
 let _officerMeta={docId:'',updatedAt:'',revision:null,found:false};
 
-// 依校曆判斷目前學期；抓不到就用月份粗估（2–7 月為下學期）。
+// 依校曆判斷目前學期。
+// v2.8.9：semStart2 可能是上一學年殘留值（例如新學年 semStart1=2026-08-31，
+// semStart2 卻還是 2026-02-23），早於 semStart1 就視為無效，否則暑假會被判成下學期。
 function currentSemester(){
   const s=_osSettings||{};
   const today=new Date().toISOString().slice(0,10);
-  if(s.semStart2&&today>=s.semStart2)return '2';
-  if(s.semStart1&&today>=s.semStart1&&s.semEnd1&&today<=s.semEnd1)return '1';
-  if(s.semStart1&&today<s.semStart1)return '1';
+  const s1=String(s.semStart1||'');
+  const s2=String(s.semStart2||'');
+  const s2valid=!!s2&&(!s1||s2>s1);
+  if(s2valid&&today>=s2)return '2';
+  if(s1)return '1';
   const m=new Date().getMonth()+1;
   return (m>=2&&m<=7)?'2':'1';
 }
@@ -2941,6 +2940,21 @@ function applyOfficerSemester(){
     if(!map[seat].includes(role))map[seat].push(role);
   });
   _officers=map;
+}
+
+// v2.8.9：新班級在 Venus Card 沒有座號時，直接沿用 Venus OS 班級設定的人數。
+// 只在座號完全空白時執行，絕不覆蓋既有名單；classSize 來自 settings:main.classes。
+function seedNosFromVenusOS(){
+  if(_nos.length)return false;
+  const cls=_classes.find(c=>c.id===_curClassId);
+  if(!cls||cls.source!=='venus-os')return false;
+  const raw=_osClasses.find(c=>String(c.id)===String(_curClassId));
+  const size=parseInt((raw&&raw.classSize)!==undefined?raw.classSize:cls.classSize);
+  if(isNaN(size)||size<1||size>60)return false;
+  _nos=Array.from({length:size},(_,i)=>i+1);
+  sched('nos');scheduleSync();
+  toast(`✅ 已依 Venus OS 設定帶入 1–${size} 號`);
+  return true;
 }
 
 async function loadOfficersForClass(classId){
@@ -2975,6 +2989,12 @@ async function loadOfficersForClass(classId){
     _officersRaw=v&&typeof v==='object'&&!Array.isArray(v)?v:null;
     _officerMeta={docId,updatedAt:String(d.updatedAt||''),revision:d.revision,found:!!_officersRaw};
     if(!_officerSem)_officerSem=currentSemester();
+    // 判斷出來的學期若沒資料、另一學期卻有，就顯示有資料的那個，免得畫面一片空白。
+    const cnt=sem=>Array.isArray(_officersRaw&&_officersRaw[sem])?_officersRaw[sem].length:0;
+    if(!cnt(_officerSem)){
+      const other=_officerSem==='1'?'2':'1';
+      if(cnt(other))_officerSem=other;
+    }
     applyOfficerSemester();
     renderNoPicker();
   }catch(e){console.warn('officers read fail',e);}
@@ -2985,7 +3005,7 @@ function setOfficerSemester(sem){
   _officerSem=sem;
   applyOfficerSemester();
   renderNoPicker();
-  const n=Object.keys(_officers).length;
+  const n=Object.keys(_officers).map(Number).filter(no=>_nos.includes(no)).length;
   toast(n?`已切換到${sem==='1'?'上':'下'}學期幹部（${n} 人）`:`${sem==='1'?'上':'下'}學期尚未設定幹部`);
 }
 
@@ -3004,19 +3024,42 @@ function reseedOfficers(){
   toast(`✅ 幹部已帶入 ${seats.length} 人`);
 }
 
+// v2.8.9：LIMU 已改用 groupVersions:{classId}，結構為
+// { versions:[{effectiveDate,verId,groups:[{id,label,members,leader,secretary}]}] }。
+// 舊的 hw5ren:groups:{classId} 保留為備援。
+function pickGroupVersion(parsed){
+  const vs=parsed&&Array.isArray(parsed.versions)?parsed.versions:[];
+  if(!vs.length)return null;
+  const today=new Date().toISOString().slice(0,10);
+  // 取生效日已到、且最新的一版；都還沒生效就退回最早那版。
+  const eligible=vs.filter(v=>!v.effectiveDate||String(v.effectiveDate)<=today);
+  const pool=eligible.length?eligible:vs;
+  const best=pool.slice().sort((a,b)=>{
+    const d=String(a.effectiveDate||'').localeCompare(String(b.effectiveDate||''));
+    if(d!==0)return d;
+    return (Number(a.verId)||0)-(Number(b.verId)||0);
+  }).pop();
+  return best&&Array.isArray(best.groups)?best.groups:null;
+}
+
 async function loadGroupsForClass(id){
   const uid=firebaseUidRef.current;
   if(!uid||!_db)return;
   try{
     const dataCol=_db.collection('users').doc(uid).collection('data');
-    const grpDoc=await dataCol.doc('hw5ren:groups:'+id).get();
-    if(id!==_curClassId)return;
-    if(grpDoc.exists){
-      const raw=grpDoc.data().value;
-      const parsed=typeof raw==='string'?JSON.parse(raw):raw;
-      if(Array.isArray(parsed)){_groups=parsed;renderNoPicker();}
+    let groups=null;
+    const gv=await dataCol.doc('groupVersions:'+id).get();
+    if(gv.exists)groups=pickGroupVersion(parseStored(gv.data().value,null));
+    if(!groups){
+      const grpDoc=await dataCol.doc('hw5ren:groups:'+id).get();
+      if(grpDoc.exists){
+        const parsed=parseStored(grpDoc.data().value,null);
+        if(Array.isArray(parsed))groups=parsed;
+      }
     }
-  }catch{}
+    if(id!==_curClassId)return;
+    if(groups){_groups=groups;renderNoPicker();}
+  }catch(e){console.warn('groups read fail',e);}
 }
 
 // 從 Venus OS Firestore 讀取作業抵免紀錄，統計每人消耗幾張
