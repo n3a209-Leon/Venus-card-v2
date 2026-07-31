@@ -1533,7 +1533,7 @@ tr:hover td{background:var(--accent-light)}
 // ══════════════════════════════════════════
 // Firebase 設定
 // ══════════════════════════════════════════
-const APP_VERSION='2.8.3';
+const APP_VERSION='2.8.2';
 const FB_CONFIG = {
   apiKey: "AIzaSyAqgA9pYvOduWypEE5kxVNlq9fEfrEMV0c",
   authDomain: "attendance-pwa-9fa73.firebaseapp.com",
@@ -2865,12 +2865,7 @@ async function loadGroupsForClass(id){
 const _exemptLoadedSession={};
 function academicRangeForClass(classId){
   const cls=_classes.find(c=>c.id===classId);
-  // v2.8.3：Venus OS 的 classId 本身就帶學年（例如 2026_五年王班），而 day 文件
-  // 也是以 classId 命名，所以 classId 才是唯一可信來源。cls.year 是可在 Venus OS
-  // 隨時修改的欄位，只能當 Card 自建班級（id 不帶年份）的備援。
-  const fromId=String(classId||'').match(/^(\d{3,4})_/);
-  let raw=fromId?parseInt(fromId[1]):NaN;
-  if(isNaN(raw)&&cls&&cls.year!==undefined)raw=parseInt(String(cls.year));
+  const raw=cls&&cls.year!==undefined?parseInt(String(cls.year)):NaN;
   let startYear;
   if(!isNaN(raw)&&raw>=100&&raw<200)startYear=raw+1911;
   else if(!isNaN(raw)&&raw>=2000&&raw<2200)startYear=raw;
@@ -2878,9 +2873,9 @@ function academicRangeForClass(classId){
     const now=new Date();
     startYear=now.getMonth()>=7?now.getFullYear():now.getFullYear()-1;
   }
-  // 掃描窗前後各擴一年：classId 裡的年份可能代表學年起始年或結束年（例如
-  // 2026_五年王班 的資料實際落在 2026-06），這一年的 padding 正是用來吸收這個歧義，
-  // 請勿收緊。前綴已鎖定單一班級，擴大日期窗只會多讀同班自己的文件，不會跨班污染。
+  // 掃描窗前後各擴一年：Venus OS 把同一班所有 day 資料塞在同一個 {年}_{班名}: 前綴下，
+  // 而 cls.year 可能代表學年起始年或結束年，日期實際可能落在 startYear 的前一個學年。
+  // 前綴已鎖定單一班級，擴大日期窗只會多讀同班自己的文件，不會跨班污染。
   return{start:`${startYear-1}-08-01`,end:`${startYear+1}-07-31`,startYear};
 }
 
@@ -2893,27 +2888,13 @@ async function loadExemptFromVenusOS(classId){
   try{
     const dataCol=_db.collection('users').doc(uid).collection('data');
     const cls=_classes.find(c=>c.id===classId);
-
-    // v2.8.3：Card 自建班級在 Venus OS 沒有 day 文件，直接視為無抵免。
-    // 一併避免下面的備援前綴誤中同名的 OS 班級。
-    if(cls&&cls.source!=='venus-os'){
-      if(token!==_exemptLoadToken||classId!==_curClassId)return;
-      _exemptMap={};renderOverview();renderExemptSummary();
-      await storeSet(cacheKey,{start:range.start,end:range.end,map:{},updatedAt:Date.now()});
-      return;
-    }
-
-    // v2.8.3：Venus OS 的 day 文件一律以 classId 命名，所以 classId 是主前綴。
-    // {年}_{班名} 只留作舊資料備援（classId 不帶年份前綴的情況），且「主前綴掃不到
-    // 任何文件」才會啟用。刻意不做聯集：{年}_{班名} 不含屆別，聯集有可能把去年
-    // 同名班級的抵免併進來，那比顯示 0 更糟。
-    const primaryPfx=`${classId}:day:`;
-    const fallbackPfxList=[];
+    // 建構候選前綴：Venus OS 的學年可能存西元或民國，三種都試（去重），哪個對得上就抓到，其餘回空無副作用。
+    let pfxList;
     if(cls){
-      new Set([String(cls.year),String(range.startYear),String(range.startYear-1911)]).forEach(y=>{
-        const p=`${y}_${cls.className}:day:`;
-        if(p!==primaryPfx&&!fallbackPfxList.includes(p))fallbackPfxList.push(p);
-      });
+      const yrTokens=new Set([String(cls.year),String(range.startYear),String(range.startYear-1911)]);
+      pfxList=[...yrTokens].map(y=>`${y}_${cls.className}:day:`);
+    }else{
+      pfxList=[`${classId}:day:`];
     }
 
     // 先顯示上次結果，切頁時不必重新等待；同一次開啟 App 每班只完整掃描一次。
@@ -2940,53 +2921,26 @@ async function loadExemptFromVenusOS(classId){
     };
 
     // 優先用文件 ID 範圍查詢，一次只取實際存在的日期；若規則不允許 list，再退回逐日讀取。
-    // v2.8.3：兩條路徑都改成「主前綴優先，掃到 0 份才試備援」，回傳 -1 代表已被新的
-    // 載入或切班取消，呼叫端必須立刻結束，不可再寫入 _exemptMap。
-    let scannedDocs=0;
     try{
       const fid=firebase.firestore.FieldPath.documentId();
-      const scan=async pfx=>{
+      for(const pfx of pfxList){
         const snap=await dataCol.where(fid,'>=',pfx+range.start).where(fid,'<=',pfx+range.end).get();
         snap.forEach(ingest);
-        return snap.size;
-      };
-      scannedDocs=await scan(primaryPfx);
-      if(!scannedDocs){
-        for(const pfx of fallbackPfxList){
-          scannedDocs=await scan(pfx);
-          if(scannedDocs)break;
-        }
       }
     }catch(queryErr){
       const dates=[];
       for(let d=new Date(range.start+'T00:00:00');d<=new Date(range.end+'T00:00:00');d.setDate(d.getDate()+1)){
         dates.push(`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`);
       }
+      const ids=[];
+      for(const pfx of pfxList){for(const ds of dates)ids.push(pfx+ds);}
       const BATCH=25;
-      const readPfx=async pfx=>{
-        let found=0;
-        for(let i=0;i<dates.length;i+=BATCH){
-          const got=await Promise.all(dates.slice(i,i+BATCH).map(async ds=>{
-            try{
-              const d=await dataCol.doc(pfx+ds).get();
-              if(d&&d.exists){ingest(d);return 1;}
-            }catch{}
-            return 0;
-          }));
-          found+=got.reduce((a,b)=>a+b,0);
-          if(token!==_exemptLoadToken||classId!==_curClassId)return -1;
-          _exemptMap={...newExempt};renderOverview();renderExemptSummary();
-        }
-        return found;
-      };
-      scannedDocs=await readPfx(primaryPfx);
-      if(scannedDocs===-1)return;
-      if(!scannedDocs){
-        for(const pfx of fallbackPfxList){
-          scannedDocs=await readPfx(pfx);
-          if(scannedDocs===-1)return;
-          if(scannedDocs)break;
-        }
+      for(let i=0;i<ids.length;i+=BATCH){
+        await Promise.all(ids.slice(i,i+BATCH).map(async id=>{
+          try{ingest(await dataCol.doc(id).get());}catch{}
+        }));
+        if(token!==_exemptLoadToken||classId!==_curClassId)return;
+        _exemptMap={...newExempt};renderOverview();renderExemptSummary();
       }
     }
     if(token!==_exemptLoadToken||classId!==_curClassId)return;
@@ -3013,8 +2967,6 @@ async function diagExempt(){
   lines.push('班級：'+(cls?(cls.className||cls.id):_curClassId||'(未選擇)'));
   lines.push('班級代碼：'+(_curClassId||'(無)'));
   lines.push('學年度原值：'+(cls?JSON.stringify(cls.year):'(找不到班級)'));
-  lines.push('班級來源：'+(cls?(cls.source==='venus-os'?'Venus OS（唯讀）':'Card 自建'):'(未知)'));
-  lines.push('主前綴：'+(_curClassId||'(無)')+':day:');
   lines.push('掃描日期：'+range.start+' ～ '+range.end);
   if(!uid||!_db||!cls){alert(lines.join('\n'));return;}
   toast('🩺 正在診斷抵免資料…');
@@ -3027,14 +2979,9 @@ async function diagExempt(){
   if(cls.year!==undefined&&cls.year!==null)years.add(String(cls.year));
   const dataCol=_db.collection('users').doc(uid).collection('data');
   const fid=firebase.firestore.FieldPath.documentId();
-  // v2.8.3：把載入器實際使用的 classId 主前綴排在最前面，方便一眼看出主前綴是否命中。
-  const prefixes=[_curClassId+':day:'];
-  years.forEach(y=>{
-    const p=y+'_'+nm+':day:';
-    if(!prefixes.includes(p))prefixes.push(p);
-  });
   let sampleKeys=[],sampleExempt='',anyDoc=false,totalDocs=0,totalWithExempt=0,totalExempt=0;
-  for(const pfx of prefixes){
+  for(const y of years){
+    const pfx=y+'_'+nm+':day:';
     try{
       const snap=await dataCol.where(fid,'>=',pfx+'2020-01-01').where(fid,'<=',pfx+'2035-12-31').get();
       if(snap.size>0){
@@ -3043,12 +2990,9 @@ async function diagExempt(){
           if(sampleKeys.length<4)sampleKeys.push(d.id);
           const p=parseStored(d.data().value,null);
           if(p&&p.exempt){
-            const n=Object.values(p.exempt).reduce((a,v)=>a+(Array.isArray(v)?v.length:0),0);
-            if(n>0)withEx++;
-            cnt+=n;
-            // v2.8.3：樣本只挑真的有抵免的那天。空的 {} 也是 truthy，
-            // 以前很容易讓人誤以為資料被清空。
-            if(n>0&&!sampleExempt)sampleExempt=d.id+' → '+JSON.stringify(p.exempt).slice(0,140);
+            withEx++;
+            cnt+=Object.values(p.exempt).reduce((a,v)=>a+(Array.isArray(v)?v.length:0),0);
+            if(!sampleExempt)sampleExempt=d.id+' → '+JSON.stringify(p.exempt).slice(0,140);
           }
         });
         totalDocs+=snap.size;totalWithExempt+=withEx;totalExempt+=cnt;
@@ -3062,7 +3006,7 @@ async function diagExempt(){
   else lines.push('合計：文件 '+totalDocs+'｜含抵免文件 '+totalWithExempt+'｜抵免 '+totalExempt+' 筆');
   if(sampleKeys.length)lines.push('樣本：'+sampleKeys.join('｜'));
   if(sampleExempt)lines.push('抵免樣本：'+sampleExempt);
-  else if(anyDoc)lines.push('結果：有 day 文件，但裡面沒有任何抵免紀錄');
+  else if(anyDoc)lines.push('結果：有 day 文件，但未找到 exempt 欄位');
   alert(lines.join('\n'));
 }
 
