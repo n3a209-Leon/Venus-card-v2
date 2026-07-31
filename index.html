@@ -1572,7 +1572,7 @@ tr:hover td{background:var(--accent-light)}
 // ══════════════════════════════════════════
 // Firebase 設定
 // ══════════════════════════════════════════
-const APP_VERSION='2.8.9';
+const APP_VERSION='2.8.10';
 const FB_CONFIG = {
   apiKey: "AIzaSyAqgA9pYvOduWypEE5kxVNlq9fEfrEMV0c",
   authDomain: "attendance-pwa-9fa73.firebaseapp.com",
@@ -3019,6 +3019,8 @@ function reseedOfficers(){
   pushUndo('重新帶入幹部');
   _fixed.cadre={};
   seats.forEach(no=>{_fixed.cadre[no]=1;});
+  if(!_fixed.seeded||typeof _fixed.seeded!=='object')_fixed.seeded={};
+  _fixed.seeded.cadre=Date.now();
   sched('fixed');scheduleSync();
   renderNoPicker();
   toast(`✅ 幹部已帶入 ${seats.length} 人`);
@@ -4396,26 +4398,35 @@ function venusRoleNos(role){
 }
 
 // 首次載入時自動帶入一次，之後尊重老師的手動調整，不再覆蓋。
-// _fixed.roleSeeded 記錄已完成初次帶入，隨 fixed 欄位一起同步。
+// _fixed.seeded 逐份記錄已完成初次帶入，隨 fixed 欄位一起同步。
 function seedRolesFromVenusOS(){
   ensureFixed();
-  if(_fixed.roleSeeded)return false;
   if(!_nos.length)return false;
-  const hasOfficers=Object.keys(_officers).length>0;
-  if(!_groups.length&&!hasOfficers)return false;
-  let n=0;
-  // v2.8.8：幹部名單改由 LIMU 的 officers 帶入。一人可兼多職，
-  // 但卡片一律以「人」為單位 ×1，不因兼職而加倍。
-  if(hasOfficers&&!Object.keys(_fixed.cadre).length){
-    Object.keys(_officers).map(Number).filter(no=>_nos.includes(no)).forEach(no=>{_fixed.cadre[no]=1;n++;});
+  if(!_fixed.seeded||typeof _fixed.seeded!=='object'||Array.isArray(_fixed.seeded))_fixed.seeded={};
+  // v2.8.10：改成逐份記錄。先前用單一 roleSeeded 旗標，但分組與幹部名單是兩個
+  // 非同步讀取，誰先回來就把旗標鎖上，後到的那份永遠帶不進來。
+  // 舊旗標只補記組長／秘書長，幹部維持未帶入，讓它有機會補上。
+  if(_fixed.roleSeeded){
+    ['leader','secretary'].forEach(r=>{if(!_fixed.seeded[r])_fixed.seeded[r]=_fixed.roleSeeded;});
+    delete _fixed.roleSeeded;
   }
-  ['leader','secretary'].forEach(role=>{
-    if(Object.keys(_fixed[role]).length)return;
-    venusRoleNos(role).forEach(no=>{_fixed[role][no]=1;n++;});
-  });
-  _fixed.roleSeeded=Date.now();
+  let added=0,changed=false;
+  // 來源還沒到就先不標記，下次 render 再試；已有名單則只標記、不覆蓋手動調整。
+  const seedList=(role,seats)=>{
+    if(_fixed.seeded[role]||!seats.length)return;
+    if(!Object.keys(_fixed[role]).length){
+      seats.forEach(no=>{_fixed[role][no]=1;added++;});
+    }
+    _fixed.seeded[role]=Date.now();
+    changed=true;
+  };
+  // 幹部一律以「人」為單位 ×1，兼多職不加倍。
+  seedList('cadre',Object.keys(_officers).map(Number).filter(no=>_nos.includes(no)).sort((a,b)=>a-b));
+  seedList('leader',venusRoleNos('leader'));
+  seedList('secretary',venusRoleNos('secretary'));
+  if(!changed)return false;
   sched('fixed');scheduleSync();
-  if(n)toast(`✅ 已從 Venus OS 帶入幹部名單共 ${n} 人次`);
+  if(added)toast(`✅ 已自動帶入名單共 ${added} 人`);
   return true;
 }
 
@@ -4431,30 +4442,29 @@ function reseedRole(role){
   pushUndo(`重新帶入${label}`);
   _fixed[role]={};
   nos.forEach(no=>{_fixed[role][no]=1;});
+  if(!_fixed.seeded||typeof _fixed.seeded!=='object')_fixed.seeded={};
+  _fixed.seeded[role]=Date.now();
   sched('fixed');scheduleSync();
   renderNoPicker();
   toast(`✅ ${label}已帶入 ${nos.length} 人`);
 }
 
-// 幹部按鈕的小字：優先顯示 LIMU 的職稱，其次才是 Venus OS 的組長／秘書長。
+// 幹部按鈕的小字只顯示 LIMU 的職稱。
+// v2.8.10：不再退回顯示組長／秘書長——那兩個已是獨立區塊，重複標示只會混淆。
 // 職稱是使用者自訂字串，一律經過 esc() 才能進 HTML。
-function roleHintHtml(role,no,leaderNos,secNos){
+function roleHintHtml(role,no){
   if(role!=='cadre')return '';
   const titles=_officers[no]||[];
-  if(titles.length){
-    const first=esc(titles[0]);
-    const more=titles.length>1?`+${titles.length-1}`:'';
-    return `<br><span style="font-size:8px">${first}${more}</span>`;
-  }
-  if(leaderNos.has(no))return '<br><span style="font-size:8px">組長</span>';
-  if(secNos.has(no))return '<br><span style="font-size:8px">秘書長</span>';
-  return '';
+  if(!titles.length)return '';
+  const first=esc(titles[0]);
+  const more=titles.length>1?`+${titles.length-1}`:'';
+  return `<br><span style="font-size:8px">${first}${more}</span>`;
 }
 
-function roleBtnHtml(role,no,leaderNos,secNos){
+function roleBtnHtml(role,no){
   const cnt=_fixed[role][no]||0;
   const baseCls=cnt===1?'cadre1':cnt===2?'cadre2':'';
-  const hint=roleHintHtml(role,no,leaderNos,secNos);
+  const hint=roleHintHtml(role,no);
   const mul=cnt>0?`<br><span style="font-size:9px">×${cnt}</span>`:'';
   const titles=(role==='cadre'&&(_officers[no]||[]).length)?`${no}號｜${(_officers[no]||[]).join('、')}`:`${no}號`;
   return `<button class="no-btn${baseCls?' '+baseCls:''}" onclick="toggleRole('${role}',${no},this)" title="${esc(titles)}">${no}${mul}${hint}</button>`;
@@ -4463,13 +4473,10 @@ function roleBtnHtml(role,no,leaderNos,secNos){
 function renderNoPicker(){
   ensureFixed();
   seedRolesFromVenusOS();
-  // 優先從 Venus OS groups 讀 leader/secretary
-  const leaderNos=new Set(_groups.map(g=>g.leader).filter(Boolean));
-  const secNos=new Set(_groups.map(g=>g.secretary).filter(Boolean));
   ROLE_KEYS.forEach(role=>{
     const el=document.getElementById(ROLE_META[role].pickerId);
     if(!el)return;
-    el.innerHTML=_nos.map(no=>roleBtnHtml(role,no,leaderNos,secNos)).join('');
+    el.innerHTML=_nos.map(no=>roleBtnHtml(role,no)).join('');
   });
   const toiletEl=document.getElementById('toilet-picker');
   toiletEl.innerHTML=_nos.map(no=>{
@@ -4487,9 +4494,7 @@ function toggleRole(role,no,btn){
   if(next===0)delete _fixed[role][no];else _fixed[role][no]=next;
   sched('fixed');
   btn.className='no-btn'+(next===1?' cadre1':next===2?' cadre2':'');
-  const leaderNos=new Set(_groups.map(g=>g.leader).filter(Boolean));
-  const secNos=new Set(_groups.map(g=>g.secretary).filter(Boolean));
-  const hint=roleHintHtml(role,no,leaderNos,secNos);
+  const hint=roleHintHtml(role,no);
   btn.innerHTML=no+(next>0?`<br><span style="font-size:9px">×${next}</span>`:'')+hint;
   scheduleSync();updRoleHints();
 }
