@@ -37,14 +37,17 @@
   --safe-top:env(safe-area-inset-top,0px);
   --safe-bottom:env(safe-area-inset-bottom,0px);
   /*
-   * 常駐導覽採「54px 完整按鍵 + 最多 8px Home 指示條緩衝」。
-   * 不恢復過去整段 34px 空白，但讓圖示、文字與手指離系統手勢區更遠。
+   * v2.8.11 懸浮式導覽（IG 風格）：54px 完整按鍵不變，改成離開螢幕邊緣的膠囊。
+   * --dock-float-bottom 離底部距離，已避開 Home 指示條；--dock-inline 左右內縮。
+   * --tabar-h 仍代表導覽總佔用高度，供 scroll-area、toast、undo-fab 計算讓位。
    */
   --dock-safe-bottom:min(var(--safe-bottom),8px);
   --dock-control-height:54px;
+  --dock-inline:14px;
+  --dock-float-bottom:calc(min(var(--safe-bottom),20px) + 8px);
   --safe-bottom-ui:var(--dock-safe-bottom);
   --header-h:52px;
-  --tabar-h:calc(var(--dock-control-height) + var(--dock-safe-bottom));
+  --tabar-h:calc(var(--dock-control-height) + var(--dock-float-bottom));
 }
 
 /* ══ NERV THEME ══ */
@@ -66,8 +69,9 @@
 }
 [data-theme="nerv"]::before{content:"";position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.07) 2px,rgba(0,0,0,.07) 4px);pointer-events:none;z-index:9998}
 [data-theme="nerv"] .app-header{background:linear-gradient(180deg,#120400,#080200);border-bottom:1px solid #FF6600;box-shadow:0 0 30px rgba(255,102,0,.25)}
-[data-theme="nerv"] .tab-bar{background:#080200;border-top:1px solid rgba(255,102,0,.3)}
+[data-theme="nerv"] .tab-bar{background:#080200;border:1px solid rgba(255,102,0,.42);box-shadow:0 8px 28px rgba(0,0,0,.6),0 0 14px rgba(255,102,0,.16)}
 [data-theme="nerv"] .tab-btn.active{color:#FF6600;text-shadow:0 0 8px rgba(255,102,0,.8)}
+[data-theme="nerv"] .tab-btn.active::before{background:rgba(255,102,0,.15);box-shadow:inset 0 0 0 1px rgba(255,102,0,.42)}
 [data-theme="nerv"] .card{border:1px solid rgba(255,102,0,.15);background:#0a0400}
 [data-theme="nerv"] .btn-primary{background:rgba(255,102,0,.15);color:#FF6600;border:1px solid rgba(255,102,0,.5)}
 [data-theme="nerv"] .btn-primary:active{background:rgba(255,102,0,.3)}
@@ -282,22 +286,15 @@
 }
 [data-theme="mucha"] .tab-bar{
   border-color:rgba(139,99,47,.45);
-  background:rgba(247,240,229,.97);
-  box-shadow:0 -8px 26px rgba(72,55,35,.18),inset 0 1px 0 rgba(255,255,255,.68);
-}
-[data-theme="mucha"] .tab-bar::before{
-  content:"";position:absolute;left:12px;right:12px;top:0;height:1px;pointer-events:none;
-  background:linear-gradient(90deg,transparent,rgba(178,138,69,.78) 12%,rgba(117,131,107,.35) 50%,rgba(178,138,69,.78) 88%,transparent);
-  opacity:.72;
+  background:rgba(247,240,229,.99);
+  box-shadow:0 10px 30px rgba(72,55,35,.24),inset 0 1px 0 rgba(255,255,255,.68);
 }
 [data-theme="mucha"] .tab-btn{color:#71665A}
-[data-theme="mucha"] .tab-btn.active{
-  color:#355A50;background:rgba(117,131,107,.13);
-  border:1px solid rgba(178,138,69,.28);
-  border-radius:18px 18px 13px 13px;
-  box-shadow:inset 0 2px 0 rgba(226,201,135,.35);
+[data-theme="mucha"] .tab-btn.active{color:#355A50}
+[data-theme="mucha"] .tab-btn.active::before{
+  background:rgba(117,131,107,.16);
+  box-shadow:inset 0 0 0 1px rgba(178,138,69,.34);
 }
-[data-theme="mucha"] .tab-btn.active::before{background:#B28A45}
 [data-theme="mucha"] .undo-fab{background:#355A50;color:#FFF5DF;border:1px solid rgba(210,179,109,.55)}
 @media(max-width:480px){
   [data-theme="mucha"] .scroll-area::before{
@@ -369,12 +366,12 @@
 }
 /* Tab bar */
 [data-theme="nebula"] .tab-bar{
-  background:rgba(4,3,14,.92);
-  border-top:1px solid rgba(100,60,220,.3);
-  backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+  background:rgba(6,4,20,.97);
+  border:1px solid rgba(120,80,240,.42);
+  box-shadow:0 10px 30px rgba(0,0,0,.55),0 0 16px rgba(140,90,255,.18);
 }
 [data-theme="nebula"] .tab-btn.active{color:#c8a0ff;text-shadow:0 0 8px rgba(180,120,255,.7)}
-[data-theme="nebula"] .tab-btn.active::before{background:rgba(160,100,255,.8)}
+[data-theme="nebula"] .tab-btn.active::before{background:rgba(140,90,255,.22);box-shadow:inset 0 0 0 1px rgba(160,100,255,.45)}
 /* Cards - 毛玻璃 */
 [data-theme="nebula"] .card{
   background:rgba(8,5,24,.55);
@@ -479,11 +476,6 @@
   pointer-events:none;
 }
 [data-theme="nebula"] .modal>*{position:relative;z-index:1}
-[data-theme="nebula"] .tab-bar::before{
-  content:"";position:absolute;left:14px;right:14px;top:0;height:1px;
-  background:linear-gradient(90deg,transparent,rgba(192,132,252,.64) 25%,rgba(96,165,250,.32) 70%,transparent);
-  pointer-events:none;
-}
 
 /* ══ BODY ══ */
 html{min-height:100%;width:100%;overflow-x:hidden;background:#08051C}
@@ -576,48 +568,51 @@ body{min-height:100%;width:100%;overflow-x:hidden;overflow-y:auto;overscroll-beh
 .panel.active{display:block}
 
 /* ══ TAB BAR ══ */
+/* v2.8.11：懸浮膠囊式導覽。刻意不用 backdrop-filter——固定元素上的毛玻璃
+   是 iPhone 捲動卡頓的主因之一，改用高不透明度背景，視覺差異極小。 */
 .tab-bar{
-  background:var(--bg2);border-top:1px solid var(--border);
+  background:var(--bg2);
+  border:1px solid var(--border);
   display:flex;align-items:stretch;
-  /* 54px 完整操作區 + 最多 8px 手勢緩衝；五欄從頂端到底部皆可點擊。 */
-  height:var(--tabar-h);
-  min-height:var(--tabar-h);
-  max-height:var(--tabar-h);
-  padding:0 6px var(--dock-safe-bottom);
-  flex:0 0 var(--tabar-h);
+  height:var(--dock-control-height);
+  min-height:var(--dock-control-height);
+  max-height:var(--dock-control-height);
+  padding:0 4px;
   overflow:hidden;
-  position:fixed;left:0;right:0;bottom:0;z-index:340;
-  border-radius:16px 16px 0 0;
-  box-shadow:0 -4px 18px rgba(20,42,74,.14);
-  backdrop-filter:blur(18px) saturate(1.2);
-  -webkit-backdrop-filter:blur(18px) saturate(1.2);
+  position:fixed;
+  left:var(--dock-inline);right:var(--dock-inline);
+  bottom:var(--dock-float-bottom);
+  z-index:340;
+  border-radius:999px;
+  box-shadow:0 8px 28px rgba(20,42,74,.20),0 2px 8px rgba(20,42,74,.10);
 }
-/* Tab 按鍵：整格 54px 可點，並把命中區延伸到下方手勢緩衝內。 */
+/* Tab 按鍵：整格 54px 可點。膠囊外側是內容區，不再向下延伸命中區。 */
 .tab-btn{
   flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
   gap:2px;border:none;background:transparent;color:var(--text4);
   cursor:pointer;font-family:inherit;font-size:11px;font-weight:650;
   height:var(--dock-control-height);min-height:var(--dock-control-height);
-  padding:4px 4px 3px;
-  transition:color .15s,background-color .12s,transform .08s;
+  padding:4px 2px 3px;
+  transition:color .15s,transform .08s;
   position:relative;-webkit-appearance:none;
-  touch-action:manipulation;-webkit-tap-highlight-color:rgba(37,99,235,.12);
-}
-.tab-btn::after{
-  content:"";position:absolute;inset:-2px -1px calc(0px - var(--dock-safe-bottom));
+  touch-action:manipulation;-webkit-tap-highlight-color:transparent;
 }
 .tab-btn .icon{font-size:21px;line-height:1}
-.tab-btn:active{background:var(--accent-light);transform:translateY(1px)}
-.tab-btn:focus-visible{outline:2px solid var(--accent);outline-offset:-3px;border-radius:12px}
+.tab-btn>span{position:relative;z-index:1}
+.tab-btn:active{transform:scale(.94)}
+.tab-btn:focus-visible{outline:2px solid var(--accent);outline-offset:-4px;border-radius:999px}
 .tab-btn.active{color:var(--accent)}
-.tab-btn.active::before{content:"";position:absolute;top:0;left:15%;right:15%;height:2.5px;background:var(--accent);border-radius:0 0 3px 3px}
+/* 作用中改用膠囊底色，取代原本頂端的細線 */
+.tab-btn.active::before{
+  content:"";position:absolute;inset:5px 4px;z-index:0;
+  background:var(--accent-light);
+  border-radius:999px;
+}
 [data-theme="nebula"] .tab-btn.active{color:#c8a0ff;text-shadow:0 0 8px rgba(192,132,252,.6)}
-[data-theme="nebula"] .tab-btn.active::before{background:rgba(160,100,255,.8)}
 [data-theme="nerv"] .tab-btn.active{color:#FF6600}
-[data-theme="nebula"] .tab-bar{background:rgba(4,3,14,.95);border-top-color:rgba(100,60,220,.3)}
+[data-theme="nebula"] .tab-bar{background:rgba(6,4,20,.97);border-color:rgba(120,80,240,.42);position:fixed}
 [data-theme="nebula"] .tab-bar::after{display:none}
-[data-theme="nebula"] .tab-bar{position:fixed}
-[data-theme="nerv"] .tab-bar{background:#080200;border-top-color:rgba(255,102,0,.3)}
+[data-theme="nerv"] .tab-bar{background:#080200;border-color:rgba(255,102,0,.42)}
 
 /* ══ CARDS ══ */
 .card{background:var(--bg2);border-radius:14px;padding:14px;margin-bottom:10px;box-shadow:0 2px 8px rgba(0,0,0,.06);border:1px solid var(--border)}
@@ -827,6 +822,10 @@ tr:hover td{background:var(--accent-light)}
   .overview-card-head{align-items:center}
   .overview-card-actions{gap:4px}
   .overview-card-actions button{min-width:44px;padding:7px;font-size:11px}
+  /* 窄螢幕收窄懸浮膠囊的左右內縮，確保五個標籤不被擠壓 */
+  :root{--dock-inline:8px}
+  .tab-btn{font-size:10.5px;padding:4px 1px 3px}
+  .tab-btn .icon{font-size:20px}
 }
 /* ══ SPLASH SCREEN ══ */
 #splash{
@@ -1572,7 +1571,7 @@ tr:hover td{background:var(--accent-light)}
 // ══════════════════════════════════════════
 // Firebase 設定
 // ══════════════════════════════════════════
-const APP_VERSION='2.8.10';
+const APP_VERSION='2.8.11';
 const FB_CONFIG = {
   apiKey: "AIzaSyAqgA9pYvOduWypEE5kxVNlq9fEfrEMV0c",
   authDomain: "attendance-pwa-9fa73.firebaseapp.com",
