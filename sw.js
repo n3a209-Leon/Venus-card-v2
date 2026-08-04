@@ -8,18 +8,22 @@
    - 其他同源資源走「快取優先、背景更新」
    - 跨來源請求（Firebase / gstatic 等）完全不攔截
 */
-const CACHE_VERSION = 'vcard-v2.9.0';
+const CACHE_VERSION = 'vcard-v3.2.0';
 const CACHE_NAME = CACHE_VERSION;
+const BUILD_ID = 'venus-card-v3.2.0-20260804';
 const OWNED_CACHE_PREFIXES = ['vcard-', 'venus-card-'];
 const CORE = [
   './',
   './index.html',
   './manifest.json',
   './xlsx.full.min.js',
-  './splash-v2.6.1.jpg',
-  './venus-icon-180-v2.6.1.png',
-  './venus-icon-192-v2.6.1.png',
-  './venus-icon-512-v2.6.1.png',
+  './splash.jpeg',
+  './icon-180.png',
+  './icon-192.png',
+  './icon-512.png',
+  './icon-1024.png',
+  './icon-maskable-512.png',
+  './assets/odyssey-ambient.webp',
   './assets/mucha-master-frame.webp',
   './assets/mucha-card-frame.webp',
   './assets/mucha-empty-ornament.webp',
@@ -33,8 +37,16 @@ self.addEventListener('install', (e) => {
   // 首次安裝沒有舊版 worker 時，瀏覽器仍會照標準流程自動啟用。
   e.waitUntil((async () => {
     const c = await caches.open(CACHE_NAME);
+    // index、sw 若不是同一建置就中止安裝，避免只上傳部分檔案造成混版。
+    const indexResponse = await fetch(new Request('./index.html', { cache: 'no-store' }));
+    if (!indexResponse || !indexResponse.ok) throw new Error('index.html unavailable');
+    const indexText = await indexResponse.clone().text();
+    if (!indexText.includes(BUILD_ID)) throw new Error('Venus Card deployment files are from different builds');
+    await c.put('./index.html', indexResponse.clone());
+    await c.put('./', indexResponse.clone());
     // 逐一加入，單一檔案缺失不會讓整批失敗
     for (const u of CORE) {
+      if (u === './' || u === './index.html') continue;
       try { await c.add(new Request(u, { cache: 'reload' })); } catch (_) {}
     }
   })());
@@ -77,6 +89,10 @@ self.addEventListener('fetch', (e) => {
         const freshReq = new Request(req, { cache: 'no-store' });
         const res = await fetch(freshReq);
         if (res && res.ok && res.type === 'basic') {
+          const text = await res.clone().text();
+          if (!text.includes(BUILD_ID)) {
+            return (await caches.match('./index.html')) || res;
+          }
           const copy = res.clone();
           caches.open(CACHE_NAME).then((c) => c.put(req, copy)).catch(() => {});
         }

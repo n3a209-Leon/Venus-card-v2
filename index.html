@@ -6,15 +6,16 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <!-- 與 LIMU v20.19 相同：由頁面根層自然延伸，狀態列使用主題背景。 -->
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="theme-color" content="#08051C">
+<meta name="theme-color" content="#171A22">
 <meta name="application-name" content="Venus Card System">
 <meta name="apple-mobile-web-app-title" content="Venus Card">
 <meta name="description" content="班級獎卡、成績點數、兌換與給卡管理">
+<meta name="venus-build" content="venus-card-v3.2.0-20260804">
 <link rel="manifest" href="./manifest.json">
-<link rel="preload" as="image" href="./splash-v2.6.1.jpg" fetchpriority="high">
-<link rel="apple-touch-icon" sizes="180x180" href="./venus-icon-180-v2.6.1.png">
-<link rel="icon" type="image/png" sizes="192x192" href="./venus-icon-192-v2.6.1.png">
-<link rel="icon" type="image/png" sizes="512x512" href="./venus-icon-512-v2.6.1.png">
+<link rel="preload" as="image" href="./splash.jpeg" fetchpriority="high">
+<link rel="apple-touch-icon" sizes="180x180" href="./icon-180.png">
+<link rel="icon" type="image/png" sizes="192x192" href="./icon-192.png">
+<link rel="icon" type="image/png" sizes="512x512" href="./icon-512.png">
 <title>獎卡系統</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
@@ -473,9 +474,155 @@
 }
 [data-theme="nebula"] .modal>*{position:relative;z-index:1}
 
+/* ══ ECLIPSE ODYSSEY THEME（日蝕奧德賽・v3.2 主題）══
+ * 只在既有畫面後方放置一幅不重複的主視覺；細線裝飾不增加版面空間、
+ * 不攔截觸控，也不使用固定毛玻璃，避免 iPhone 捲動重新出現卡頓。
+ */
+[data-theme="odyssey"]{
+  --bg:#12151C;--bg2:rgba(29,32,41,.95);--bg3:rgba(39,42,52,.94);--bg4:#343843;
+  --accent:#C2A2B7;--accent2:#9B778F;--accent-light:rgba(194,162,183,.13);
+  --green:#73B58C;--green-light:rgba(115,181,140,.12);
+  --orange:#D49A68;--orange-light:rgba(212,154,104,.12);
+  --red:#D2767D;--red-light:rgba(210,118,125,.12);
+  --gold:#D2AD76;--gold-light:rgba(210,173,118,.13);
+  --purple:#B696B0;--purple-light:rgba(182,150,176,.13);
+  --text:#F2EBEF;--text2:#D7CBD2;--text3:#AA9FA7;--text4:#817983;
+  --border:rgba(211,191,203,.18);--border2:rgba(210,173,118,.32);
+  color:#F2EBEF;background:#12151C;
+}
+[data-theme="odyssey"] body{background:#12151C}
+[data-theme="odyssey"] .app{background:#12151C;isolation:isolate}
+[data-theme="odyssey"] .app::before{
+  content:"";position:fixed;inset:0;z-index:0;
+  background:
+    linear-gradient(180deg,rgba(16,19,26,.38) 0%,rgba(16,19,26,.72) 42%,rgba(16,19,26,.94) 100%),
+    radial-gradient(circle at 15% 8%,rgba(210,173,118,.15),transparent 26%),
+    url("./assets/odyssey-ambient.webp") 50% top/cover no-repeat;
+  opacity:.72;pointer-events:none;user-select:none;
+}
+[data-theme="odyssey"] .app>*{position:relative;z-index:1}
+[data-theme="odyssey"] .scroll-area{background:transparent;position:relative;isolation:isolate}
+[data-theme="odyssey"] .scroll-area::before{
+  content:"";position:absolute;inset:6px 5px 1px;z-index:0;border-radius:18px;
+  background:
+    radial-gradient(circle at left top,transparent 0 18px,rgba(210,173,118,.34) 19px 20px,transparent 21px)
+      left top/54px 54px no-repeat,
+    radial-gradient(circle at right bottom,transparent 0 18px,rgba(194,162,183,.28) 19px 20px,transparent 21px)
+      right bottom/54px 54px no-repeat,
+    linear-gradient(180deg,rgba(210,173,118,.42),rgba(194,162,183,.08) 42%,transparent 80%)
+      left top/1px 58% no-repeat,
+    linear-gradient(0deg,rgba(194,162,183,.36),rgba(210,173,118,.06) 44%,transparent 82%)
+      right bottom/1px 52% no-repeat;
+  pointer-events:none;user-select:none;opacity:.72;
+}
+[data-theme="odyssey"] .panel{position:relative;z-index:1}
+[data-theme="odyssey"] .app-header{
+  background:linear-gradient(180deg,rgba(24,27,35,.99),rgba(18,21,28,.99));
+  border-bottom-color:rgba(210,173,118,.30);
+  box-shadow:0 8px 26px rgba(0,0,0,.24),inset 0 -1px 0 rgba(194,162,183,.09);
+}
+[data-theme="odyssey"] .app-header::after{
+  content:"";position:absolute;left:14px;right:14px;bottom:1px;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(210,173,118,.68) 18%,rgba(194,162,183,.36) 54%,transparent);
+  pointer-events:none;
+}
+[data-theme="odyssey"] .theme-select-bar,
+[data-theme="odyssey"] .user-btn,
+[data-theme="odyssey"] .class-chip{
+  color:#E6D8E0;background:rgba(194,162,183,.09);border-color:rgba(210,173,118,.31);
+}
+[data-theme="odyssey"] .sync-chip{color:#BEB3BA}
+[data-theme="odyssey"] .login-btn{
+  color:#171A22;background:linear-gradient(135deg,#D7B9CA,#C7A26E);
+  box-shadow:0 5px 16px rgba(0,0,0,.20);
+}
+[data-theme="odyssey"] .class-dropdown{
+  color:#F2EBEF;background:rgba(25,28,36,.99);border-color:rgba(210,173,118,.34);
+  box-shadow:0 18px 46px rgba(0,0,0,.48),inset 0 1px 0 rgba(255,255,255,.04);
+}
+[data-theme="odyssey"] .cd-item:hover,
+[data-theme="odyssey"] .cd-item.active{background:rgba(194,162,183,.11)}
+[data-theme="odyssey"] .card,
+[data-theme="odyssey"] .stat{
+  color:#F2EBEF;
+  background:linear-gradient(155deg,rgba(35,38,48,.97),rgba(24,27,35,.96));
+  border-color:rgba(211,191,203,.17);
+  box-shadow:0 8px 22px rgba(0,0,0,.20),inset 0 1px 0 rgba(255,255,255,.035);
+}
+[data-theme="odyssey"] .card{position:relative;isolation:isolate}
+[data-theme="odyssey"] .card::before{
+  content:"";position:absolute;inset:2px;z-index:0;border-radius:11px;
+  background:
+    linear-gradient(90deg,rgba(210,173,118,.68),rgba(194,162,183,.12),transparent)
+      left 10px top/36% 1px no-repeat,
+    linear-gradient(270deg,rgba(194,162,183,.50),rgba(210,173,118,.08),transparent)
+      right 10px bottom/28% 1px no-repeat;
+  border:1px solid rgba(194,162,183,.08);pointer-events:none;
+}
+[data-theme="odyssey"] .card>*{position:relative;z-index:1}
+[data-theme="odyssey"] .card-title{color:#E7DAE1}
+[data-theme="odyssey"] .stu-cell{
+  background:rgba(31,34,43,.96);border-color:rgba(211,191,203,.15);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.025);
+}
+[data-theme="odyssey"] .stu-cell.ready{
+  background:linear-gradient(145deg,rgba(64,52,61,.94),rgba(38,36,45,.97));
+  border-color:rgba(210,173,118,.58);
+}
+[data-theme="odyssey"] .stu-no-circle{background:linear-gradient(135deg,#87677E,#5E4E62);border:1px solid rgba(210,173,118,.38)}
+[data-theme="odyssey"] .stu-cell.ready .stu-no-circle{background:linear-gradient(135deg,#C7A26E,#8E6F49)}
+[data-theme="odyssey"] input,
+[data-theme="odyssey"] select,
+[data-theme="odyssey"] textarea{
+  color:#F2EBEF;background:rgba(21,24,31,.90);border-color:rgba(211,191,203,.22);
+}
+[data-theme="odyssey"] input:focus,
+[data-theme="odyssey"] select:focus,
+[data-theme="odyssey"] textarea:focus{border-color:#C2A2B7;box-shadow:0 0 0 3px rgba(194,162,183,.10)}
+[data-theme="odyssey"] .btn-primary,
+[data-theme="odyssey"] .btn-green{
+  color:#171A22;background:linear-gradient(135deg,#C5A5B9,#C7A26E);
+  border:1px solid rgba(232,211,179,.34);box-shadow:0 5px 15px rgba(0,0,0,.18);
+}
+[data-theme="odyssey"] .btn-ghost{
+  color:#D7CBD2;background:rgba(55,49,59,.68);border-color:rgba(211,191,203,.23);
+}
+[data-theme="odyssey"] .btn-orange{background:linear-gradient(135deg,#C99061,#9A694B);border-color:#C99061}
+[data-theme="odyssey"] .btn-red{background:linear-gradient(135deg,#BC6872,#8B4952);border-color:#BC6872}
+[data-theme="odyssey"] .tip,
+[data-theme="odyssey"] .quality-report{color:#DCCBD5;background:rgba(194,162,183,.09);border:1px solid rgba(194,162,183,.14)}
+[data-theme="odyssey"] .sx,
+[data-theme="odyssey"] .score-input-area,
+[data-theme="odyssey"] .upload-area,
+[data-theme="odyssey"] .stab-row{background:rgba(28,31,39,.92);border-color:rgba(211,191,203,.16)}
+[data-theme="odyssey"] .stab.active{color:#E6D8E0;background:rgba(194,162,183,.13);box-shadow:inset 0 0 0 1px rgba(210,173,118,.18)}
+[data-theme="odyssey"] th{color:#EADFE5;background:#272A33;border-color:rgba(210,173,118,.17)}
+[data-theme="odyssey"] td{border-color:rgba(211,191,203,.12)}
+[data-theme="odyssey"] tr:hover td{background:rgba(194,162,183,.06)}
+[data-theme="odyssey"] .more-item{border-color:rgba(211,191,203,.14)}
+[data-theme="odyssey"] .more-item:active{background:rgba(194,162,183,.08)}
+[data-theme="odyssey"] .modal-bg{background:rgba(6,8,12,.78)}
+[data-theme="odyssey"] .modal{
+  color:#F2EBEF;background:linear-gradient(180deg,#262933,#191C24);
+  border:1px solid rgba(210,173,118,.35);
+  box-shadow:0 -18px 58px rgba(0,0,0,.52),inset 0 1px 0 rgba(255,255,255,.04);
+}
+[data-theme="odyssey"] .tab-bar{
+  background:#1A1D25;border-color:rgba(210,173,118,.31);
+  box-shadow:0 10px 30px rgba(0,0,0,.46),inset 0 1px 0 rgba(255,255,255,.035);
+}
+[data-theme="odyssey"] .tab-btn{color:#817983}
+[data-theme="odyssey"] .tab-btn.active{color:#E1C5D5;text-shadow:0 0 10px rgba(194,162,183,.30)}
+[data-theme="odyssey"] .tab-btn.active::before{
+  background:linear-gradient(135deg,rgba(194,162,183,.18),rgba(210,173,118,.10));
+  box-shadow:inset 0 0 0 1px rgba(210,173,118,.27);
+}
+[data-theme="odyssey"] .undo-fab{color:#171A22;background:linear-gradient(135deg,#C5A5B9,#C7A26E);box-shadow:0 7px 22px rgba(0,0,0,.34)}
+
 /* ══ BODY ══ */
 html{min-height:100%;width:100%;overflow-x:hidden;background:#08051C}
 body{min-height:100%;width:100%;overflow-x:hidden;overflow-y:auto;overscroll-behavior-y:none;padding-bottom:0;background:#08051C;color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Noto Sans TC",sans-serif;font-size:14px;line-height:1.5}
+body.modal-scroll-locked{overflow:hidden;position:fixed;left:0;right:0;width:100%}
 /*
  * 與 LIMU v20.19 相同：App 採自然頁面高度，不再用 100dvh + hidden
  * 把整個介面鎖進較短的 WebKit layout viewport。底部導覽獨立 fixed，
@@ -549,7 +696,7 @@ body{min-height:100%;width:100%;overflow-x:hidden;overflow-y:auto;overscroll-beh
 }
 .class-chip .arrow{font-size:10px;opacity:.7;transition:transform .2s}
 .class-chip.open .arrow{transform:rotate(180deg)}
-.class-dropdown{position:fixed;top:58px;left:12px;min-width:240px;max-width:88vw;max-height:min(70vh,520px);background:var(--bg2);border:1px solid var(--border2);border-radius:12px;box-shadow:var(--shadow-md),0 8px 32px rgba(0,0,0,.25);z-index:99999;overflow-y:auto;overscroll-behavior:contain;animation:drop-in .15s ease}
+.class-dropdown{position:fixed;top:calc(var(--safe-top) + var(--header-h) + 6px);left:12px;min-width:240px;max-width:88vw;max-height:min(70vh,520px);background:var(--bg2);border:1px solid var(--border2);border-radius:12px;box-shadow:var(--shadow-md),0 8px 32px rgba(0,0,0,.25);z-index:99999;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;animation:drop-in .15s ease}
 @keyframes drop-in{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
 .cd-hdr{padding:8px 12px 4px;font-size:10px;font-weight:700;color:var(--text4);letter-spacing:2px}
 .cd-item{display:flex;align-items:center;gap:10px;padding:12px 14px;cursor:pointer;border-bottom:1px solid var(--border);transition:background .1s}
@@ -602,7 +749,8 @@ body{min-height:100%;width:100%;overflow-x:hidden;overflow-y:auto;overscroll-beh
   position:relative;-webkit-appearance:none;
   touch-action:manipulation;-webkit-tap-highlight-color:transparent;
 }
-.tab-btn .icon{font-size:21px;line-height:1}
+.tab-btn .icon{width:22px;height:22px;display:grid;place-items:center;line-height:1}
+.tab-btn .icon svg{width:21px;height:21px;display:block;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 .tab-btn>span{position:relative;z-index:1}
 .tab-btn:active{transform:scale(.94)}
 .tab-btn:focus-visible{outline:2px solid var(--accent);outline-offset:-4px;border-radius:999px}
@@ -754,9 +902,9 @@ tr:hover td{background:var(--accent-light)}
 #col-confirm-table .col-nocol{background:var(--bg3);color:var(--text4);font-style:italic}
 
 /* ══ MODAL ══ */
-.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:200;display:none;align-items:flex-end;justify-content:center;padding:0}
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:200;display:none;align-items:flex-end;justify-content:center;padding:0;overscroll-behavior:contain;touch-action:none}
 .modal-bg.show{display:flex}
-.modal{background:var(--bg2);border-radius:20px 20px 0 0;padding:20px 20px max(20px,calc(16px + var(--safe-bottom)));width:100%;max-height:85vh;overflow-y:auto;box-shadow:0 -8px 40px rgba(0,0,0,.2)}
+.modal{background:var(--bg2);border-radius:20px 20px 0 0;padding:20px 20px max(20px,calc(16px + var(--safe-bottom)));width:100%;max-height:85vh;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;touch-action:pan-y;box-shadow:0 -8px 40px rgba(0,0,0,.2)}
 .modal h3{font-size:15px;font-weight:700;margin-bottom:14px}
 .modal-center{align-items:center}
 .modal.center-modal{border-radius:16px;max-width:440px;margin:auto}
@@ -838,7 +986,8 @@ tr:hover td{background:var(--accent-light)}
   /* 窄螢幕收窄懸浮膠囊的左右內縮，確保五個標籤不被擠壓 */
   :root{--dock-inline:8px}
   .tab-btn{font-size:10.5px;padding:4px 1px 3px}
-  .tab-btn .icon{font-size:20px}
+  .tab-btn .icon{width:21px;height:21px}
+  .tab-btn .icon svg{width:20px;height:20px}
 }
 /* ══ 減少動態效果 ══
  * v2.9.0：配合 iPhone 設定 → 輔助使用 → 動作 → 減少動態效果。
@@ -862,19 +1011,22 @@ tr:hover td{background:var(--accent-light)}
 /* ══ SPLASH SCREEN ══ */
 #splash{
   position:fixed;inset:0;z-index:99999;
-  background:#08051C;
+  background:#11151C;
   display:flex;align-items:center;justify-content:center;
   overflow:hidden;
   transition:opacity .6s ease,visibility .6s ease;
 }
 #splash.hide{opacity:0;visibility:hidden;pointer-events:none}
 #splash::before{
-  content:'';position:absolute;inset:0;
+  content:'';position:absolute;inset:0;z-index:2;pointer-events:none;
   background:
-    radial-gradient(ellipse 70% 50% at 30% 20%,rgba(100,50,200,.35) 0%,transparent 60%),
-    radial-gradient(ellipse 60% 70% at 75% 75%,rgba(40,90,210,.28) 0%,transparent 60%),
-    radial-gradient(ellipse 50% 40% at 50% 95%,rgba(180,70,230,.22) 0%,transparent 55%);
+    radial-gradient(circle at 14% 9%,rgba(214,177,122,.16),transparent 27%),
+    radial-gradient(ellipse 60% 24% at 50% 31%,rgba(8,10,14,.32),transparent 72%);
   animation:splash-glow 4s ease-in-out infinite;
+}
+#splash::after{
+  content:"";position:absolute;inset:0;z-index:2;pointer-events:none;
+  background:linear-gradient(180deg,rgba(10,12,17,.08) 0%,transparent 22%,transparent 58%,rgba(9,11,15,.18) 73%,rgba(9,11,15,.74) 100%);
 }
 @keyframes splash-glow{
   0%,100%{opacity:.7}
@@ -896,11 +1048,11 @@ tr:hover td{background:var(--accent-light)}
   animation:splash-shimmer 3s ease-in-out infinite;
 }
 @keyframes splash-shimmer{
-  0%,100%{filter:brightness(1) saturate(1)}
-  50%{filter:brightness(1.08) saturate(1.15)}
+  0%,100%{filter:brightness(.98) saturate(.92)}
+  50%{filter:brightness(1.015) saturate(.96)}
 }
 .splash-title{
-  position:absolute;bottom:18%;left:0;right:0;
+  position:absolute;top:30%;left:18px;right:18px;
   text-align:center;z-index:3;
   animation:splash-title-in 1.2s ease .4s both;
 }
@@ -909,24 +1061,24 @@ tr:hover td{background:var(--accent-light)}
   to{opacity:1;transform:translateY(0)}
 }
 .splash-title h1{
-  font-size:22px;font-weight:800;letter-spacing:3px;
-  color:#fff;
-  text-shadow:0 0 30px rgba(180,130,255,.9),0 2px 12px rgba(0,0,0,.6);
-  margin-bottom:4px;
+  font-size:21px;font-weight:750;letter-spacing:3.4px;
+  color:#F2EBEF;
+  text-shadow:0 2px 14px rgba(0,0,0,.82),0 0 24px rgba(210,173,118,.22);
+  margin-bottom:6px;
 }
 .splash-title p{
-  font-size:11px;letter-spacing:4px;
-  color:rgba(255,240,255,.8);
+  font-size:10px;letter-spacing:2.2px;
+  color:rgba(226,208,218,.84);
   font-family:'Share Tech Mono',monospace;
-  text-shadow:0 1px 6px rgba(0,0,0,.5);
+  text-shadow:0 1px 8px rgba(0,0,0,.78);
 }
 .splash-spinner{
-  position:absolute;bottom:8%;left:0;right:0;
+  position:absolute;bottom:calc(max(var(--safe-bottom),12px) + 3.2%);left:0;right:0;
   display:flex;justify-content:center;gap:6px;z-index:3;
 }
 .splash-spinner span{
   width:6px;height:6px;border-radius:50%;
-  background:#fff;
+  background:#D2AD76;
   animation:splash-dot 1.2s ease-in-out infinite;
 }
 .splash-spinner span:nth-child(2){animation-delay:.15s}
@@ -935,6 +1087,42 @@ tr:hover td{background:var(--accent-light)}
   0%,80%,100%{opacity:.3;transform:scale(.8)}
   40%{opacity:1;transform:scale(1.2)}
 }
+/* ══ v3.1 教室效率／回收筒／操作流水帳 ══ */
+.quick-tools{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0}
+.quick-tools select{width:auto;min-width:96px;min-height:36px;padding:5px 8px;font-size:11px}
+.template-strip{display:flex;gap:6px;overflow-x:auto;padding:2px 0 8px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.template-strip::-webkit-scrollbar{display:none}
+.template-chip{flex:0 0 auto;border:1px solid var(--border);background:var(--bg3);color:var(--text2);border-radius:999px;padding:7px 10px;min-height:34px;font-size:11px;font-weight:700}
+.template-chip.custom{border-color:color-mix(in srgb,var(--accent) 45%,var(--border));background:var(--accent-light)}
+.privacy-badge{display:inline-flex;align-items:center;border-radius:999px;padding:2px 7px;font-size:9px;font-weight:800;margin-left:5px;background:var(--green-light);color:var(--green)}
+.privacy-badge.public{background:var(--red-light);color:var(--red)}
+.student-kpi-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;margin:2px 0 10px}
+.student-kpi{padding:8px 9px;border:1px solid var(--border);border-radius:10px;background:var(--bg3)}
+.student-kpi small{display:block;font-size:9px;color:var(--text4);margin-bottom:2px}
+.student-kpi b{font-size:17px;line-height:1.1;color:var(--text2)}
+.student-actions{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;margin:8px 0 12px}
+.student-actions button{padding:7px 4px;min-height:40px;font-size:10px}
+.student-detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
+.student-mini-panel{border:1px solid var(--border);border-radius:10px;background:var(--bg3);padding:9px;min-width:0}
+.student-mini-panel h4{font-size:11px;margin:0 0 6px;color:var(--text3)}
+.student-mini-list{font-size:10px;color:var(--text3);line-height:1.55;max-height:92px;overflow:auto}
+.student-mini-row{display:flex;justify-content:space-between;gap:7px;border-bottom:1px dotted var(--border);padding:3px 0}
+.student-mini-row:last-child{border-bottom:none}
+.audit-row,.trash-row{display:flex;gap:10px;align-items:flex-start;padding:11px;border:1px solid var(--border);border-radius:11px;background:var(--bg2);margin-bottom:8px}
+.audit-icon,.trash-icon{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;background:var(--accent-light);flex:0 0 auto}
+.audit-main,.trash-main{flex:1;min-width:0}
+.audit-title,.trash-title{font-size:12px;font-weight:800;color:var(--text2)}
+.audit-meta,.trash-meta{font-size:10px;color:var(--text4);line-height:1.55;margin-top:2px}
+.audit-detail,.trash-detail{font-size:11px;color:var(--text3);line-height:1.5;margin-top:4px;word-break:break-word}
+.trash-actions{display:flex;gap:5px;flex:0 0 auto}
+.year-copy-options{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:10px 0}
+.year-copy-option{display:flex;gap:8px;align-items:flex-start;border:1px solid var(--border);border-radius:10px;background:var(--bg3);padding:9px;font-size:11px;line-height:1.45}
+.year-copy-option input{width:18px;height:18px;min-height:0;margin-top:1px}
+@media(max-width:420px){
+  .student-actions{grid-template-columns:1fr 1fr}
+  .student-detail-grid{grid-template-columns:1fr}
+  .trash-row{flex-wrap:wrap}.trash-actions{width:100%;justify-content:flex-end}
+}
 </style>
 </head>
 <body>
@@ -942,11 +1130,11 @@ tr:hover td{background:var(--accent-light)}
 <!-- SPLASH SCREEN -->
 <div id="splash">
   <div class="splash-img-wrap">
-    <img src="./splash-v2.6.1.jpg" alt="Venus Card System" fetchpriority="high">
+    <img src="./splash.jpeg" alt="Venus Card System" fetchpriority="high">
   </div>
   <div class="splash-title">
     <h1>VENUS CARD SYSTEM</h1>
-    <p>獎卡系統</p>
+    <p>ECLIPSE ODYSSEY · 獎卡系統</p>
   </div>
   <div class="splash-spinner"><span></span><span></span><span></span></div>
 </div>
@@ -954,7 +1142,7 @@ tr:hover td{background:var(--accent-light)}
 <!-- 全螢幕登入頁面（未登入時顯示）-->
 <div id="login-screen" style="display:none;position:fixed;inset:0;z-index:9000;background:var(--bg);flex-direction:column;align-items:center;justify-content:center;padding:32px">
   <div style="width:100%;max-width:360px;text-align:center">
-    <img src="./venus-icon-192-v2.6.1.png" alt="Venus Card System" style="width:120px;height:120px;object-fit:cover;border-radius:20px;margin-bottom:20px;box-shadow:0 8px 32px rgba(120,60,220,.3)">
+    <img src="./icon-192.png" alt="Venus Card System" style="width:120px;height:120px;object-fit:cover;border-radius:20px;margin-bottom:20px;box-shadow:0 8px 32px rgba(120,60,220,.3)">
     <h1 style="font-size:22px;font-weight:800;letter-spacing:2px;margin-bottom:6px">VENUS CARD SYSTEM</h1>
     <p style="font-size:13px;color:var(--text4);margin-bottom:32px">獎卡兌換管理系統</p>
     <button onclick="doLogin()" style="width:100%;display:flex;align-items:center;justify-content:center;gap:12px;background:#fff;color:#1e3a5f;border:none;border-radius:50px;padding:16px 24px;font-size:16px;font-weight:700;cursor:pointer;box-shadow:0 8px 24px rgba(0,0,0,.15);font-family:inherit;margin-bottom:16px">
@@ -984,6 +1172,7 @@ tr:hover td{background:var(--accent-light)}
         <span id="sync-label">未同步</span>
       </button>
       <select id="theme-select" onchange="applyTheme(this.value)" class="theme-select-bar">
+        <option value="odyssey">🌘 日蝕</option>
         <option value="default">☀️ 日間</option>
         <option value="nerv">🔴 NERV</option>
         <option value="nebula">🌌 星雲</option>
@@ -1155,6 +1344,7 @@ tr:hover td{background:var(--accent-light)}
         <div class="card-title">⚡ 快速給卡
           <span style="font-size:11px;font-weight:400;color:var(--text4);margin-left:4px">點座號選取，可複選</span>
         </div>
+        <div class="template-strip" id="qg-template-strip"></div>
         <div class="form-row" style="margin-bottom:10px">
           <div class="fg" style="max-width:130px">
             <label>類型</label>
@@ -1166,8 +1356,8 @@ tr:hover td{background:var(--accent-light)}
             </select>
           </div>
           <div class="fg" style="max-width:80px">
-            <label>張數</label>
-            <input type="number" id="qg-cards" value="1" min="-99" max="99">
+            <label>發卡張數</label>
+            <input type="number" id="qg-cards" value="1" min="1" max="99">
           </div>
           <div class="fg">
             <label>備註（選填）</label>
@@ -1175,10 +1365,20 @@ tr:hover td{background:var(--accent-light)}
           </div>
         </div>
         <div class="no-picker" id="qg-picker"></div>
+        <div class="quick-tools">
+          <button class="btn-ghost btn-sm" onclick="selectQgPreset('all')">全選</button>
+          <button class="btn-ghost btn-sm" onclick="selectQgPreset('cadre')">幹部</button>
+          <button class="btn-ghost btn-sm" onclick="selectQgPreset('leader')">組長</button>
+          <button class="btn-ghost btn-sm" onclick="selectQgPreset('secretary')">秘書長</button>
+          <select id="qg-group-select" aria-label="選擇組別"></select>
+          <button class="btn-ghost btn-sm" onclick="selectQgGroup()">選整組</button>
+        </div>
         <div style="display:flex;gap:8px;margin-top:10px;align-items:center;flex-wrap:wrap">
           <span id="qg-count" style="font-size:12px;color:var(--text4);flex:1">已選 0 人</span>
+          <button class="btn-ghost btn-sm" onclick="saveCurrentQuickTemplate()">存成範本</button>
           <button class="btn-ghost btn-sm" onclick="clearQgSel()">清除選取</button>
-          <button class="btn-orange btn-sm" onclick="submitQuickGive()">送出</button>
+          <button class="btn-red btn-sm" onclick="openDeductModal()">扣卡…</button>
+          <button class="btn-orange btn-sm" onclick="submitQuickGive()">送出給卡</button>
         </div>
       </div>
       <div class="card">
@@ -1208,6 +1408,16 @@ tr:hover td{background:var(--accent-light)}
           <span class="mi-icon">📝</span>
           <span>紀錄查詢</span>
           <span class="mi-arr">›</span>
+        </div>
+        <div class="more-item" style="padding:14px 16px" onclick="goMore('audit')">
+          <span class="mi-icon">🧾</span>
+          <span>操作流水帳</span>
+          <span class="mi-arr">›</span>
+        </div>
+        <div class="more-item" style="padding:14px 16px" onclick="goMore('trash')">
+          <span class="mi-icon">♻️</span>
+          <span>回收筒</span>
+          <span class="mi-arr" id="trash-more-count">›</span>
         </div>
         <div class="more-item" style="padding:14px 16px" onclick="goMore('settings')">
           <span class="mi-icon">⚙️</span>
@@ -1304,6 +1514,43 @@ tr:hover td{background:var(--accent-light)}
       </div>
     </div>
 
+    <!-- 操作流水帳 (sub-panel) -->
+    <div class="panel" id="tab-audit">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;flex-wrap:wrap">
+        <button class="btn-ghost btn-sm" onclick="goTab('more')">‹ 返回</button>
+        <div style="font-weight:700;font-size:15px">🧾 操作流水帳</div>
+        <button class="btn-ghost btn-sm" style="margin-left:auto" onclick="exportAuditCSV()">匯出 CSV</button>
+      </div>
+      <div class="card">
+        <div class="tip">完整記錄操作者、時間、班級、座號與卡片增減；此紀錄不參與學生點數計算。</div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;margin:10px 0">
+          <select id="audit-kind" onchange="renderAudit()" style="font-size:12px;min-height:36px;flex:1">
+            <option value="">全部操作</option>
+            <option value="card">給卡／扣卡</option>
+            <option value="redeem">兌換</option>
+            <option value="score">成績</option>
+            <option value="data">刪除／還原</option>
+            <option value="class">班級／年度</option>
+          </select>
+          <select id="audit-no" onchange="renderAudit()" style="font-size:12px;min-height:36px;flex:1"><option value="">全部座號</option></select>
+        </div>
+        <div id="audit-list"></div>
+      </div>
+    </div>
+
+    <!-- 回收筒 (sub-panel) -->
+    <div class="panel" id="tab-trash">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;flex-wrap:wrap">
+        <button class="btn-ghost btn-sm" onclick="goTab('more')">‹ 返回</button>
+        <div style="font-weight:700;font-size:15px">♻️ 回收筒</div>
+        <button class="btn-red btn-sm" style="margin-left:auto" onclick="emptyTrash()">永久清空</button>
+      </div>
+      <div class="card">
+        <div class="tip orange">刪除的成績、獎卡、兌換與午休紀錄會保留在這裡；還原後會重新同步到其他裝置。</div>
+        <div id="trash-list" style="margin-top:10px"></div>
+      </div>
+    </div>
+
     <!-- 設定 (sub-panel) -->
     <div class="panel" id="tab-settings">
       <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
@@ -1389,8 +1636,15 @@ tr:hover td{background:var(--accent-light)}
             <button class="btn-ghost btn-sm" onclick="renderStorageStatus()">更新狀態</button>
             <button class="btn-orange btn-sm" onclick="diagnoseAndRecoverData()">🛟 資料診斷與救援</button>
             <button class="btn-primary btn-sm" onclick="archiveAcademicData()">建立封存快照</button>
+            <button class="btn-green btn-sm" onclick="openAcademicWizard()">🎓 開始新學年度</button>
           </div>
-          <div style="font-size:11px;color:var(--text4);margin-top:9px;line-height:1.6">診斷會檢查本機、新版雲端與舊版雲端，找到資料後才詢問是否救援；不會直接清除任何來源。封存會下載完整備份，雲端權限允許時也會保留快照。</div>
+          <div style="font-size:11px;color:var(--text4);margin-top:9px;line-height:1.6">診斷會檢查本機、新版雲端與舊版雲端，找到資料後才詢問是否救援；不會直接清除任何來源。新學年度精靈會先封存舊班，再建立獨立的新年度班級，不會回寫 Venus OS。</div>
+        </div>
+        <div class="card">
+          <div class="card-title">🔐 私人 Google Sheets 唯讀授權</div>
+          <div id="sheets-auth-status" style="font-size:12px;color:var(--text3);line-height:1.65;margin-bottom:10px">尚未授權本次使用</div>
+          <button class="btn-primary btn-sm" onclick="authorizePrivateSheets(true)">連線私人試算表</button>
+          <div style="font-size:11px;color:var(--text4);margin-top:9px;line-height:1.6">只要求讀取試算表，不會修改內容；授權憑證只保留在本次 App 使用期間。</div>
         </div>
       </div>
     </div>
@@ -1400,19 +1654,19 @@ tr:hover td{background:var(--accent-light)}
   <!-- TAB BAR -->
   <nav class="tab-bar">
     <button class="tab-btn active" id="tbtn-overview" onclick="goTab('overview',this)">
-      <span class="icon">🏠</span><span>總覽</span>
+      <span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M3 10.5 12 3l9 7.5v8.8A1.7 1.7 0 0 1 19.3 21H4.7A1.7 1.7 0 0 1 3 19.3z"/><path d="M9 21v-7h6v7"/></svg></span><span>總覽</span>
     </button>
     <button class="tab-btn" id="tbtn-score" onclick="goTab('score',this)">
-      <span class="icon">📊</span><span>成績</span>
+      <span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 20V10h4v10M10 20V4h4v16M16 20v-7h4v7M3 20.5h18"/></svg></span><span>成績</span>
     </button>
     <button class="tab-btn" id="tbtn-redeem" onclick="goTab('redeem',this)">
-      <span class="icon">🎴</span><span>兌換</span>
+      <span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2.2"/><circle cx="9" cy="12" r="2.3"/><path d="M13.5 9h4M13.5 12h4M13.5 15h2.5"/></svg></span><span>兌換</span>
     </button>
     <button class="tab-btn" id="tbtn-give" onclick="goTab('give',this)">
-      <span class="icon">⚡</span><span>給卡</span>
+      <span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M13 2 5 13h6l-1 9 9-12h-6z"/></svg></span><span>給卡</span>
     </button>
     <button class="tab-btn" id="tbtn-more" onclick="goTab('more',this)">
-      <span class="icon">☰</span><span>更多</span>
+      <span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.45" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.45" fill="currentColor" stroke="none"/><circle cx="19" cy="12" r="1.45" fill="currentColor" stroke="none"/></svg></span><span>更多</span>
     </button>
   </nav>
 
@@ -1453,7 +1707,15 @@ tr:hover td{background:var(--accent-light)}
 <div class="modal-bg" id="add-sheet-modal">
   <div class="modal">
     <h3>新增 Google Sheets 連結</h3>
-    <div class="tip">前往 Google Sheets → 右上角「共用」→ 設成「知道連結的人均可查看」→ 複製連結貼到下方。</div>
+    <div class="tip green">建議使用「私人唯讀」：試算表可維持限制存取，不必開放成知道連結的人都能查看。</div>
+    <div class="fg" style="margin-bottom:12px">
+      <label>讀取方式</label>
+      <select id="new-sheet-privacy" onchange="updateSheetPrivacyHelp()">
+        <option value="private">🔐 私人唯讀（推薦）</option>
+        <option value="public">🔗 公開連結（舊版相容）</option>
+      </select>
+      <div id="sheet-privacy-help" style="font-size:10px;color:var(--text4);margin-top:5px;line-height:1.55">保留試算表原本的限制存取；第一次同步時會要求 Google Sheets 唯讀授權。</div>
+    </div>
     <div class="fg" style="margin-bottom:12px">
       <label>名稱（自己取，方便辨識）</label>
       <input type="text" id="new-sheet-name" placeholder="例：114下成績與獎卡兌換">
@@ -1507,8 +1769,64 @@ tr:hover td{background:var(--accent-light)}
       <button class="btn-ghost btn-sm" onclick="exportClassReport(_chartCur.no)">🖨 個人報告</button>
       <button class="btn-ghost btn-sm" style="margin-left:auto" onclick="closeModal('chart-modal')">✕</button>
     </div>
+    <div class="student-kpi-grid" id="student-kpis"></div>
+    <div class="student-actions">
+      <button class="btn-green" onclick="studentQuickGive(1)">＋1 張</button>
+      <button class="btn-red" onclick="openDeductModal(_chartCur&&_chartCur.no)">扣卡</button>
+      <button class="btn-orange" id="student-redeem-btn" onclick="studentRedeemOne()">兌換 1 張</button>
+      <button class="btn-ghost" onclick="undoStudentLast()">撤銷最近操作</button>
+    </div>
+    <div class="student-detail-grid">
+      <div class="student-mini-panel"><h4>最近成績</h4><div class="student-mini-list" id="student-recent-scores"></div></div>
+      <div class="student-mini-panel"><h4>獎卡／折抵明細</h4><div class="student-mini-list" id="student-recent-cards"></div></div>
+    </div>
     <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px" id="chart-subj-btns"></div>
     <canvas id="chart-canvas" width="500" height="240" style="width:100%;border-radius:8px;border:1px solid var(--border)"></canvas>
+  </div>
+</div>
+
+<!-- MODAL: 獨立扣卡 -->
+<div class="modal-bg center" id="deduct-modal">
+  <div class="modal" style="max-width:440px">
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
+      <h3 style="margin:0">➖ 扣除獎卡</h3>
+      <button class="btn-ghost btn-sm" style="margin-left:auto" onclick="closeModal('deduct-modal')">✕</button>
+    </div>
+    <div class="tip orange" id="deduct-targets">尚未選取學生</div>
+    <div class="form-row" style="margin-top:12px">
+      <div class="fg" style="max-width:100px"><label>扣除張數</label><input type="number" id="deduct-cards" value="1" min="1" max="99"></div>
+      <div class="fg"><label>原因</label><input type="text" id="deduct-note" maxlength="80" placeholder="例：未完成值日工作"></div>
+    </div>
+    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:14px">
+      <button class="btn-ghost btn-sm" onclick="closeModal('deduct-modal')">取消</button>
+      <button class="btn-red" onclick="submitQuickDeduct()">確認扣卡</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: 新學年度轉換精靈 -->
+<div class="modal-bg center" id="academic-wizard-modal">
+  <div class="modal" style="max-width:520px">
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
+      <h3 style="margin:0">🎓 新學年度轉換</h3>
+      <button class="btn-ghost btn-sm" style="margin-left:auto" onclick="closeModal('academic-wizard-modal')">✕</button>
+    </div>
+    <div class="tip green" id="academic-wizard-source"></div>
+    <div class="form-row" style="margin-top:12px">
+      <div class="fg"><label>新班級名稱</label><input type="text" id="academic-new-name" maxlength="30"></div>
+      <div class="fg" style="max-width:110px"><label>新學年度</label><input type="text" id="academic-new-year" maxlength="8" inputmode="numeric"></div>
+    </div>
+    <div class="year-copy-options">
+      <label class="year-copy-option"><input type="checkbox" id="academic-copy-nos" checked><span><b>座號</b><br>帶入目前存在的座號</span></label>
+      <label class="year-copy-option"><input type="checkbox" id="academic-copy-fixed" checked><span><b>工作名單</b><br>幹部、組長、秘書長、廁所</span></label>
+      <label class="year-copy-option"><input type="checkbox" id="academic-copy-settings" checked><span><b>基本設定</b><br>換卡門檻與常用範本</span></label>
+      <label class="year-copy-option"><input type="checkbox" checked disabled><span><b>重新開始</b><br>不帶成績、舊紀錄與持卡數</span></label>
+    </div>
+    <div class="tip orange">執行順序：先同步並下載舊班完整封存，再建立 Venus Card 新年度班級。Venus OS／LIMU 不會被修改。</div>
+    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:14px">
+      <button class="btn-ghost btn-sm" onclick="closeModal('academic-wizard-modal')">取消</button>
+      <button class="btn-green" id="academic-wizard-submit" onclick="runAcademicWizard()">封存並建立新年度</button>
+    </div>
   </div>
 </div>
 
@@ -1592,6 +1910,21 @@ tr:hover td{background:var(--accent-light)}
   </div>
 </div>
 
+<!-- MODAL: local storage failure (cannot be dismissed until a verified save succeeds) -->
+<div class="modal-bg center" id="storage-failure-modal" role="alertdialog" aria-modal="true" aria-labelledby="storage-failure-title">
+  <div class="modal" style="max-width:460px">
+    <h3 id="storage-failure-title" style="color:var(--red);margin-bottom:8px">⚠️ 本機儲存尚未完成</h3>
+    <div id="storage-failure-message" style="font-size:13px;line-height:1.75;color:var(--text2);margin-bottom:14px">
+      為避免目前資料遺失，App 已暫停登出、換版與重新整理。
+    </div>
+    <div class="tip orange" style="margin-bottom:14px">請先保留此畫面。可重試儲存，或先下載緊急備份。</div>
+    <div style="display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap">
+      <button class="btn-ghost btn-sm" onclick="exportBackup()">下載緊急備份</button>
+      <button class="btn-primary" id="storage-retry-btn" onclick="retryLocalSave()">重新嘗試儲存</button>
+    </div>
+  </div>
+</div>
+
 <!-- TOAST -->
 <div id="toast"></div>
 
@@ -1606,7 +1939,8 @@ tr:hover td{background:var(--accent-light)}
 // ══════════════════════════════════════════
 // Firebase 設定
 // ══════════════════════════════════════════
-const APP_VERSION='2.9.0';
+const APP_VERSION='3.2.0';
+const BUILD_ID='venus-card-v3.2.0-20260804';
 const FB_CONFIG = {
   apiKey: "AIzaSyAqgA9pYvOduWypEE5kxVNlq9fEfrEMV0c",
   authDomain: "attendance-pwa-9fa73.firebaseapp.com",
@@ -1641,10 +1975,14 @@ async function idbKeys(){
 // ══ localStorage wrapper ══
 const _sl={
   get:k=>{try{return localStorage.getItem(k);}catch{return null;}},
-  set:(k,v)=>{try{localStorage.setItem(k,v);}catch{}},
+  set:(k,v)=>{try{localStorage.setItem(k,v);return localStorage.getItem(k)===String(v);}catch{return false;}},
 };
 function safeGet(k){return _sl.get(k);}
-function safeSet(k,v){_sl.set(k,v);}
+function safeSet(k,v){return _sl.set(k,v);}
+
+function sameStoredValue(a,b){
+  try{return JSON.stringify(a)===JSON.stringify(b);}catch{return false;}
+}
 
 // ══ Combined store ══
 async function storeGet(k){
@@ -1655,8 +1993,30 @@ async function storeGet(k){
   try{return JSON.parse(lv);}catch{return null;}
 }
 async function storeSet(k,v){
-  try{safeSet('vc2:'+k,JSON.stringify(v));}catch{}
-  await idbSet(k,v);
+  let encoded=null;
+  try{encoded=JSON.stringify(v);}catch{return false;}
+  const localOk=encoded!==undefined&&safeSet('vc2:'+k,encoded);
+  const idbWriteOk=await idbSet(k,v);
+  let idbOk=false;
+  if(idbWriteOk){
+    try{idbOk=sameStoredValue(await idbGet(k),v);}catch{}
+  }
+  return !!(localOk||idbOk);
+}
+// 個別讀取兩種儲存後端。v4 提交驗證不能只信「優先讀到的那一份」，
+// 否則 Safari 若只成功寫入其中一邊，舊值可能遮住已完成的新值。
+async function storeCandidates(k){
+  const out=[],seen=new Set();
+  const add=v=>{
+    if(v===undefined||v===null)return;
+    const parsed=typeof v==='string'?parseStored(v,null):v;
+    if(parsed===null||parsed===undefined)return;
+    let sig='';try{sig=JSON.stringify(parsed);}catch{return;}
+    if(!seen.has(sig)){seen.add(sig);out.push(parsed);}
+  };
+  try{add(await idbGet(k));}catch{}
+  try{add(safeGet('vc2:'+k));}catch{}
+  return out;
 }
 async function storeKeys(){
   const keys=new Set(await idbKeys());
@@ -1669,9 +2029,40 @@ async function storeKeys(){
   return[...keys].map(String);
 }
 
+class LocalWriteError extends Error{
+  constructor(message){super(message||'裝置拒絕寫入本機資料');this.name='LocalWriteError';}
+}
+let _storageBlocked=false;
+let _storageErrMsg='';
+function showStorageFailure(err){
+  _storageBlocked=true;
+  _storageErrMsg=(err&&err.message?String(err.message):'本機儲存空間目前無法完成寫入').slice(0,220);
+  const msg=document.getElementById('storage-failure-message');
+  if(msg)msg.textContent=`${_storageErrMsg}。為避免目前資料遺失，App 已暫停登出、換版與重新整理。`;
+  const modal=document.getElementById('storage-failure-modal');
+  if(modal)modal.classList.add('show');
+  setSyncDot('off','storage');
+}
+function clearStorageFailure(){
+  _storageBlocked=false;_storageErrMsg='';
+  const modal=document.getElementById('storage-failure-modal');
+  if(modal)modal.classList.remove('show');
+}
+async function retryLocalSave(){
+  const btn=document.getElementById('storage-retry-btn');
+  if(btn){btn.disabled=true;btn.textContent='驗證中…';}
+  const dataOk=await persistLocal(true);
+  if(_classIndexLocalDirty)await persistCardClassIndex();
+  const ok=dataOk&&!_classIndexLocalDirty;
+  if(btn){btn.disabled=false;btn.textContent='重新嘗試儲存';}
+  if(ok){clearStorageFailure();setSyncDot(firebaseUidRef.current?'ing':'off',firebaseUidRef.current?'pending':'auth');scheduleSync();toast('✅ 本機資料已驗證完成');}
+}
+
 // ══ Firebase ══
 let _auth=null,_db=null,_fbReady=false;
 let firebaseUidRef={current:null};
+let _googleSheetsToken='';
+let _googleSheetsTokenExpiresAt=0;
 
 async function initFirebase(){
   try{
@@ -1685,10 +2076,27 @@ async function initFirebase(){
     }catch(persistErr){
       console.warn('setPersistence fail',persistErr);
     }
+    // iPhone PWA 若不支援 popup，私人 Sheets 授權會改走 redirect；回來後只取
+    // Google API access token，絕不寫入 localStorage、IndexedDB 或雲端快照。
+    try{
+      const redirectResult=await _auth.getRedirectResult();
+      let pending=false;try{pending=sessionStorage.getItem('vc:sheets-auth-pending')==='1';}catch{}
+      if(pending){
+        try{sessionStorage.removeItem('vc:sheets-auth-pending');}catch{}
+        const credential=redirectResult&&firebase.auth.GoogleAuthProvider.credentialFromResult(redirectResult);
+        if(credential&&credential.accessToken){
+          _googleSheetsToken=credential.accessToken;_googleSheetsTokenExpiresAt=Date.now()+50*60*1000;
+          setTimeout(()=>toast('✅ 私人 Sheets 唯讀授權已完成，請再按一次同步',4200),800);
+        }
+      }
+    }catch(redirectErr){console.warn('Sheets redirect result unavailable',redirectErr);}
     _auth.onAuthStateChanged(user=>{
       firebaseUidRef.current=user?user.uid:null;
       updateLoginUI(user);
-      if(user)loadFromFirestore();
+      if(user){
+        // 第一個在此裝置升級的既有帳號可複製 v2.9 未分帳號資料；之後其他帳號不得讀取它。
+        claimLegacyMigrationOwner(user.uid).then(()=>loadFromFirestore());
+      }
     });
     _fbReady=true;
   }catch(e){
@@ -1726,6 +2134,39 @@ function updateLoginUI(user){
     if(ss)ss.textContent='未登入';
     setSyncDot('off','auth');
   }
+  updateSheetsAuthStatus();
+}
+
+function updateSheetsAuthStatus(){
+  const el=document.getElementById('sheets-auth-status');if(!el)return;
+  const active=!!_googleSheetsToken&&Date.now()<_googleSheetsTokenExpiresAt;
+  if(active)el.innerHTML='<span style="color:var(--green);font-weight:700">✅ 私人唯讀授權有效</span>｜憑證只保留於本次使用期間';
+  else el.textContent=firebaseUidRef.current?'尚未授權本次私人試算表讀取':'請先完成 Google 登入';
+}
+
+async function authorizePrivateSheets(showSuccess){
+  if(!_fbReady||!_auth)throw new Error('Google 登入尚未完成初始化');
+  const provider=new firebase.auth.GoogleAuthProvider();
+  provider.addScope('https://www.googleapis.com/auth/spreadsheets.readonly');
+  provider.setCustomParameters({prompt:'consent'});
+  try{
+    const result=_auth.currentUser?await _auth.currentUser.reauthenticateWithPopup(provider):await _auth.signInWithPopup(provider);
+    const credential=firebase.auth.GoogleAuthProvider.credentialFromResult(result);
+    const token=credential&&credential.accessToken;
+    if(!token)throw new Error('Google 沒有回傳試算表唯讀憑證');
+    _googleSheetsToken=token;_googleSheetsTokenExpiresAt=Date.now()+50*60*1000;updateSheetsAuthStatus();
+    if(showSuccess)toast('✅ 私人 Google Sheets 已完成唯讀授權');
+    return token;
+  }catch(e){
+    if(e&&['auth/popup-blocked','auth/operation-not-supported-in-this-environment','auth/web-storage-unsupported'].includes(e.code)){
+      try{sessionStorage.setItem('vc:sheets-auth-pending','1');}catch{}
+      await _auth.signInWithRedirect(provider);
+      return new Promise(()=>{});
+    }
+    const err=e&&e.code==='auth/popup-closed-by-user'?new Error('已取消 Google Sheets 授權'):e;
+    if(showSuccess){toast('授權失敗：'+(err&&err.message?err.message:'未知錯誤'),4200);return null;}
+    throw err;
+  }
 }
 
 function showUserMenu(){
@@ -1754,9 +2195,11 @@ async function doLogin(){
   }
 }
 async function doLogout(){
-  await persistLocal();
+  const saved=await persistLocal(true);
+  if(!saved||_storageBlocked){showStorageFailure(new LocalWriteError(_storageErrMsg||'登出前無法確認本機資料'));return;}
   if(_auth&&_auth.currentUser&&navigator.onLine)await doSync(true);
   stopCloudListener();
+  _googleSheetsToken='';_googleSheetsTokenExpiresAt=0;updateSheetsAuthStatus();
   if(_auth)await _auth.signOut();
   toast('已登出');
 }
@@ -1767,10 +2210,12 @@ let _osClasses=[];    // Venus OS 來源（只讀）
 let _cardClasses=[];  // Venus Card 自建班級（可封存／恢復）
 let _hiddenOsClassIds=[];
 let _classIndexUpdatedAt=0;
+let _classIndexLocalDirty=false;
 let _classes=[];      // 目前可見班級（上述兩個來源合併）
 let _groups=[];       // [{id,label,members,leader,secretary}]
 let _osSettings={};   // v2.8.8：Venus OS settings:main 的內容（校曆、學期起訖等，唯讀）
 let _curClassId='';   // 目前選取的班級 id
+let _activeDataUid='';// 目前記憶體中的班級資料屬於哪個 Google UID
 let _chartCur=null;   // {no,subj} 目前圖表視窗顯示中的座號/科目
 function curClassName(){
   const c=_classes.find(x=>x.id===_curClassId);
@@ -1850,7 +2295,8 @@ async function loadCardClassIndex(uid){
     }catch(e){console.warn('Card class index fallback read fail',e);}
   }
   applyClassIndex(best);
-  await storeSet(key,best);
+  if(!(await storeSet(key,best))){_classIndexLocalDirty=true;showStorageFailure(new LocalWriteError('班級索引無法保存到本機'));}
+  else _classIndexLocalDirty=false;
 }
 async function persistCardClassIndex(){
   const uid=firebaseUidRef.current;
@@ -1865,7 +2311,12 @@ async function persistCardClassIndex(){
     appVersion:APP_VERSION
   };
   _classIndexUpdatedAt=payload.clientUpdatedAt;
-  await storeSet(cardClassIndexKey(uid),payload);
+  _classIndexLocalDirty=true;
+  if(!(await storeSet(cardClassIndexKey(uid),payload))){
+    showStorageFailure(new LocalWriteError('班級新增／封存狀態無法保存到本機'));
+    return false;
+  }
+  _classIndexLocalDirty=false;
   if(uid&&_db&&navigator.onLine){
     try{
       await cardClassIndexRef(uid).set({
@@ -1886,6 +2337,8 @@ async function persistCardClassIndex(){
 let _nos=[];          // 存在的座號 [1,2,3,5,...]
 let _scores={};       // {subjLabel:[{label,date,nos:{1:85,2:90,...}}]}
 let _logs=[];         // [{id,t,no,k,v,c,note}]
+let _trash=[];        // v3.1：可跨重開／跨裝置還原的刪除項目
+let _audit=[];        // v3.1：不參與點數計算的操作流水帳
 let _fixed={cadre:{},leader:{},secretary:{},toilet:[]};
 // v2.8.4：幹部／組長／秘書長三份名單各自獨立，但發卡紀錄一律記為 k:'幹部'，
 // 以免 cardCounts() 漏算（它只認 幹部／廁所／特殊／兌換／調整 五種）。
@@ -1918,7 +2371,7 @@ let _exemptLoadToken=0;
 let _overviewQuery='';
 let _overviewFilter='all';
 let _undoStack=[];
-let _deleted={scores:{},logs:{}};
+let _deleted={scores:{},logs:{},trash:{}};
 let _fieldUpdatedAt={fixed:0,settings:0,nos:0};
 let _revision=0;
 let _syncMode='unknown';
@@ -1927,8 +2380,36 @@ let _listenerToken=0;
 const _deviceId=safeGet('vc2:deviceId')||((self.crypto&&crypto.randomUUID)?crypto.randomUUID():'dev-'+Date.now().toString(36)+'-'+Math.random().toString(36).slice(2));
 safeSet('vc2:deviceId',_deviceId);
 
-function curPfx(){return _curClassId?'vc:'+_curClassId+':':'';}
-function pfxFor(classId){return classId?'vc:'+classId+':':'';}
+function localUid(uid){return String(uid||firebaseUidRef.current||'offline');}
+function keyPart(v){return encodeURIComponent(String(v||''));}
+function scopedClassRoot(uid){return'u:'+keyPart(localUid(uid))+':vc:';}
+function pfxFor(classId,uid){return classId?scopedClassRoot(uid)+keyPart(classId)+':':'';}
+function curPfx(){return _curClassId?pfxFor(_curClassId):'';}
+// v2.9 以前的本機鍵與舊版單一雲端文件仍使用這個格式；v3 只讀、不刪除。
+function legacyPfxFor(classId){return classId?'vc:'+classId+':':'';}
+function lastClassKey(uid){return'vc2:lastClass:'+keyPart(localUid(uid));}
+const LEGACY_MIGRATION_OWNER_KEY='vc2:migration-owner:v4';
+let _legacyMigrationOwner=safeGet(LEGACY_MIGRATION_OWNER_KEY)||'';
+async function claimLegacyMigrationOwner(uid){
+  uid=String(uid||'');
+  if(!uid)return false;
+  let owner=(await storeGet('migration-owner:v4'))||_legacyMigrationOwner;
+  if(!owner){
+    if(await storeSet('migration-owner:v4',uid))owner=uid;
+    else showStorageFailure(new LocalWriteError('無法建立舊資料的帳號歸屬標記'));
+  }
+  _legacyMigrationOwner=String(owner||'');
+  return owner===uid;
+}
+function mayReadLegacyLocal(uid){return !!uid&&_legacyMigrationOwner===String(uid);}
+function scopedClassIdFromKey(k,uid){
+  const root=scopedClassRoot(uid);
+  if(!String(k||'').startsWith(root))return null;
+  const rest=String(k).slice(root.length);
+  const m=rest.match(/^(.+):(?:snapshot:v4:[ab]|commit:v4|snapshot:v3|scores:all|scores:\d{4}|logs:all|logs:\d{4}|fixed|settings|nos|meta)$/);
+  if(!m)return null;
+  try{return decodeURIComponent(m[1]);}catch{return m[1];}
+}
 function cloneData(v){return JSON.parse(JSON.stringify(v));}
 function parseStored(v,fallback){
   if(v===undefined||v===null)return fallback;
@@ -1976,6 +2457,14 @@ function logIdentity(l){
   if(l&&l.id)return String(l.id);
   return 'log-'+hashText([l&&l.t,l&&l.no,l&&l.k,l&&l.v,l&&l.c,l&&l.note].map(v=>String(v||'')).join('|'));
 }
+function trashIdentity(item){
+  if(item&&item.id)return String(item.id);
+  return 'trash-'+hashText([item&&item.kind,item&&item.entityId,item&&item.deletedAt].map(v=>String(v||'')).join('|'));
+}
+function auditIdentity(item){
+  if(item&&item.id)return String(item.id);
+  return 'audit-'+hashText([item&&item.at,item&&item.action,item&&item.actorUid,item&&item.classId,item&&item.detail].map(v=>String(v||'')).join('|'));
+}
 function cleanClockMap(v){
   const out={};
   if(v&&typeof v==='object')Object.keys(v).forEach(k=>{const n=Number(v[k]);if(n>0)out[k]=n;});
@@ -1993,6 +2482,14 @@ function ensureDataIdentity(stamp){
     l.id=logIdentity(l);
     if(!Number(l._updatedAt))l._updatedAt=ts;
   });
+  (_trash||[]).forEach(item=>{
+    item.id=trashIdentity(item);
+    if(!Number(item._updatedAt))item._updatedAt=ts;
+  });
+  (_audit||[]).forEach(item=>{
+    item.id=auditIdentity(item);
+    if(!Number(item._updatedAt))item._updatedAt=ts;
+  });
 }
 function markScoreDeleted(subj,entry,stamp){
   if(!entry)return;
@@ -2006,6 +2503,57 @@ function markLogsDeleted(items,stamp){
     const id=logIdentity(l);
     _deleted.logs[id]=Math.max(Number(_deleted.logs[id])||0,ts);
   });
+}
+function markTrashDeleted(items,stamp){
+  const ts=Number(stamp)||Date.now();
+  (items||[]).forEach(item=>{
+    const id=trashIdentity(item);
+    _deleted.trash[id]=Math.max(Number(_deleted.trash[id])||0,ts);
+  });
+}
+function actorInfo(){
+  const user=_auth&&_auth.currentUser;
+  return{
+    actor:user?(user.displayName||user.email||'Google 使用者'):'本機使用者',
+    actorUid:user?user.uid:'offline',deviceId:_deviceId
+  };
+}
+function recordAudit(action,kind,detail,seats,cardDelta,extra){
+  const ts=Date.now();
+  const actor=actorInfo();
+  const entry={
+    id:genId(),at:ts,t:nowStr(),action:String(action||'操作'),kind:String(kind||'data'),
+    detail:String(detail||''),seats:[...new Set((seats||[]).map(Number).filter(Number.isInteger))].sort((a,b)=>a-b),
+    cardDelta:Number(cardDelta)||0,classId:_curClassId,className:curClassName(),
+    academicYear:academicYearKey(_curClassId),...actor,...(extra&&typeof extra==='object'?extra:{}),_updatedAt:ts
+  };
+  _audit.push(entry);
+  return entry;
+}
+function putScoreInTrash(subj,entry,label,stamp){
+  if(!entry)return null;
+  const ts=Number(stamp)||Date.now();
+  const item={id:genId(),kind:'score',entityId:scoreIdentity(subj,entry),subj,
+    payload:cloneData(entry),label:label||entry.label||subj,deletedAt:ts,deletedText:nowStr(),
+    classId:_curClassId,className:curClassName(),...actorInfo(),_updatedAt:ts};
+  _trash.push(item);updateTrashCount();return item;
+}
+function putLogsInTrash(items,label,stamp){
+  const ts=Number(stamp)||Date.now();
+  const batch='trash-batch:'+genId();
+  return(items||[]).map(log=>{
+    const item={id:genId(),batch,kind:'log',entityId:logIdentity(log),payload:cloneData(log),
+      label:label||log.note||log.k||'紀錄',deletedAt:ts,deletedText:nowStr(),classId:_curClassId,
+      className:curClassName(),...actorInfo(),_updatedAt:ts};
+    _trash.push(item);updateTrashCount();return item;
+  });
+}
+function trashAllVisibleScores(label,stamp){
+  const ts=Number(stamp)||Date.now();let count=0;
+  Object.keys(_scores||{}).forEach(subj=>(_scores[subj]||[]).forEach(entry=>{
+    putScoreInTrash(subj,entry,`${label}：${entry.label||subj}`,ts);count++;
+  }));
+  return count;
 }
 function replaceAllScores(nextScores){
   const stamp=Date.now();
@@ -2033,7 +2581,8 @@ function replaceCurrentWithSnapshot(raw){
   const target=normalizeSnapshot(raw,stamp);
   const nextDeleted={
     scores:mergeDeleted(before.deleted.scores,target.deleted.scores),
-    logs:mergeDeleted(before.deleted.logs,target.deleted.logs)
+    logs:mergeDeleted(before.deleted.logs,target.deleted.logs),
+    trash:mergeDeleted(before.deleted.trash,target.deleted.trash)
   };
   const targetScoreIds=new Set();
   Object.keys(target.scores).forEach(subj=>target.scores[subj].forEach(e=>{e.id=scoreIdentity(subj,e);e._updatedAt=Math.max(stamp,(Number(nextDeleted.scores[e.id])||0)+1);targetScoreIds.add(e.id);}));
@@ -2041,6 +2590,11 @@ function replaceCurrentWithSnapshot(raw){
   const targetLogIds=new Set();
   target.logs.forEach(l=>{l.id=logIdentity(l);l._updatedAt=Math.max(stamp,(Number(nextDeleted.logs[l.id])||0)+1);targetLogIds.add(l.id);});
   before.logs.forEach(l=>{const id=logIdentity(l);if(!targetLogIds.has(id))nextDeleted.logs[id]=stamp;});
+  const targetTrashIds=new Set();
+  target.trash.forEach(item=>{item.id=trashIdentity(item);item._updatedAt=Math.max(stamp,(Number(nextDeleted.trash[item.id])||0)+1);targetTrashIds.add(item.id);});
+  before.trash.forEach(item=>{const id=trashIdentity(item);if(!targetTrashIds.has(id))nextDeleted.trash[id]=stamp;});
+  // 流水帳採 append-only；還原備份或撤銷資料時不會抹除已經發生過的操作紀錄。
+  target.audit=mergeListEntities(before.audit,target.audit,{},auditIdentity);
   target.deleted=nextDeleted;
   target.fieldUpdatedAt={fixed:stamp,settings:stamp,nos:stamp};
   target.updatedAt=stamp;
@@ -2053,10 +2607,16 @@ function normalizeSnapshot(raw,fallbackStamp){
   const out={
     scores:src.scores&&typeof src.scores==='object'?src.scores:{},
     logs:Array.isArray(src.logs)?src.logs:[],
+    trash:Array.isArray(src.trash)?src.trash:[],
+    audit:Array.isArray(src.audit)?src.audit:[],
     fixed:src.fixed&&typeof src.fixed==='object'?src.fixed:{cadre:{},toilet:[]},
     settings:{threshold:300,...(src.settings&&typeof src.settings==='object'?src.settings:{})},
     nos:Array.isArray(src.nos)?src.nos.map(Number).filter(n=>Number.isInteger(n)&&n>0).sort((a,b)=>a-b):[],
-    deleted:{scores:cleanClockMap(src.deleted&&src.deleted.scores),logs:cleanClockMap(src.deleted&&src.deleted.logs)},
+    deleted:{
+      scores:cleanClockMap(src.deleted&&src.deleted.scores),
+      logs:cleanClockMap(src.deleted&&src.deleted.logs),
+      trash:cleanClockMap(src.deleted&&src.deleted.trash)
+    },
     fieldUpdatedAt:{
       fixed:src.fieldUpdatedAt&&Number.isFinite(Number(src.fieldUpdatedAt.fixed))?Number(src.fieldUpdatedAt.fixed):stamp,
       settings:src.fieldUpdatedAt&&Number.isFinite(Number(src.fieldUpdatedAt.settings))?Number(src.fieldUpdatedAt.settings):stamp,
@@ -2078,6 +2638,19 @@ function normalizeSnapshot(raw,fallbackStamp){
     const item=l&&typeof l==='object'?l:{};
     item.id=logIdentity(item);
     if(!Number(item._updatedAt))item._updatedAt=stamp||1;
+    return item;
+  });
+  out.trash=out.trash.map(raw=>{
+    const item=raw&&typeof raw==='object'?raw:{};
+    item.id=trashIdentity(item);
+    if(!Number(item._updatedAt))item._updatedAt=Number(item.deletedAt)||stamp||1;
+    return item;
+  });
+  out.audit=out.audit.map(raw=>{
+    const item=raw&&typeof raw==='object'?raw:{};
+    item.id=auditIdentity(item);
+    if(!Number(item._updatedAt))item._updatedAt=Number(item.at)||stamp||1;
+    if(!Array.isArray(item.seats))item.seats=[];
     return item;
   });
   if(Array.isArray(out.fixed.cadre)){const o={};out.fixed.cadre.forEach(n=>o[n]=1);out.fixed.cadre=o;}
@@ -2130,17 +2703,30 @@ function mergeLogEntities(local,remote,deleted){
   });
   return [...map.values()].filter(item=>Number(item._updatedAt)>(Number(deleted[item.id])||0)).sort((a,b)=>Number(a._updatedAt)-Number(b._updatedAt)||String(a.id).localeCompare(String(b.id)));
 }
+function mergeListEntities(local,remote,deleted,identity){
+  const map=new Map();
+  [...(remote||[]),...(local||[])].forEach(raw=>{
+    const item=cloneData(raw||{});item.id=identity(item);
+    const prev=map.get(item.id);
+    if(!prev||Number(item._updatedAt)>=Number(prev._updatedAt))map.set(item.id,item);
+  });
+  return[...map.values()].filter(item=>Number(item._updatedAt)>(Number((deleted||{})[item.id])||0))
+    .sort((a,b)=>Number(a._updatedAt)-Number(b._updatedAt)||String(a.id).localeCompare(String(b.id)));
+}
 function mergeSnapshots(localRaw,remoteRaw){
   const local=normalizeSnapshot(localRaw,localRaw&&localRaw.updatedAt);
   const remote=normalizeSnapshot(remoteRaw,remoteRaw&&remoteRaw.updatedAt);
   const deleted={
     scores:mergeDeleted(local.deleted.scores,remote.deleted.scores),
-    logs:mergeDeleted(local.deleted.logs,remote.deleted.logs)
+    logs:mergeDeleted(local.deleted.logs,remote.deleted.logs),
+    trash:mergeDeleted(local.deleted.trash,remote.deleted.trash)
   };
   const pickField=name=>Number(local.fieldUpdatedAt[name])>=Number(remote.fieldUpdatedAt[name])?cloneData(local[name]):cloneData(remote[name]);
   return normalizeSnapshot({
     scores:mergeScoreEntities(local.scores,remote.scores,deleted.scores),
     logs:mergeLogEntities(local.logs,remote.logs,deleted.logs),
+    trash:mergeListEntities(local.trash,remote.trash,deleted.trash,trashIdentity),
+    audit:mergeListEntities(local.audit,remote.audit,{},auditIdentity),
     fixed:pickField('fixed'),settings:pickField('settings'),nos:pickField('nos'),deleted,
     fieldUpdatedAt:{
       fixed:Math.max(local.fieldUpdatedAt.fixed,remote.fieldUpdatedAt.fixed),
@@ -2158,11 +2744,11 @@ function snapshotFingerprint(raw){
   return JSON.stringify(s);
 }
 function currentSnapshot(){
-  const hasLocal=Object.keys(_scores||{}).some(k=>(_scores[k]||[]).length)||(_logs||[]).length||(_nos||[]).length||ROLE_KEYS.some(r=>Object.keys((_fixed&&_fixed[r])||{}).length)||((_fixed&&_fixed.toilet)||[]).length;
+  const hasLocal=Object.keys(_scores||{}).some(k=>(_scores[k]||[]).length)||(_logs||[]).length||(_trash||[]).length||(_audit||[]).length||(_nos||[]).length||ROLE_KEYS.some(r=>Object.keys((_fixed&&_fixed[r])||{}).length)||((_fixed&&_fixed.toilet)||[]).length;
   const stamp=_dataUpdatedAt||(hasLocal?Date.now():0);
   ensureDataIdentity(stamp||1);
   return{
-    scores:cloneData(_scores),logs:cloneData(_logs),fixed:cloneData(_fixed),
+    scores:cloneData(_scores),logs:cloneData(_logs),trash:cloneData(_trash),audit:cloneData(_audit),fixed:cloneData(_fixed),
     settings:cloneData(_settings),nos:[..._nos],deleted:cloneData(_deleted),
     fieldUpdatedAt:cloneData(_fieldUpdatedAt),updatedAt:stamp,
     lastSyncedAt:_lastSyncedAt,revision:_revision
@@ -2185,16 +2771,61 @@ function sched(changed){
 
 document.addEventListener('visibilitychange',async()=>{
   if(document.visibilityState==='hidden'){
-    await persistLocal();
-    if(navigator.onLine&&firebaseUidRef.current&&_dataUpdatedAt>_lastSyncedAt)doSync(true);
+    const saved=await persistLocal();
+    if(saved&&navigator.onLine&&firebaseUidRef.current&&_dataUpdatedAt>_lastSyncedAt)doSync(true);
   }else if(navigator.onLine&&firebaseUidRef.current&&(_dirty||_dataUpdatedAt>_lastSyncedAt))scheduleSync();
 });
 window.addEventListener('pagehide',()=>{persistLocal();});
+window.addEventListener('beforeunload',e=>{
+  if(!_storageBlocked)return;
+  e.preventDefault();e.returnValue='';
+});
+
+async function snapshotChecksum(payload){
+  const text=JSON.stringify(normalizeSnapshot(payload,payload&&payload.updatedAt));
+  return(await sha256Hex(text))||('fnv1a-'+hashText(text));
+}
+
+async function readCommittedSnapshotV4(classId,uid){
+  if(!classId)return null;
+  uid=localUid(uid);
+  const pfx=pfxFor(classId,uid);
+  const commits=(await storeCandidates(pfx+'commit:v4'))
+    .filter(c=>c&&Number(c.schema)===4&&c.ownerUid===uid&&c.classId===classId&&(c.slot==='a'||c.slot==='b')&&c.checksum)
+    .sort((a,b)=>(Number(b.generation)||0)-(Number(a.generation)||0)||(Number(b.committedAt)||0)-(Number(a.committedAt)||0));
+  for(const commit of commits){
+    const envelopes=await storeCandidates(pfx+'snapshot:v4:'+commit.slot);
+    for(const env of envelopes){
+      if(!env||Number(env.schema)!==4||env.ownerUid!==uid||env.classId!==classId||env.checksum!==commit.checksum||env.writeId!==commit.writeId||!env.payload)continue;
+      const checksum=await snapshotChecksum(env.payload);
+      if(checksum===commit.checksum)return normalizeSnapshot(env.payload,env.payload.updatedAt);
+    }
+  }
+  return null;
+}
 
 async function writeLocalSnapshot(classId,snap){
-  if(!classId||!snap)return;
-  const pfx=pfxFor(classId);
+  if(!classId||!snap)return true;
+  const uid=localUid();
+  const pfx=pfxFor(classId,uid);
   const normalized=normalizeSnapshot(snap,snap.updatedAt);
+  const currentCommits=(await storeCandidates(pfx+'commit:v4'))
+    .filter(c=>c&&Number(c.schema)===4&&c.ownerUid===uid&&c.classId===classId&&(c.slot==='a'||c.slot==='b'))
+    .sort((a,b)=>(Number(b.generation)||0)-(Number(a.generation)||0)||(Number(b.committedAt)||0)-(Number(a.committedAt)||0));
+  const slot=currentCommits[0]&&currentCommits[0].slot==='a'?'b':'a';
+  const generation=Math.max(0,...currentCommits.map(c=>Number(c.generation)||0))+1;
+  const checksum=await snapshotChecksum(normalized);
+  const writeId=(self.crypto&&crypto.randomUUID)?crypto.randomUUID():'write-'+Date.now().toString(36)+'-'+Math.random().toString(36).slice(2);
+  const envelope={schema:4,ownerUid:uid,classId,slot,generation,writeId,checksum,writtenAt:Date.now(),payload:normalized};
+  if(!(await storeSet(pfx+'snapshot:v4:'+slot,envelope)))throw new LocalWriteError('完整快照無法寫入裝置儲存空間');
+  const envelopeVerified=(await storeCandidates(pfx+'snapshot:v4:'+slot)).some(v=>v&&v.writeId===writeId&&v.checksum===checksum);
+  if(!envelopeVerified)throw new LocalWriteError('完整快照寫入後驗證失敗');
+  const commit={schema:4,ownerUid:uid,classId,slot,generation,writeId,checksum,committedAt:Date.now(),appVersion:APP_VERSION};
+  if(!(await storeSet(pfx+'commit:v4',commit)))throw new LocalWriteError('快照提交標記無法寫入');
+  const verified=await readCommittedSnapshotV4(classId,uid);
+  if(!verified||(await snapshotChecksum(verified))!==checksum)throw new LocalWriteError('快照提交後完整性檢查失敗');
+
+  // v3 分欄資料只作相容與救援備援；v4 提交已成功後才更新，失敗不會破壞已提交快照。
   await Promise.all([
     storeSet(pfx+'snapshot:v3',normalized),
     storeSet(pfx+'scores:all',normalized.scores),
@@ -2202,83 +2833,114 @@ async function writeLocalSnapshot(classId,snap){
     storeSet(pfx+'fixed',normalized.fixed),
     storeSet(pfx+'settings',normalized.settings),
     storeSet(pfx+'nos',normalized.nos),
-    storeSet(pfx+'meta',{schema:3,updatedAt:normalized.updatedAt,lastSyncedAt:normalized.lastSyncedAt,revision:normalized.revision})
+    storeSet(pfx+'meta',{schema:4,checksum,updatedAt:normalized.updatedAt,lastSyncedAt:normalized.lastSyncedAt,revision:normalized.revision})
   ]);
+  return true;
 }
 
 async function persistLocal(force){
-  if((!_dirty&&!force)||!_curClassId)return;
+  if((!_dirty&&!force)||!_curClassId)return true;
   const classId=_curClassId;
   const stamp=_dataUpdatedAt||Date.now();
   const snap=currentSnapshot();
   snap.updatedAt=stamp;snap.lastSyncedAt=_lastSyncedAt;
-  await writeLocalSnapshot(classId,snap);
-  if(_curClassId===classId&&_dataUpdatedAt===stamp)_dirty=false;
+  try{
+    await writeLocalSnapshot(classId,snap);
+    if(_curClassId===classId&&_dataUpdatedAt===stamp)_dirty=false;
+    if(_storageBlocked&&!_classIndexLocalDirty)clearStorageFailure();
+    return true;
+  }catch(e){
+    showStorageFailure(e instanceof Error?e:new LocalWriteError());
+    return false;
+  }
+}
+
+async function readLegacyLocalParts(pfx){
+  const yr=new Date().getFullYear();
+  const[v3,scAll,lgAll,scNow,lgNow,scPrev,lgPrev,fx,st,ns,meta]=await Promise.all([
+    storeGet(pfx+'snapshot:v3'),storeGet(pfx+'scores:all'),storeGet(pfx+'logs:all'),
+    storeGet(pfx+'scores:'+yr),storeGet(pfx+'logs:'+yr),
+    storeGet(pfx+'scores:'+(yr-1)),storeGet(pfx+'logs:'+(yr-1)),
+    storeGet(pfx+'fixed'),storeGet(pfx+'settings'),storeGet(pfx+'nos'),storeGet(pfx+'meta')
+  ]);
+  const split=normalizeSnapshot({
+    scores:scAll||mergeScores(scPrev,scNow),logs:lgAll||mergeLogs(lgPrev,lgNow),
+    fixed:fx||{cadre:{},leader:{},secretary:{},toilet:[]},settings:{threshold:300,...(st||{})},
+    nos:Array.isArray(ns)?ns:[],updatedAt:meta&&Number(meta.updatedAt)||0,
+    lastSyncedAt:meta&&Number(meta.lastSyncedAt)||0,revision:meta&&Number(meta.revision)||0
+  },meta&&Number(meta.updatedAt)||0);
+  const modern=v3?normalizeSnapshot(v3,v3.updatedAt):null;
+  const snapshot=modern&&hasVisibleData(modern)&&hasVisibleData(split)?mergeSnapshots(modern,split):
+    modern&&hasVisibleData(modern)?modern:hasVisibleData(split)?split:(modern||split);
+  return{snapshot,v3};
 }
 
 async function loadClass(classId){
-  if(!classId)return;
-  // 切班前先把原班尚未落盤的內容寫完，避免資料寫進下一班。
-  clearTimeout(_saveTimer);
-  clearTimeout(_syncTimer);
-  const previousNeedsSync=!!_curClassId&&(_dirty||_dataUpdatedAt>_lastSyncedAt);
-  await persistLocal();
-  if(previousNeedsSync&&firebaseUidRef.current&&_db&&navigator.onLine)await doSync(true);
+  if(!classId)return false;
+  clearTimeout(_saveTimer);clearTimeout(_syncTimer);
+  const targetUid=localUid();
+  const ownerChanged=!!_activeDataUid&&_activeDataUid!==targetUid;
+  const previousClassId=ownerChanged?'':_curClassId;
+  const previousNeedsSync=!!previousClassId&&(_dirty||_dataUpdatedAt>_lastSyncedAt);
+  const previousSnapshot=previousClassId?currentSnapshot():null;
+  // 只等待可驗證的本機落盤；網路同步改在背景執行，切班不再被網路拉住。
+  if(!ownerChanged&&!(await persistLocal()))return false;
+  if(previousNeedsSync&&firebaseUidRef.current&&_db&&navigator.onLine){
+    syncDetachedClass(firebaseUidRef.current,previousClassId,previousSnapshot).catch(e=>console.warn('Detached class sync fail',e));
+  }
   stopCloudListener();
   const token=++_classLoadToken;
   _curClassId=classId;
-  const pfx='vc:'+classId+':';
-  // v2.9.0：每班各自記錄「這台裝置」最後成功同步的時間（不進 snapshot）。
+  const uid=targetUid;
+  _activeDataUid=uid;
+  const pfx=pfxFor(classId,uid);
+  const legacyPfx=legacyPfxFor(classId);
   _lastSyncOkAt=0;_syncErrMsg='';
-  storeGet(pfx+'lastSyncOk').then(v=>{
-    if(classId===_curClassId){_lastSyncOkAt=Number(v)||0;renderSyncStatus();}
-  }).catch(()=>{});
-  const yr=new Date().getFullYear();
   try{
-    const[v3,scAll,lgAll,scNow,lgNow,scPrev,lgPrev,fx,st,ns,meta]=await Promise.all([
-      storeGet(pfx+'snapshot:v3'),
-      storeGet(pfx+'scores:all'),
-      storeGet(pfx+'logs:all'),
-      storeGet(pfx+'scores:'+yr),
-      storeGet(pfx+'logs:'+yr),
-      storeGet(pfx+'scores:'+(yr-1)),
-      storeGet(pfx+'logs:'+(yr-1)),
-      storeGet(pfx+'fixed'),
-      storeGet(pfx+'settings'),
-      storeGet(pfx+'nos'),
-      storeGet(pfx+'meta'),
-    ]);
-    if(token!==_classLoadToken)return;
-    const legacy={scores:scAll||mergeScores(scPrev,scNow),logs:lgAll||mergeLogs(lgPrev,lgNow),fixed:fx||{cadre:{},toilet:[]},settings:{threshold:300,...(st||{})},nos:Array.isArray(ns)?ns:[],updatedAt:meta&&Number(meta.updatedAt)||0,lastSyncedAt:meta&&Number(meta.lastSyncedAt)||0,revision:meta&&Number(meta.revision)||0};
-    const modern=v3?normalizeSnapshot(v3,v3.updatedAt):null;
-    const oldLocal=normalizeSnapshot(legacy,legacy.updatedAt);
-    // 舊資料與 v3 快照同時存在時一併檢查；空白 v3 不得遮住舊本機資料。
-    const snap=modern&&hasVisibleData(modern)&&hasVisibleData(oldLocal)?mergeSnapshots(modern,oldLocal):
-      modern&&hasVisibleData(modern)?modern:hasVisibleData(oldLocal)?oldLocal:(modern||oldLocal);
-    _scores=snap.scores;_logs=snap.logs;_fixed=snap.fixed;_settings=snap.settings;_nos=snap.nos;
+    let syncOk=await storeGet(pfx+'lastSyncOk');
+    if(!syncOk&&mayReadLegacyLocal(uid))syncOk=await storeGet(legacyPfx+'lastSyncOk');
+    if(classId===_curClassId){_lastSyncOkAt=Number(syncOk)||0;renderSyncStatus();}
+  }catch{}
+  try{
+    const committed=await readCommittedSnapshotV4(classId,uid);
+    const scoped=committed?null:await readLegacyLocalParts(pfx);
+    const unscoped=!committed&&mayReadLegacyLocal(uid)?await readLegacyLocalParts(legacyPfx):null;
+    if(token!==_classLoadToken)return false;
+    let snap=committed;
+    if(!snap){
+      const candidates=[scoped&&scoped.snapshot,unscoped&&unscoped.snapshot].filter(Boolean);
+      snap=mergeVisibleSnapshots(candidates)||candidates[0]||normalizeSnapshot({},0);
+    }
+    snap=normalizeSnapshot(snap,snap&&snap.updatedAt);
+    _scores=snap.scores;_logs=snap.logs;_trash=snap.trash;_audit=snap.audit;_fixed=snap.fixed;_settings=snap.settings;_nos=snap.nos;
     _deleted=snap.deleted;_fieldUpdatedAt=snap.fieldUpdatedAt;_revision=snap.revision;
-    _groups=[];
-    _dataUpdatedAt=snap.updatedAt;
-    _lastSyncedAt=snap.lastSyncedAt;
-    _dirty=false;
+    _groups=[];_officers={};_officersRaw=null;_officerMeta={docId:'',updatedAt:'',revision:null,found:false};
+    _dataUpdatedAt=snap.updatedAt;_lastSyncedAt=snap.lastSyncedAt;_dirty=false;
     _overviewQuery='';_overviewFilter='all';
     const searchEl=document.getElementById('student-search');if(searchEl)searchEl.value='';
     const filterEl=document.getElementById('student-filter');if(filterEl)filterEl.value='all';
-    _skipMap={};_exemptMap={};_qgSel.clear();_undoStack=[];updateUndoButton();
+    _skipMap={};_exemptMap={};_qgSel.clear();_qgClassId='';_undoStack=[];updateUndoButton();
     _syncMode='unknown';
-    safeSet('vc2:lastClass',classId);
-    if(!v3&&hasMeaningfulData(snap))await writeLocalSnapshot(classId,snap);
+    if(!safeSet(lastClassKey(uid),classId))console.warn('Last class preference could not be saved');
+    // 首次升級採複製驗證；原 v2.9 鍵永遠不刪除。
+    if(!committed&&hasMeaningfulData(snap)){
+      try{
+        await writeLocalSnapshot(classId,snap);
+        if(_lastSyncOkAt)await storeSet(pfx+'lastSyncOk',_lastSyncOkAt);
+      }catch(e){showStorageFailure(e);}
+    }
   }catch(e){
-    if(token!==_classLoadToken)return;
-    _scores={};_logs=[];_fixed={cadre:{},leader:{},secretary:{},toilet:[]};_settings={threshold:300};_nos=[];_deleted={scores:{},logs:{}};_fieldUpdatedAt={fixed:0,settings:0,nos:0};_revision=0;_dataUpdatedAt=0;_lastSyncedAt=0;_dirty=false;
+    if(token!==_classLoadToken)return false;
+    console.warn('Local class load fail',e);
+    _scores={};_logs=[];_trash=[];_audit=[];_fixed={cadre:{},leader:{},secretary:{},toilet:[]};_settings={threshold:300};_nos=[];_deleted={scores:{},logs:{},trash:{}};_fieldUpdatedAt={fixed:0,settings:0,nos:0};_revision=0;_dataUpdatedAt=0;_lastSyncedAt=0;_dirty=false;
   }
-  renderAll();
-  renderStorageStatus();
+  renderAll();renderStorageStatus();
+  return true;
 }
 
 function hasMeaningfulData(snap){
   const s=normalizeSnapshot(snap,0);
-  return Object.keys(s.scores).some(k=>(s.scores[k]||[]).length)||s.logs.length||s.nos.length||ROLE_KEYS.some(r=>Object.keys(s.fixed[r]||{}).length)||(s.fixed.toilet||[]).length||Object.keys(s.deleted.scores).length||Object.keys(s.deleted.logs).length||Object.keys(s.settings||{}).some(k=>k!=='threshold'||Number(s.settings[k])!==300);
+  return Object.keys(s.scores).some(k=>(s.scores[k]||[]).length)||s.logs.length||s.trash.length||s.audit.length||s.nos.length||ROLE_KEYS.some(r=>Object.keys(s.fixed[r]||{}).length)||(s.fixed.toilet||[]).length||Object.keys(s.deleted.scores).length||Object.keys(s.deleted.logs).length||Object.keys(s.deleted.trash).length||Object.keys(s.settings||{}).some(k=>k!=='threshold'||Number(s.settings[k])!==300);
 }
 
 function snapshotCounts(raw){
@@ -2292,7 +2954,7 @@ function snapshotCounts(raw){
   });
   const fixedCount=ROLE_KEYS.reduce((a,r)=>a+Object.keys((s.fixed&&s.fixed[r])||{}).length,0)+(((s.fixed&&s.fixed.toilet)||[]).length);
   const settingCount=Object.keys(s.settings||{}).filter(k=>k!=='threshold'||Number(s.settings[k])!==300).length;
-  return{scoreEntries,scoreValues,logs:s.logs.length,nos:s.nos.length,fixed:fixedCount,settings:settingCount};
+  return{scoreEntries,scoreValues,logs:s.logs.length,trash:s.trash.length,audit:s.audit.length,nos:s.nos.length,fixed:fixedCount,settings:settingCount};
 }
 
 // 「有刪除標記」不等於「有可見資料」。v2.2.0 曾把空的新文件誤認成完整資料，
@@ -2300,7 +2962,7 @@ function snapshotCounts(raw){
 function hasVisibleData(raw){
   const c=snapshotCounts(raw);
   // 單獨只有換卡閾值等設定，不足以證明這份快照含有班級資料。
-  return c.scoreEntries>0||c.scoreValues>0||c.logs>0||c.nos>0||c.fixed>0;
+  return c.scoreEntries>0||c.scoreValues>0||c.logs>0||c.trash>0||c.audit>0||c.nos>0||c.fixed>0;
 }
 
 function mergeVisibleSnapshots(items){
@@ -2313,7 +2975,7 @@ function mergeVisibleSnapshots(items){
 }
 
 function cloudSnapshotFromDoc(data,classId){
-  const pfx=pfxFor(classId);
+  const pfx=legacyPfxFor(classId);
   const keys=Object.keys(data||{});
   const v3=parseStored(data[pfx+'snapshot:v3'],null);
   const stableScores=parseStored(data[pfx+'scores:all'],null);
@@ -2345,10 +3007,17 @@ function academicYearKey(classId){
   return String(now.getMonth()>=7?now.getFullYear():now.getFullYear()-1);
 }
 function classCloudDocId(classId){
-  return encodeURIComponent(academicYearKey(classId)+'__'+classId).replace(/\./g,'%2E');
+  // v3.0：文件 ID 只由不可變 classId 決定；學年度改成文件欄位，修改年度不會換一份資料。
+  return'class--'+encodeURIComponent(String(classId||'')).replace(/\./g,'%2E');
 }
 function classCloudRef(uid,classId){
   return _db.collection('vc-card-users').doc(uid).collection('classes').doc(classCloudDocId(classId));
+}
+function legacyYearCloudDocId(classId){
+  return encodeURIComponent(academicYearKey(classId)+'__'+classId).replace(/\./g,'%2E');
+}
+function legacyYearCloudRef(uid,classId){
+  return _db.collection('vc-card-users').doc(uid).collection('classes').doc(legacyYearCloudDocId(classId));
 }
 function legacyCloudRef(uid){return _db.collection('vc-card-users').doc(uid);}
 function snapshotFromClassDoc(doc){
@@ -2363,13 +3032,15 @@ function stopCloudListener(){
 }
 function applySnapshotToState(raw,dirty){
   const snap=normalizeSnapshot(raw,raw&&raw.updatedAt);
-  _scores=snap.scores;_logs=snap.logs;_fixed=snap.fixed;_settings=snap.settings;_nos=snap.nos;
+  _scores=snap.scores;_logs=snap.logs;_trash=snap.trash;_audit=snap.audit;_fixed=snap.fixed;_settings=snap.settings;_nos=snap.nos;
   _deleted=snap.deleted;_fieldUpdatedAt=snap.fieldUpdatedAt;_revision=snap.revision;
   _dataUpdatedAt=snap.updatedAt;_lastSyncedAt=snap.lastSyncedAt;_dirty=!!dirty;
   return snap;
 }
 async function readCloudSnapshot(uid,classId){
   let modern=null,legacy=null,separateReadable=false;
+  const historical=[];
+  let historicalVisible=0;
   try{
     const doc=await classCloudRef(uid,classId).get();
     separateReadable=true;
@@ -2378,6 +3049,22 @@ async function readCloudSnapshot(uid,classId){
   }catch(e){
     if(!['permission-denied','failed-precondition','unimplemented'].includes(e&&e.code))console.warn('Separated cloud read unavailable',e);
     _syncMode='legacy';
+  }
+  if(separateReadable){
+    try{
+      const oldDoc=await legacyYearCloudRef(uid,classId).get();
+      const oldSnap=snapshotFromClassDoc(oldDoc);
+      if(oldSnap){historical.push(oldSnap);if(hasVisibleData(oldSnap))historicalVisible++;}
+    }catch(e){console.warn('Current academic-year legacy document unavailable',e);}
+    try{
+      const col=_db.collection('vc-card-users').doc(uid).collection('classes');
+      const qs=await col.where('classId','==',classId).limit(50).get();
+      qs.forEach(doc=>{
+        if(doc.id===classCloudDocId(classId)||doc.id===legacyYearCloudDocId(classId))return;
+        const snap=snapshotFromClassDoc(doc);
+        if(snap){historical.push(snap);if(hasVisibleData(snap))historicalVisible++;}
+      });
+    }catch(e){console.warn('Historical class document scan unavailable',e);}
   }
   try{
     const legacyDoc=await legacyCloudRef(uid).get();
@@ -2388,11 +3075,16 @@ async function readCloudSnapshot(uid,classId){
   }
   const modernVisible=!!modern&&hasVisibleData(modern);
   const legacyVisible=!!legacy&&hasVisibleData(legacy);
-  // 新文件空白時，明確忽略它的空狀態／刪除標記，優先救回舊文件中的可見資料。
-  const snapshot=modernVisible&&legacyVisible?mergeSnapshots(modern,legacy):
-    modernVisible?modern:legacyVisible?legacy:(modern&&hasMeaningfulData(modern)?modern:null);
-  const needsMigration=separateReadable&&legacyVisible&&(!modernVisible||snapshotFingerprint(snapshot)!==snapshotFingerprint(modern));
-  return{snapshot,needsMigration,recoveredLegacy:legacyVisible&&!modernVisible};
+  // 把所有同 classId 的年度孤兒文件一起合併；原文件只讀保留，不刪除。
+  const visibleParts=[modern,...historical,legacy].filter(s=>s&&hasVisibleData(s));
+  const snapshot=mergeVisibleSnapshots(visibleParts)||(modern&&hasMeaningfulData(modern)?modern:null);
+  const needsMigration=separateReadable&&!!snapshot&&(!modernVisible||snapshotFingerprint(snapshot)!==snapshotFingerprint(modern));
+  return{
+    snapshot,needsMigration,
+    recoveredLegacy:legacyVisible&&!modernVisible,
+    recoveredHistorical:historicalVisible,
+    legacyYearDocId:legacyYearCloudDocId(classId)
+  };
 }
 function startCloudListener(uid,classId){
   stopCloudListener();
@@ -2414,12 +3106,12 @@ function startCloudListener(uid,classId){
     merged.lastSyncedAt=Date.now();
     if(localChanged){
       applySnapshotToState(merged,cloudMissing);
-      await persistLocal(true);
+      if(!(await persistLocal(true)))return;
       refreshVisiblePanel();
     }else{
       _lastSyncedAt=merged.lastSyncedAt;
       _revision=Math.max(_revision,merged.revision);
-      await persistLocal(true);
+      if(!(await persistLocal(true)))return;
     }
     setSyncDot(cloudMissing?'ing':'ok');
     renderStorageStatus();
@@ -2455,15 +3147,16 @@ async function loadCardClassFromFirestore(classId){
     const needsUpload=cloudResult.needsMigration||snapshotFingerprint(merged)!==snapshotFingerprint(cloud);
     merged.lastSyncedAt=Date.now();
     applySnapshotToState(merged,needsUpload);
-    await persistLocal(true);
+    if(!(await persistLocal(true)))return false;
     refreshVisiblePanel();
     startCloudListener(uid,classId);
     // 不需上傳＝雲端已含本機資料，等同一次成功同步。
-    if(!needsUpload)markSyncOk();
+    if(!needsUpload)markSyncOk(classId,uid);
     setSyncDot(needsUpload?'ing':'ok');
     renderStorageStatus();
     if(needsUpload)scheduleSync();
     if(cloudResult.recoveredLegacy)toast('✅ 已從舊版雲端找回本班資料，正在安全轉存',4200);
+    else if(cloudResult.recoveredHistorical)toast(`✅ 已合併 ${cloudResult.recoveredHistorical} 份舊學年度資料，正在轉存到固定班級文件`,4500);
     return true;
   }catch(e){
     setSyncDot('off');
@@ -2504,16 +3197,20 @@ async function loadFromFirestore(){
     if(!_classes.length){
       renderAll();
       toast('尚無班級；可由左上角開啟班級管理新增 Venus Card 專用班級',4500);
-      setSyncDot('ok');
+      if(!_storageBlocked)setSyncDot('ok');
       return;
     }
 
     // 優先保留目前／上次班級；若已隱藏或封存，再改用第一個可見班級。
-    const lastClassId=safeGet('vc2:lastClass');
+    let lastClassId=safeGet(lastClassKey(uid));
+    if(!lastClassId&&mayReadLegacyLocal(uid)){
+      lastClassId=safeGet('vc2:lastClass');
+      if(lastClassId)safeSet(lastClassKey(uid),lastClassId);
+    }
     const preferCls=_classes.find(c=>c.id===_curClassId)||
       (lastClassId&&_classes.find(c=>c.id===lastClassId))||_classes[0];
     document.getElementById('chip-text').textContent=preferCls.className||preferCls.id;
-    if(_curClassId!==preferCls.id)await loadClass(preferCls.id);
+    if(_curClassId!==preferCls.id||_activeDataUid!==uid)await loadClass(preferCls.id);
     await loadCardClassFromFirestore(preferCls.id);
 
     if(isOsClass(preferCls.id)){
@@ -2536,13 +3233,92 @@ async function loadFromFirestore(){
         setTimeout(()=>switchStab('nos'),100);
       },800);
     }
-    setSyncDot('ok');
+    if(!_storageBlocked)setSyncDot('ok');
   }catch(e){setSyncDot('off');toast('❌ 讀取失敗：'+e.message);console.warn('Firestore read fail',e);}
+}
+
+async function historicalCloudBase(uid,classId){
+  try{
+    const col=_db.collection('vc-card-users').doc(uid).collection('classes');
+    const[qs,oldDoc]=await Promise.all([
+      col.where('classId','==',classId).limit(50).get(),
+      legacyYearCloudRef(uid,classId).get().catch(()=>null)
+    ]);
+    const parts=[];qs.forEach(doc=>{const s=snapshotFromClassDoc(doc);if(s&&hasVisibleData(s))parts.push(s);});
+    const old=snapshotFromClassDoc(oldDoc);if(old&&hasVisibleData(old))parts.push(old);
+    return mergeVisibleSnapshots(parts);
+  }catch(e){console.warn('Historical sync base unavailable',e);return null;}
+}
+
+async function syncSnapshotToCloud(uid,classId,raw){
+  const snap=normalizeSnapshot(raw,raw&&raw.updatedAt||Date.now());
+  if(!snap.updatedAt)snap.updatedAt=Date.now();
+  const historical=await historicalCloudBase(uid,classId);
+  try{
+    const ref=classCloudRef(uid,classId);
+    const merged=await _db.runTransaction(async tx=>{
+      // Firestore 交易規則：全部讀取必須先於寫入。
+      const modernDoc=await tx.get(ref);
+      const legacyDoc=await tx.get(legacyCloudRef(uid));
+      const modern=snapshotFromClassDoc(modernDoc);
+      const legacy=legacyDoc.exists?cloudSnapshotFromDoc(legacyDoc.data()||{},classId):null;
+      const parts=[modern,historical,legacy,snap].filter(s=>s&&hasVisibleData(s));
+      const next=mergeVisibleSnapshots(parts)||normalizeSnapshot(snap,snap.updatedAt);
+      next.revision=Math.max(Number(modern&&modern.revision)||0,Number(historical&&historical.revision)||0,Number(legacy&&legacy.revision)||0,Number(next.revision)||0)+1;
+      next.updatedAt=Math.max(next.updatedAt,Date.now());
+      tx.set(ref,{
+        schema:5,classId,academicYear:academicYearKey(classId),revision:next.revision,
+        clientUpdatedAt:next.updatedAt,updatedBy:_deviceId,appVersion:APP_VERSION,
+        data:JSON.stringify(next),updatedAt:firebase.firestore.FieldValue.serverTimestamp()
+      });
+      return next;
+    });
+    return{merged,mode:'separate'};
+  }catch(separateErr){
+    if(!['permission-denied','failed-precondition','unimplemented'].includes(separateErr&&separateErr.code))throw separateErr;
+  }
+
+  // 舊規則尚未允許 classes 子集合時保留相容路徑；雲端欄位仍不使用本機 UID 前綴。
+  const ref=legacyCloudRef(uid);
+  const merged=await _db.runTransaction(async tx=>{
+    const doc=await tx.get(ref);
+    const remote=doc.exists?cloudSnapshotFromDoc(doc.data()||{},classId):null;
+    const parts=[remote,historical,snap].filter(s=>s&&hasVisibleData(s));
+    const next=mergeVisibleSnapshots(parts)||normalizeSnapshot(snap,snap.updatedAt);
+    next.revision=Math.max(Number(remote&&remote.revision)||0,Number(next.revision)||0)+1;
+    next.updatedAt=Math.max(next.updatedAt,Date.now());
+    const pfx=legacyPfxFor(classId),payload={};
+    payload[pfx+'snapshot:v3']=JSON.stringify(next);
+    payload[pfx+'scores:all']=JSON.stringify(next.scores);
+    payload[pfx+'logs:all']=JSON.stringify(next.logs);
+    payload[pfx+'fixed']=JSON.stringify(next.fixed);
+    payload[pfx+'settings']=JSON.stringify(next.settings);
+    payload[pfx+'nos']=JSON.stringify(next.nos);
+    payload[pfx+'meta']=JSON.stringify({schema:5,updatedAt:next.updatedAt,revision:next.revision,appVersion:APP_VERSION});
+    payload.updatedAt=firebase.firestore.FieldValue.serverTimestamp();
+    tx.set(ref,payload,{merge:true});
+    return next;
+  });
+  return{merged,mode:'legacy'};
+}
+
+const _detachedSyncs=new Map();
+async function syncDetachedClass(uid,classId,snapshot){
+  if(!uid||!classId||!snapshot||!_db||!navigator.onLine)return false;
+  const key=uid+'|'+classId;
+  if(_detachedSyncs.has(key))return _detachedSyncs.get(key);
+  const job=(async()=>{
+    const result=await syncSnapshotToCloud(uid,classId,snapshot);
+    markSyncOk(classId,uid);
+    return !!result;
+  })().finally(()=>_detachedSyncs.delete(key));
+  _detachedSyncs.set(key,job);
+  return job;
 }
 
 async function doSync(silent){
   const uid=firebaseUidRef.current;
-  if(!uid||!_db||!_curClassId){setSyncDot('off',uid?'':'auth');return;}
+  if(!uid||!_db||!_curClassId){setSyncDot('off',uid?'':'auth');return false;}
   if(!navigator.onLine){setSyncDot('off','offline');return false;}
   if(_syncInFlight){_syncQueued=true;return false;}
   _syncInFlight=true;
@@ -2552,78 +3328,29 @@ async function doSync(silent){
   if(!snap.updatedAt)snap.updatedAt=Date.now();
   setSyncDot('ing');
   try{
-    await persistLocal();
-    let merged;
-    if(_syncMode!=='legacy'){
-      try{
-        const ref=classCloudRef(uid,classId);
-        merged=await _db.runTransaction(async tx=>{
-          const doc=await tx.get(ref);
-          let remote=snapshotFromClassDoc(doc);
-          // 防止空白的新分班文件覆蓋舊主文件：新文件沒有可見資料時，同一交易內再讀舊來源。
-          if(!remote||!hasVisibleData(remote)){
-            const legacyDoc=await tx.get(legacyCloudRef(uid));
-            const legacy=legacyDoc.exists?cloudSnapshotFromDoc(legacyDoc.data()||{},classId):null;
-            if(legacy&&hasVisibleData(legacy))remote=legacy;
-          }
-          const next=remote&&hasVisibleData(remote)?
-            (hasVisibleData(snap)?mergeSnapshots(snap,remote):normalizeSnapshot(remote,remote.updatedAt)):
-            normalizeSnapshot(snap,snap.updatedAt);
-          next.revision=Math.max(Number(remote&&remote.revision)||0,Number(next.revision)||0)+1;
-          next.updatedAt=Math.max(next.updatedAt,Date.now());
-          tx.set(ref,{
-            schema:3,classId,academicYear:academicYearKey(classId),revision:next.revision,
-            clientUpdatedAt:next.updatedAt,updatedBy:_deviceId,appVersion:APP_VERSION,
-            data:JSON.stringify(next),updatedAt:firebase.firestore.FieldValue.serverTimestamp()
-          });
-          return next;
-        });
-        _syncMode='separate';
-      }catch(separateErr){
-        if(!['permission-denied','failed-precondition','unimplemented'].includes(separateErr&&separateErr.code))throw separateErr;
-        _syncMode='legacy';
-      }
-    }
-    if(_syncMode==='legacy'){
-      const ref=legacyCloudRef(uid);
-      merged=await _db.runTransaction(async tx=>{
-        const doc=await tx.get(ref);
-        const remote=doc.exists?cloudSnapshotFromDoc(doc.data()||{},classId):null;
-        const next=remote&&hasVisibleData(remote)?
-          (hasVisibleData(snap)?mergeSnapshots(snap,remote):normalizeSnapshot(remote,remote.updatedAt)):
-          normalizeSnapshot(snap,snap.updatedAt);
-        next.revision=Math.max(Number(remote&&remote.revision)||0,Number(next.revision)||0)+1;
-        next.updatedAt=Math.max(next.updatedAt,Date.now());
-        const pfx=pfxFor(classId);
-        const payload={};
-        payload[pfx+'snapshot:v3']=JSON.stringify(next);
-        payload[pfx+'scores:all']=JSON.stringify(next.scores);
-        payload[pfx+'logs:all']=JSON.stringify(next.logs);
-        payload[pfx+'fixed']=JSON.stringify(next.fixed);
-        payload[pfx+'settings']=JSON.stringify(next.settings);
-        payload[pfx+'nos']=JSON.stringify(next.nos);
-        payload[pfx+'meta']=JSON.stringify({schema:3,updatedAt:next.updatedAt,revision:next.revision,appVersion:APP_VERSION});
-        payload.updatedAt=firebase.firestore.FieldValue.serverTimestamp();
-        tx.set(ref,payload,{merge:true});
-        return next;
-      });
-    }
+    if(!(await persistLocal()))return false;
+    const result=await syncSnapshotToCloud(uid,classId,snap);
+    const merged=result.merged;
     if(classId===_curClassId){
+      _syncMode=result.mode;
       const changedDuringSync=_dataUpdatedAt>startStamp;
       const newest=changedDuringSync?mergeSnapshots(currentSnapshot(),merged):merged;
       newest.lastSyncedAt=Date.now();
       applySnapshotToState(newest,changedDuringSync);
-      await persistLocal(true);
+      if(!(await persistLocal(true)))return false;
       if(changedDuringSync)_syncQueued=true;
-    }
-    markSyncOk();
-    setSyncDot('ok');
-    startCloudListener(uid,classId);
-    renderStorageStatus();
-    if(!silent)toast('\u2601\ufe0f 已同步到雲端');
+      markSyncOk(classId,uid);setSyncDot('ok');startCloudListener(uid,classId);renderStorageStatus();
+      if(!silent)toast('\u2601\ufe0f 已同步到雲端');
+    }else markSyncOk(classId,uid);
     return true;
-  }catch(e){_syncErrMsg=e&&e.message?String(e.message).slice(0,80):'未知錯誤';setSyncDot('off','error');if(!silent)toast('同步失敗：'+e.message);console.warn('Card sync fail',e);return false;}
-  finally{
+  }catch(e){
+    console.warn('Card sync fail',e);
+    if(classId===_curClassId){
+      _syncErrMsg=e&&e.message?String(e.message).slice(0,80):'未知錯誤';
+      setSyncDot('off','error');if(!silent)toast('同步失敗：'+e.message);
+    }
+    return false;
+  }finally{
     _syncInFlight=false;
     if(_syncQueued){_syncQueued=false;setTimeout(()=>doSync(true),100);}
   }
@@ -2672,7 +3399,16 @@ function cardCounts(no){
 
 // ══ Utils ══
 function nowStr(){return new Date().toLocaleString('zh-TW',{hour12:false});}
-function genId(){return Date.now().toString(36)+Math.random().toString(36).slice(2,5);}
+function genId(){
+  if(self.crypto&&crypto.randomUUID)return crypto.randomUUID();
+  const bytes=new Uint8Array(16);
+  if(self.crypto&&crypto.getRandomValues){
+    crypto.getRandomValues(bytes);bytes[6]=(bytes[6]&15)|64;bytes[8]=(bytes[8]&63)|128;
+    const h=[...bytes].map(b=>b.toString(16).padStart(2,'0')).join('');
+    return`${h.slice(0,8)}-${h.slice(8,12)}-${h.slice(12,16)}-${h.slice(16,20)}-${h.slice(20)}`;
+  }
+  return'id-'+Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,12);
+}
 function esc(v){return String(v===undefined||v===null?'':v).replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));}
 function uriArg(v){return encodeURIComponent(String(v)).replace(/'/g,'%27');}
 function toast(m,dur){
@@ -2683,9 +3419,12 @@ function toast(m,dur){
 }
 // v2.9.0：同步狀態文字化。原本只有 7px 小圓點，看不出「已存本機」與「已上雲端」的差別。
 // 呼叫端沿用 setSyncDot(state)；需要區分原因時傳第二個參數。
-function markSyncOk(){
-  _lastSyncOkAt=Date.now();
-  if(_curClassId)storeSet(pfxFor(_curClassId)+'lastSyncOk',_lastSyncOkAt);
+function markSyncOk(classId,uid){
+  const target=classId||_curClassId;
+  const stamp=Date.now();
+  if(target===_curClassId)_lastSyncOkAt=stamp;
+  if(target)storeSet(pfxFor(target,uid)+'lastSyncOk',stamp);
+  return stamp;
 }
 function hhmm(ts){
   if(!ts)return '';
@@ -2700,12 +3439,16 @@ function syncStatusText(){
     const t=hhmm(_lastSyncOkAt);
     return{short:t||'已同步',full:t?`☁️ ${t} 已同步到雲端`:'☁️ 已同步到雲端',tone:'ok'};
   }
+  if(_syncReason==='storage')return{short:'未存妥',full:'⚠️ 本機儲存未完成 — 已暫停離開此畫面',tone:'bad'};
   if(_syncReason==='auth')return{short:'未登入',full:'☁️ 未登入，資料只存在這台裝置',tone:'warn'};
   if(_syncReason==='error')return{short:'失敗',full:'⚠️ 同步失敗 — 點此重試'+(_syncErrMsg?`（${_syncErrMsg}）`:''),tone:'bad'};
   if(!navigator.onLine)return{short:'離線',full:'✈️ 離線模式 — 恢復網路後自動同步',tone:'warn'};
   return{short:'未同步',full:'☁️ 尚未同步，資料只存在這台裝置',tone:'warn'};
 }
 function setSyncDot(s,reason){
+  if(_storageBlocked&&reason!=='storage'){
+    _syncState='off';_syncReason='storage';renderSyncStatus();return;
+  }
   _syncState=s==='ing'?'ing':s==='ok'?'ok':'off';
   if(reason!==undefined)_syncReason=reason||'';
   else if(_syncState!=='off')_syncReason='';
@@ -2744,7 +3487,21 @@ function showSyncDetail(){
   if(_syncErrMsg)lines.push('最近錯誤：'+_syncErrMsg);
   showDiag('☁️ 同步狀態',lines.join('\n'));
 }
-function closeModal(id){document.getElementById(id).classList.remove('show');}
+let _modalLockY=0,_modalLocked=false;
+function syncModalScrollLock(){
+  const any=!!document.querySelector('.modal-bg.show');
+  if(any&&!_modalLocked){
+    _modalLocked=true;_modalLockY=window.scrollY||document.documentElement.scrollTop||0;
+    document.body.classList.add('modal-scroll-locked');
+    document.body.style.top=`-${_modalLockY}px`;
+  }else if(!any&&_modalLocked){
+    _modalLocked=false;document.body.classList.remove('modal-scroll-locked');document.body.style.top='';
+    window.scrollTo(0,_modalLockY);
+  }
+}
+const _modalObserver=new MutationObserver(syncModalScrollLock);
+document.querySelectorAll('.modal-bg').forEach(el=>_modalObserver.observe(el,{attributes:true,attributeFilter:['class']}));
+function closeModal(id){const el=document.getElementById(id);if(el)el.classList.remove('show');}
 // v2.8.6：診斷輸出改用可捲動的視窗，alert() 在長文字會被截斷且無法複製。
 let _diagText='';
 function showDiag(title,text){
@@ -2781,7 +3538,7 @@ function refreshVisiblePanel(){
   const fn={
     redeem:renderRedeem,give:()=>{renderNoPicker();renderQgPicker();renderGiveDetail();},
     noon:()=>{fillNoSelect('noon-no');renderNoonList();updateNoonLabel();},
-    table:renderScoreTable,log:renderLog,settings:renderSettings
+    table:renderScoreTable,log:renderLog,audit:renderAudit,trash:renderTrash,settings:renderSettings
   };
   if(fn[id])fn[id]();
 }
@@ -2790,7 +3547,9 @@ async function undoLastAction(){
   if(!item){updateUndoButton();return;}
   if(item.classId!==_curClassId){_undoStack=[];updateUndoButton();toast('切換班級後無法撤銷上一班操作');return;}
   replaceCurrentWithSnapshot(item.snapshot);
-  await persistLocal(true);scheduleSync();refreshVisiblePanel();updateUndoButton();
+  recordAudit('撤銷最近操作','data',item.label,[],0);
+  if(!(await persistLocal(true)))return;
+  scheduleSync();refreshVisiblePanel();updateUndoButton();
   toast(`↶ 已撤銷「${item.label}」`);
 }
 
@@ -2906,7 +3665,7 @@ async function createCardClass(){
   if([..._osClasses,..._cardClasses].some(c=>String(c.className||c.name||c.id).trim()===className&&String(c.year||'')===year)){
     toast('已有相同名稱與學年度的班級');return;
   }
-  const id='card-'+Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,7);
+  const id='card-'+genId();
   const created={id,className,year:year||defaultAcademicYear(),school,createdAt:Date.now(),archived:false,source:'venus-card'};
   _cardClasses.push(created);
   mergeClassSources();
@@ -2915,7 +3674,7 @@ async function createCardClass(){
   renderClassManager();
   await switchClass(id);
   document.getElementById('class-manager-modal').classList.add('show');
-  toast(cloudSaved?'✅ 班級已新增並同步':'✅ 班級已新增；目前先保存在此裝置');
+  toast(_storageBlocked?'⚠️ 班級已建立，但本機儲存尚待重試':cloudSaved?'✅ 班級已新增並同步':'✅ 班級已新增；目前先保存在此裝置');
 }
 
 async function renameCardClass(id){
@@ -2937,6 +3696,10 @@ async function hideOsClass(id){
   if(!cls)return;
   if(id===_curClassId&&_classes.length<=1){toast('請先新增或恢復另一個班級，再隱藏目前班級');return;}
   if(!confirm(`只在 Venus Card 隱藏「${cls.className||id}」？\n\nVenus OS 的班級與資料完全不會變更。`))return;
+  if(id===_curClassId){
+    const next=_classes.find(c=>c.id!==id);
+    if(next&&!allowClassSwitch(next.id))return;
+  }
   if(!_hiddenOsClassIds.includes(String(id)))_hiddenOsClassIds.push(String(id));
   mergeClassSources();
   await persistCardClassIndex();
@@ -2959,6 +3722,10 @@ async function archiveCardClass(id){
   if(!cls)return;
   if(id===_curClassId&&_classes.length<=1){toast('請先新增或恢復另一個班級，再封存目前班級');return;}
   if(!confirm(`封存「${cls.className||id}」？\n\n班級資料不會刪除，可隨時在此恢復。`))return;
+  if(id===_curClassId){
+    const next=_classes.find(c=>c.id!==id);
+    if(next&&!allowClassSwitch(next.id))return;
+  }
   cls.archived=true;
   mergeClassSources();
   await persistCardClassIndex();
@@ -2978,17 +3745,51 @@ async function restoreCardClass(id){
   toast('✅ 班級已恢復');
 }
 
+function classSwitchPendingWork(){
+  const items=[];
+  const paste=document.getElementById('ps-paste');
+  if(_pasteData||(paste&&paste.value.trim()))items.push('貼上成績尚未送出');
+  if(_pendingXlsxImport)items.push('Excel 匯入尚未確認');
+  if(_colConfirmState)items.push('試算表欄位尚未確認');
+  const qgNote=document.getElementById('qg-note');
+  if((_qgSel&&_qgSel.size)||(qgNote&&qgNote.value.trim()))items.push('快速給卡尚未送出');
+  if(_deductTargets.length&&document.getElementById('deduct-modal')?.classList.contains('show'))items.push('扣卡尚未確認');
+  return[...new Set(items)];
+}
+function clearPendingClassWork(){
+  _pasteData=null;_pendingXlsxImport=null;_colConfirmState=null;_xlsxData=null;
+  const paste=document.getElementById('ps-paste');if(paste)paste.value='';
+  const psStatus=document.getElementById('ps-status');if(psStatus)psStatus.textContent='';
+  const psPreview=document.getElementById('ps-preview');if(psPreview)psPreview.innerHTML='';
+  const psSubmit=document.getElementById('ps-submit');if(psSubmit)psSubmit.style.display='none';
+  const xlsx=document.getElementById('xlsx-input');if(xlsx)xlsx.value='';
+  const xlsxPreview=document.getElementById('xlsx-preview');if(xlsxPreview)xlsxPreview.innerHTML='';
+  const note=document.getElementById('qg-note');if(note)note.value='';
+  _qgSel.clear();
+  _deductTargets=[];
+  const deduct=document.getElementById('deduct-modal');if(deduct)deduct.classList.remove('show');
+  const colModal=document.getElementById('col-confirm-modal');if(colModal)colModal.classList.remove('show');
+}
+function allowClassSwitch(id){
+  if(id===_curClassId)return true;
+  const pending=classSwitchPendingWork();
+  if(!pending.length)return true;
+  if(!confirm(`目前班級有尚未完成的操作：\n• ${pending.join('\n• ')}\n\n切換班級會取消這些草稿，但不會修改已儲存資料。確定切換嗎？`))return false;
+  clearPendingClassWork();
+  return true;
+}
+
 async function switchClass(id){
   _ddOpen=false;
   document.getElementById('class-dd').style.display='none';
   document.getElementById('class-chip').classList.remove('open');
+  if(id===_curClassId)return true;
+  if(!allowClassSwitch(id))return false;
   const cls=_classes.find(c=>c.id===id);
   if(cls){
     document.getElementById('chip-text').textContent=(cls.className||id);
   }
-  await loadClass(id);
-  await loadCardClassFromFirestore(id);
-  if(id!==_curClassId)return;
+  if(!(await loadClass(id))||id!==_curClassId)return false;
   // 只有 Venus OS 班級讀取 OS 分組與作業抵免；Card 自建班級完全獨立。
   if(isOsClass(id)){
     seedNosFromVenusOS();   // loadClass 已完成，此時帶入座號才不會蓋掉雲端名單
@@ -2996,19 +3797,21 @@ async function switchClass(id){
     loadOfficersForClass(id);
     loadExemptFromVenusOS(id);
   }else{
-    _groups=[];_exemptMap={};renderExemptSummary();
+    _groups=[];_officers={};_officersRaw=null;_officerMeta={docId:'',updatedAt:'',revision:null,found:false};
+    _exemptMap={};renderExemptSummary();
   }
-  if(!_nos.length){
-    // 這個班還沒設定座號 → 強制導向座號管理，不能略過
-    toast(`⚠ 「${cls?cls.className||id:id}」尚未設定座號，請先設定`);
-    goTab('more');
-    setTimeout(()=>goMore('settings'),50);
-    setTimeout(()=>switchStab('nos'),100);
-  }else{
-    // 已有座號 → 正常跳回總覽
-    goTab('overview');
-    toast(`✅ 已切換到「${cls?cls.className||id:id}」`);
-  }
+  // 本機畫面先立即可用；雲端合併與舊年度救援在背景完成。
+  goTab('overview');
+  toast(`✅ 已切換到「${cls?cls.className||id:id}」`);
+  const cloudJob=firebaseUidRef.current&&_db?loadCardClassFromFirestore(id):Promise.resolve(false);
+  Promise.resolve(cloudJob).finally(()=>{
+    if(id!==_curClassId)return;
+    if(!_nos.length){
+      toast(`⚠ 「${cls?cls.className||id:id}」尚未設定座號，請先設定`);
+      goTab('more');setTimeout(()=>goMore('settings'),50);setTimeout(()=>switchStab('nos'),100);
+    }
+  });
+  return true;
 }
 
 // ══ v2.8.8 幹部名單（LIMU 教師工具寫入，Venus Card 只讀）══
@@ -3026,7 +3829,7 @@ let _officerMeta={docId:'',updatedAt:'',revision:null,found:false};
 // semStart2 卻還是 2026-02-23），早於 semStart1 就視為無效，否則暑假會被判成下學期。
 function currentSemester(){
   const s=_osSettings||{};
-  const today=new Date().toISOString().slice(0,10);
+  const today=todayISO();
   const s1=String(s.semStart1||'');
   const s2=String(s.semStart2||'');
   const s2valid=!!s2&&(!s1||s2>s1);
@@ -3140,7 +3943,7 @@ function reseedOfficers(){
 function pickGroupVersion(parsed){
   const vs=parsed&&Array.isArray(parsed.versions)?parsed.versions:[];
   if(!vs.length)return null;
-  const today=new Date().toISOString().slice(0,10);
+  const today=todayISO();
   // 取生效日已到、且最新的一版；都還沒生效就退回最早那版。
   const eligible=vs.filter(v=>!v.effectiveDate||String(v.effectiveDate)<=today);
   const pool=eligible.length?eligible:vs;
@@ -3548,7 +4351,7 @@ function renderExemptSummary(){
 }
 
 // ══ Tab 切換 ══
-const TAB_IDS=['overview','score','redeem','give','more','noon','table','log','settings'];
+const TAB_IDS=['overview','score','redeem','give','more','noon','table','log','audit','trash','settings'];
 const MAIN_TABS=['overview','score','redeem','give','more'];
 
 function goTab(id,btn){
@@ -3561,7 +4364,11 @@ function goTab(id,btn){
     const b=document.getElementById('tbtn-'+t);
     if(b)b.classList.toggle('active',t===id);
   });
-  document.getElementById('scroll-area').scrollTop=0;
+  const scrollArea=document.getElementById('scroll-area');if(scrollArea)scrollArea.scrollTop=0;
+  // 目前採自然頁面捲動，實際捲動者是 document；同步歸零避免沿用上一頁籤的位置。
+  const root=document.scrollingElement||document.documentElement;
+  if(root)root.scrollTop=0;
+  window.scrollTo(0,0);
   const fn={
     overview:renderOverview,
     score:()=>{renderScoreLog();renderGsList();},
@@ -3570,6 +4377,8 @@ function goTab(id,btn){
     noon:()=>{fillNoSelect('noon-no');renderNoonList();updateNoonLabel();},
     table:renderScoreTable,
     log:renderLog,
+    audit:renderAudit,
+    trash:renderTrash,
     settings:renderSettings,
   };
   fn[id]?.();
@@ -3684,7 +4493,15 @@ function extractSheetId(url){
 function showAddSheetModal(){
   document.getElementById('new-sheet-name').value='';
   document.getElementById('new-sheet-url').value='';
+  document.getElementById('new-sheet-privacy').value='private';
+  updateSheetPrivacyHelp();
   document.getElementById('add-sheet-modal').classList.add('show');
+}
+
+function updateSheetPrivacyHelp(){
+  const mode=document.getElementById('new-sheet-privacy')?.value||'private';
+  const el=document.getElementById('sheet-privacy-help');if(!el)return;
+  el.textContent=mode==='private'?'保留試算表原本的限制存取；第一次同步時會要求 Google Sheets 唯讀授權。':'舊版相容模式：必須將試算表設為「知道連結的人均可查看」。';
 }
 
 function addSheetLink(){
@@ -3696,7 +4513,9 @@ function addSheetLink(){
   if(!sheetId){toast('無法解析連結，請確認是 Google Sheets 分享網址');return;}
   pushUndo('新增試算表連結');
   if(!_settings.gsheets)_settings.gsheets=[];
-  _settings.gsheets.push({id:genId(),name,sheetId,addedAt:nowStr()});
+  const privacy=document.getElementById('new-sheet-privacy').value==='public'?'public':'private';
+  _settings.gsheets.push({id:genId(),name,sheetId,privacy,addedAt:nowStr()});
+  recordAudit('新增試算表連結','data',`${name}｜${privacy==='private'?'私人唯讀':'公開連結'}`,[],0);
   sched('settings');scheduleSync();
   closeModal('add-sheet-modal');
   renderGsList();
@@ -3706,7 +4525,9 @@ function addSheetLink(){
 function delSheetLink(id){
   if(!confirm('確定刪除這個連結？'))return;
   pushUndo('刪除試算表連結');
+  const old=(_settings.gsheets||[]).find(g=>g.id===id);
   _settings.gsheets=(_settings.gsheets||[]).filter(g=>g.id!==id);
+  recordAudit('刪除試算表連結','data',old?old.name:'試算表連結',[],0);
   sched('settings');scheduleSync();
   renderGsList();
   toast('已刪除');
@@ -3722,30 +4543,51 @@ function renderGsList(){
   area.innerHTML=list.map(g=>`
     <div class="stu-list-item" style="align-items:center">
       <div style="flex:1;min-width:0">
-        <div style="font-weight:700;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">📊 ${esc(g.name)}</div>
+        <div style="font-weight:700;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">📊 ${esc(g.name)}<span class="privacy-badge${g.privacy==='private'?'':' public'}">${g.privacy==='private'?'私人唯讀':'公開連結'}</span></div>
         <div style="font-size:11px;color:var(--text4)" id="gs-status-${g.id}">尚未同步過</div>
       </div>
+      ${g.privacy==='private'?'':`<button class="btn-ghost btn-xs" onclick="upgradeSheetPrivacy('${g.id}')">轉私人</button>`}
       <button class="btn-primary btn-sm" onclick="syncFromGSheet('${g.id}')">🔄 同步</button>
       <button class="btn-red btn-xs" onclick="delSheetLink('${g.id}')">刪</button>
     </div>`).join('');
 }
 
+async function upgradeSheetPrivacy(id){
+  const link=(_settings.gsheets||[]).find(g=>g.id===id);if(!link)return;
+  try{await authorizePrivateSheets(false);}catch(e){toast('授權失敗：'+e.message,4200);return;}
+  pushUndo('試算表轉為私人唯讀');link.privacy='private';recordAudit('試算表轉私人唯讀','data',link.name,[],0);
+  sched('settings');scheduleSync();renderGsList();toast('✅ 已改為私人唯讀，不再需要公開分享');
+}
+
 async function syncFromGSheet(linkId){
+  const classId=_curClassId;
   const link=(_settings.gsheets||[]).find(g=>g.id===linkId);
   if(!link){toast('找不到這個連結');return;}
   if(!_nos.length){toast('請先設定座號（設定→座號管理）');return;}
   const statusEl=document.getElementById('gs-status-'+linkId);
   if(statusEl)statusEl.innerHTML='<span style="color:var(--gold)">讀取中...</span>';
   try{
-    // Google Sheets 公開 CSV 匯出端點，直接抓「獎卡兌換」分頁
-    const csvUrl=`https://docs.google.com/spreadsheets/d/${link.sheetId}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent('獎卡兌換')}`;
-    const res=await fetch(csvUrl);
-    if(!res.ok)throw new Error('無法讀取，請確認 Sheets 是否設成「知道連結的人可檢視」');
-    const csvText=await res.text();
-    if(csvText.includes('<HTML>')||csvText.includes('<!DOCTYPE')){
-      throw new Error('找不到「獎卡兌換」分頁，或權限未開放');
+    let rows=[];
+    if(link.privacy==='private'){
+      let token=(_googleSheetsToken&&Date.now()<_googleSheetsTokenExpiresAt)?_googleSheetsToken:'';
+      if(!token)token=await authorizePrivateSheets(false);
+      const range=encodeURIComponent("'獎卡兌換'");
+      let res=await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${link.sheetId}/values/${range}?majorDimension=ROWS`,{headers:{Authorization:`Bearer ${token}`}});
+      if(res.status===401){_googleSheetsToken='';_googleSheetsTokenExpiresAt=0;token=await authorizePrivateSheets(false);res=await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${link.sheetId}/values/${range}?majorDimension=ROWS`,{headers:{Authorization:`Bearer ${token}`}});}
+      const data=await res.json().catch(()=>({}));
+      if(!res.ok)throw new Error(data&&data.error&&data.error.message?data.error.message:'私人試算表讀取失敗；請確認 Sheets API 已啟用');
+      rows=Array.isArray(data.values)?data.values:[];
+      updateSheetsAuthStatus();
+    }else{
+      // v3.0 公開 CSV 模式僅供既有連結相容；新連結預設不需公開。
+      const csvUrl=`https://docs.google.com/spreadsheets/d/${link.sheetId}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent('獎卡兌換')}`;
+      const res=await fetch(csvUrl);
+      if(!res.ok)throw new Error('無法讀取，請確認公開連結權限');
+      const csvText=await res.text();
+      if(csvText.includes('<HTML>')||csvText.includes('<!DOCTYPE'))throw new Error('找不到「獎卡兌換」分頁，或公開權限未開放');
+      rows=parseCSV(csvText);
     }
-    const rows=parseCSV(csvText);
+    if(classId!==_curClassId){toast('已切換班級，本次試算表讀取已取消');return;}
     if(rows.length<3)throw new Error('資料不足');
     if(statusEl)statusEl.innerHTML='<span style="color:var(--text4)">請於彈出視窗確認欄位</span>';
     openColConfirm(rows,link.name,linkId);
@@ -3898,7 +4740,7 @@ function openColConfirm(rows,sourceName,linkId){
     if(ci.idx<2)excluded.add(ci.idx); // 座號、姓名欄不算分數欄
   });
 
-  _colConfirmState={rows,sourceName,linkId,maxCols,colInfo,excluded,dataRows};
+  _colConfirmState={classId:_curClassId,rows,sourceName,linkId,maxCols,colInfo,excluded,dataRows};
   renderColConfirmTable();
   document.getElementById('col-confirm-modal').classList.add('show');
 }
@@ -3948,6 +4790,7 @@ function toggleColExclude(idx){
 function confirmColImport(){
   const st=_colConfirmState;
   if(!st)return;
+  if(st.classId!==_curClassId){_colConfirmState=null;closeModal('col-confirm-modal');toast('班級已切換，請重新讀取試算表');return;}
   const{colInfo,excluded,dataRows,sourceName,linkId}=st;
 
   // 只用未排除、且有科目名稱的欄位
@@ -4007,7 +4850,9 @@ function confirmColImport(){
   }
 
   pushUndo('同步 Google Sheets 成績');
+  const replaced=trashAllVisibleScores('Google Sheets 覆蓋前成績');
   replaceAllScores(newScores);
+  recordAudit('同步 Google Sheets 成績','score',`${sourceName}｜${imported} 筆分數${replaced?`｜舊成績 ${replaced} 次已進回收筒`:''}`,[...new Set(sheetNos.filter(n=>_nos.includes(n)))],0);
   sched('scores');scheduleSync();
   renderScoreLog();renderOverview();
   let _alerts=[];
@@ -4083,12 +4928,13 @@ function previewPaste(){
     </tr>`).join('')}</tbody>
   </table></div>`;
 
-  _pasteData=(invalid.length||outOfRange.length)?null:result;
+  _pasteData=(invalid.length||outOfRange.length)?null:{classId:_curClassId,rows:result};
   submitBtn.style.display=(invalid.length||outOfRange.length)?'none':'';
 }
 
 function submitPaste(){
   if(!_pasteData){toast('請先確認預覽無誤');return;}
+  if(_pasteData.classId!==_curClassId){_pasteData=null;toast('班級已切換，請重新貼上成績');return;}
   const subj=document.getElementById('ps-subj').value;
   const label=document.getElementById('ps-label').value.trim();
   if(!label){toast('請輸入考試名稱');return;}
@@ -4096,7 +4942,7 @@ function submitPaste(){
   const fullLabel=`${subj}-${label}`;
   if(!_scores[subj])_scores[subj]=[];
   const nosMap={};
-  _pasteData.forEach(r=>{if(r.val!==null)nosMap[r.no]=r.val;});
+  _pasteData.rows.forEach(r=>{if(r.val!==null)nosMap[r.no]=r.val;});
 
   const existIdx=_scores[subj].findIndex(e=>e.label===fullLabel);
   const stamp=Date.now();
@@ -4104,6 +4950,7 @@ function submitPaste(){
   if(existIdx>=0){
     if(!confirm(`「${fullLabel}」已存在，確定覆蓋嗎？`))return;
     pushUndo('覆蓋成績');
+    putScoreInTrash(subj,_scores[subj][existIdx],'覆蓋前成績：'+fullLabel,stamp);
     rec.id=_scores[subj][existIdx].id||scoreIdentity(subj,_scores[subj][existIdx]);
     _scores[subj][existIdx]=rec;
   }else{
@@ -4111,6 +4958,8 @@ function submitPaste(){
     rec.id=scoreIdentity(subj,rec);
     _scores[subj].push(rec);
   }
+
+  recordAudit(existIdx>=0?'覆蓋成績':'新增成績','score',`${fullLabel}｜${Object.keys(nosMap).length} 人`,Object.keys(nosMap),0);
 
   sched('scores');scheduleSync();
   renderScoreLog();renderOverview();
@@ -4154,6 +5003,7 @@ let _pendingXlsxImport=null;
 function handleXlsx(input){
   const file=input.files[0];
   if(!file)return;
+  const classId=_curClassId;
   _pendingXlsxImport=null;
   const prev=document.getElementById('xlsx-preview');
   if(typeof XLSX==='undefined'){
@@ -4166,6 +5016,7 @@ function handleXlsx(input){
   const reader=new FileReader();
   reader.onload=e=>{
     try{
+      if(classId!==_curClassId){input.value='';toast('已切換班級，Excel 讀取已取消');return;}
       const wb=XLSX.read(e.target.result,{type:'array',cellFormula:false,cellHTML:false});
       // 找「獎卡兌換」工作表（支援多個關鍵字）
       let targetSheet=null,targetName='';
@@ -4253,7 +5104,7 @@ function parseAndImport(ws,sheetName){
 
   const subjCount=Object.keys(newScores).length;
   const examCount=Object.values(newScores).reduce((a,arr)=>a+arr.length,0);
-  _pendingXlsxImport={sheetName,newScores,imported,subjCount,examCount,quality};
+  _pendingXlsxImport={classId:_curClassId,sheetName,newScores,imported,subjCount,examCount,quality};
   const prev=document.getElementById('xlsx-preview');
   prev.innerHTML=`${qualityReportHTML(quality)}
     <div class="tip" style="margin-bottom:8px">預計匯入：<b>${subjCount}</b> 科、<b>${examCount}</b> 次考試、<b>${imported}</b> 筆分數。確認前不會改動目前資料。</div>
@@ -4275,11 +5126,14 @@ function cancelXlsxImport(){
 function commitXlsxImport(){
   const p=_pendingXlsxImport;
   if(!p){toast('請重新選取 Excel 檔案');return;}
+  if(p.classId!==_curClassId){_pendingXlsxImport=null;toast('班級已切換，請重新選取 Excel 檔案');return;}
   if(p.quality.blocked){toast('⚠️ 資料仍有紅色問題，不能覆蓋');return;}
   if(Object.keys(_scores).some(s=>(_scores[s]||[]).length)&&
      !confirm(`Excel 匯入會取代目前全部成績。\n已通過品質檢查：${p.imported} 筆分數。\n確定繼續嗎？`))return;
   pushUndo('匯入 Excel 成績');
+  const replaced=trashAllVisibleScores('Excel 覆蓋前成績');
   replaceAllScores(p.newScores);
+  recordAudit('匯入 Excel 成績','score',`${p.sheetName}｜${p.imported} 筆分數${replaced?`｜舊成績 ${replaced} 次已進回收筒`:''}`,_nos,0);
   sched('scores');scheduleSync();
   renderScoreLog();renderOverview();
   const prev=document.getElementById('xlsx-preview');
@@ -4314,16 +5168,24 @@ function renderScoreLog(){
 function delEntry(subj,idx){
   if(!confirm(`確定刪除「${_scores[subj][idx].label}」？`))return;
   pushUndo('刪除成績');
-  markScoreDeleted(subj,_scores[subj][idx]);
+  const entry=_scores[subj][idx];
+  const stamp=Date.now();
+  putScoreInTrash(subj,entry,'刪除成績：'+(entry.label||subj),stamp);
+  markScoreDeleted(subj,entry,stamp);
   _scores[subj].splice(idx,1);
+  recordAudit('刪除成績','data',`${subj}｜${entry.label||''}`,Object.keys(entry.nos||{}),0);
   sched('scores');scheduleSync();renderScoreLog();renderOverview();toast('已刪除');
 }
 
 function clearScores(){
   pushUndo('清除全部成績');
   const stamp=Date.now();
-  Object.keys(_scores).forEach(subj=>(_scores[subj]||[]).forEach(e=>markScoreDeleted(subj,e,stamp)));
+  let count=0;
+  Object.keys(_scores).forEach(subj=>(_scores[subj]||[]).forEach(e=>{
+    putScoreInTrash(subj,e,'清除全部成績：'+(e.label||subj),stamp);markScoreDeleted(subj,e,stamp);count++;
+  }));
   _scores={};sched('scores');scheduleSync();renderScoreLog();renderOverview();toast('已清除');
+  recordAudit('清除全部成績','data',`共 ${count} 次考試`,_nos,0);
 }
 
 // ══ 兌換獎卡 ══
@@ -4376,6 +5238,7 @@ function redeemCustom(no){
   pushUndo('兌換獎卡');
   const batchId='redeem:'+genId();
   _logs.push({id:genId(),batchId,t:nowStr(),no,k:'兌換',v:pts,c:cnt,note:`兌換${cnt}張扣${pts}點`});
+  recordAudit('兌換獎卡','redeem',`扣 ${pts} 點，獲得 ${cnt} 張`,[no],cnt,{pointsDelta:-pts,batchId});
   sched('logs');scheduleSync();renderRedeem();renderOverview();
   toast(`✅ ${no}號 已兌換 ${cnt} 張`);
 }
@@ -4392,6 +5255,7 @@ function doRedeemOne(){
   wr.forEach(no=>{
     _logs.push({id:genId(),batchId,t:nowStr(),no,k:'兌換',v:thr,c:1,note:`全班各換1張扣${thr}點`});
   });
+  recordAudit('全班各兌換一張','redeem',`${wr.length} 人，各扣 ${thr} 點`,wr,wr.length,{pointsDelta:-thr*wr.length,batchId});
   sched('logs');scheduleSync();renderRedeem();renderOverview();
   toast(`✅ 全班各換1張完成，共 ${wr.length} 人`);
 }
@@ -4429,8 +5293,9 @@ function doRedeem(){
   if(!confirm(`確定為 ${wr.length} 位學生兌換？\n${wr.map(n=>n+'號').join('、')}`))return;
   pushUndo('全班批次兌換');
   const batchId='redeem:'+genId();
+  let totalCards=0;
   wr.forEach(no=>{
-    const c=canRedeem(no);const p=c*thr;
+    const c=canRedeem(no);const p=c*thr;totalCards+=c;
     _logs.push({id:genId(),batchId,t:nowStr(),no,k:'兌換',v:p,c,note:`兌換${c}張扣${p}點`});
   });
   ws.forEach(no=>{
@@ -4438,6 +5303,7 @@ function doRedeem(){
     const r=(nt&&nt.value.trim())||'本次不換';
     _logs.push({id:genId(),batchId,t:nowStr(),no,k:'不兌換',v:0,c:0,note:r});
   });
+  recordAudit('批次兌換獎卡','redeem',`${wr.length} 人，共兌換 ${totalCards} 張`,wr,totalCards,{pointsDelta:-totalCards*thr,batchId});
   sched('logs');scheduleSync();renderRedeem();renderOverview();
   toast(`✅ 兌換完成，${wr.length} 人確認`);
 }
@@ -4460,8 +5326,9 @@ function revokeRedeem(logId){
   if(!log){toast('找不到這筆紀錄');return;}
   if(!confirm(`確定撤銷 ${log.no}號 這筆兌換？\n將恢復 ${log.v}pt，扣回 ${log.c}張`))return;
   pushUndo('撤銷單筆兌換');
-  markLogsDeleted([log]);
+  const stamp=Date.now();putLogsInTrash([log],'撤銷兌換',stamp);markLogsDeleted([log],stamp);
   _logs=_logs.filter(l=>String(l.id)!==String(logId));
+  recordAudit('撤銷兌換','data',`恢復 ${log.v} 點並扣回 ${log.c} 張`,[log.no],-Number(log.c||0));
   sched('logs');scheduleSync();
   renderRedeem();renderOverview();
   toast(`✅ 已撤銷 ${log.no}號 的兌換`);
@@ -4478,8 +5345,9 @@ function revokeAllRedeem(){
   if(!confirm(`確定撤銷最近一批 ${recentRedeem.length} 筆兌換？\n只會還原最近一次批次，不影響較早紀錄。`))return;
   pushUndo('撤銷最近一批兌換');
   const ids=new Set(recent.map(l=>String(l.id)));
-  markLogsDeleted(recent);
+  const stamp=Date.now();putLogsInTrash(recent,'撤銷最近一批兌換',stamp);markLogsDeleted(recent,stamp);
   _logs=_logs.filter(l=>!ids.has(String(l.id)));
+  recordAudit('撤銷批次兌換','data',`撤銷 ${recentRedeem.length} 筆兌換`,recentRedeem.map(l=>l.no),-recentRedeem.reduce((a,l)=>a+Number(l.c||0),0));
   sched('logs');scheduleSync();
   renderRedeem();renderOverview();
   toast(`✅ 已撤銷最近一批 ${recentRedeem.length} 筆兌換`);
@@ -4666,6 +5534,7 @@ function giveWeekly(type){
     if(!confirm(`⚠️ ${weekKey} 已經發過「${label}週給」。\n確定要再發一次嗎？`))return;
   }
   const batchId=`weekly:${type}:${weekKey}:${genId()}`;
+  let auditNos=[],auditCards=0;
   if(meta){
     const entries=Object.entries(_fixed[type]||{});
     if(!entries.length){toast(`${label}名單是空的`);return;}
@@ -4675,6 +5544,7 @@ function giveWeekly(type){
     entries.forEach(([no,cnt])=>{
       _logs.push({id:genId(),batchId,weekKey,wt:type,t:nowStr(),w:wk,no:parseInt(no),k:'幹部',v:0,c:cnt,note:`${label}週給×${cnt}`});
     });
+    auditNos=entries.map(([no])=>parseInt(no));auditCards=total;
     toast(`✅ ${label}週給完成，共 ${total} 張`);
   }else{
     const nos=_fixed.toilet||[];
@@ -4684,8 +5554,10 @@ function giveWeekly(type){
     nos.forEach(no=>{
       _logs.push({id:genId(),batchId,weekKey,wt:'toilet',t:nowStr(),w:wk,no,k:'廁所',v:0,c:1,note:'廁所週給'});
     });
+    auditNos=[...nos];auditCards=nos.length;
     toast(`✅ ${nos.length} 位廁所學生各獲 1 張`);
   }
+  recordAudit(`${label}週給`,'card',`${auditNos.length} 人，共發 ${auditCards} 張`,auditNos,auditCards,{batchId,weekKey});
   sched('logs');scheduleSync();renderGiveDetail();renderOverview();
 }
 
@@ -4696,6 +5568,50 @@ function fillNoSelect(id){
 
 // ── 快速給卡：點座號多選，一次送出 ──
 let _qgSel=new Set();
+let _qgClassId='';
+let _deductTargets=[];
+const BUILTIN_QUICK_TEMPLATES=[
+  {id:'builtin-class',name:'課堂表現＋1',type:'特殊',cards:1,note:'課堂表現優良'},
+  {id:'builtin-homework',name:'作業優良＋1',type:'特殊',cards:1,note:'作業優良'},
+  {id:'builtin-help',name:'熱心服務＋1',type:'幹部',cards:1,note:'熱心服務'}
+];
+
+function quickTemplates(){
+  const custom=Array.isArray(_settings.quickTemplates)?_settings.quickTemplates:[];
+  return[...BUILTIN_QUICK_TEMPLATES,...custom];
+}
+function renderQuickTemplates(){
+  const host=document.getElementById('qg-template-strip');if(!host)return;
+  host.innerHTML=quickTemplates().map(t=>{
+    const custom=!String(t.id).startsWith('builtin-');const id=uriArg(t.id);
+    return`<span style="display:inline-flex;flex:0 0 auto;align-items:center"><button class="template-chip${custom?' custom':''}" onclick="applyQuickTemplate('${id}')" title="${esc(t.note||t.name)}">${esc(t.name)}</button>${custom?`<button class="template-chip" style="padding:7px 8px;margin-left:-4px;color:var(--red)" onclick="deleteQuickTemplate('${id}')" aria-label="刪除範本 ${esc(t.name)}">×</button>`:''}</span>`;
+  }).join('');
+}
+function applyQuickTemplate(encodedId){
+  const id=decodeURIComponent(encodedId);const t=quickTemplates().find(x=>String(x.id)===String(id));if(!t)return;
+  document.getElementById('qg-type').value=t.type||'特殊';
+  document.getElementById('qg-cards').value=Math.max(1,Math.min(99,parseInt(t.cards)||1));
+  document.getElementById('qg-note').value=t.note||t.name||'';
+  toast(`已套用「${t.name}」`);
+}
+function saveCurrentQuickTemplate(){
+  const name=prompt('範本名稱（例：整潔競賽＋1）');if(name===null)return;
+  const clean=name.trim();if(!clean){toast('範本名稱不能空白');return;}
+  const cards=Math.max(1,Math.min(99,parseInt(document.getElementById('qg-cards').value)||1));
+  const item={id:'custom-'+genId(),name:clean,type:document.getElementById('qg-type').value,cards,note:document.getElementById('qg-note').value.trim()||clean};
+  if(!Array.isArray(_settings.quickTemplates))_settings.quickTemplates=[];
+  const same=_settings.quickTemplates.findIndex(t=>String(t.name).trim()===clean);
+  if(same>=0){if(!confirm(`已有「${clean}」，要覆蓋嗎？`))return;item.id=_settings.quickTemplates[same].id;_settings.quickTemplates[same]=item;}
+  else _settings.quickTemplates.push(item);
+  recordAudit('儲存給卡範本','data',`${clean}｜${item.type}＋${cards}`,[],0);
+  sched('settings');scheduleSync();renderQuickTemplates();toast('✅ 常用範本已儲存');
+}
+function deleteQuickTemplate(encodedId){
+  const id=decodeURIComponent(encodedId);const list=Array.isArray(_settings.quickTemplates)?_settings.quickTemplates:[];const item=list.find(t=>String(t.id)===String(id));if(!item)return;
+  if(!confirm(`刪除常用範本「${item.name}」？`))return;
+  _settings.quickTemplates=list.filter(t=>String(t.id)!==String(id));recordAudit('刪除給卡範本','data',item.name,[],0);
+  sched('settings');scheduleSync();renderQuickTemplates();toast('範本已刪除');
+}
 
 function renderQgPicker(){
   const picker=document.getElementById('qg-picker');
@@ -4703,10 +5619,19 @@ function renderQgPicker(){
   picker.innerHTML=_nos.map(no=>
     `<button class="no-btn${_qgSel.has(no)?' sel':''}" onclick="toggleQgSel(${no},this)">${no}</button>`
   ).join('');
+  const groupSel=document.getElementById('qg-group-select');
+  if(groupSel){
+    const prev=groupSel.value;
+    groupSel.innerHTML='<option value="">選擇組別</option>'+(_groups||[]).map((g,i)=>`<option value="${i}">${esc(g.label||g.name||`第${i+1}組`)}</option>`).join('');
+    if([...groupSel.options].some(o=>o.value===prev))groupSel.value=prev;
+  }
+  renderQuickTemplates();
   updQgCount();
 }
 
 function toggleQgSel(no,btn){
+  if(_qgClassId&&_qgClassId!==_curClassId)_qgSel.clear();
+  _qgClassId=_curClassId;
   if(_qgSel.has(no)){_qgSel.delete(no);btn.className='no-btn';}
   else{_qgSel.add(no);btn.className='no-btn sel';}
   updQgCount();
@@ -4719,17 +5644,37 @@ function updQgCount(){
 
 function clearQgSel(){
   _qgSel.clear();
+  _qgClassId='';
   renderQgPicker();
+}
+
+function selectQgPreset(kind){
+  let nos=[];
+  if(kind==='all')nos=[..._nos];
+  else if(ROLE_KEYS.includes(kind))nos=Object.keys((_fixed&&_fixed[kind])||{}).map(Number).filter(n=>_nos.includes(n));
+  _qgSel=new Set(nos);_qgClassId=_curClassId;renderQgPicker();
+  toast(nos.length?`已選 ${nos.length} 人`:'目前名單是空的');
+}
+function groupSeatNos(group){
+  const source=group&&(group.members??group.seats);
+  const raw=Array.isArray(source)?source:(typeof source==='string'?source.split(/[,、\s]+/):source&&typeof source==='object'?Object.values(source):[]);
+  return[...new Set(raw.map(x=>parseInt(x&&typeof x==='object'?(x.seat??x.no??x.id):x)).filter(n=>_nos.includes(n)))].sort((a,b)=>a-b);
+}
+function selectQgGroup(){
+  const sel=document.getElementById('qg-group-select');const idx=sel?parseInt(sel.value):-1;
+  if(!Number.isInteger(idx)||!_groups[idx]){toast('請先選擇組別');return;}
+  const nos=groupSeatNos(_groups[idx]);_qgSel=new Set(nos);_qgClassId=_curClassId;renderQgPicker();
+  toast(nos.length?`已選 ${esc(_groups[idx].label||`第${idx+1}組`)} ${nos.length} 人`:'這一組沒有可用座號');
 }
 
 function submitQuickGive(){
   if(!_qgSel.size){toast('請先點選座號');return;}
+  if(_qgClassId!==_curClassId){clearQgSel();toast('班級已切換，請重新選取座號');return;}
   const type=document.getElementById('qg-type').value;
   let c=parseInt(document.getElementById('qg-cards').value);
-  if(!Number.isFinite(c)||c===0){toast('張數不可為 0');return;}
-  c=Math.max(-99,Math.min(99,c));
+  if(!Number.isFinite(c)||c<1){toast('發卡張數請輸入 1～99');return;}
+  c=Math.max(1,Math.min(99,c));
   document.getElementById('qg-cards').value=c;
-  if(c<0&&type!=='調整'){toast('扣卡請將類型改為「調整」');return;}
   const note=document.getElementById('qg-note').value.trim();
   const nos=[..._qgSel].sort((a,b)=>a-b);
   if(!confirm(`確定給 ${nos.length} 人「${type}」${c>0?'+':''}${c} 張？\n${nos.map(n=>n+'號').join('、')}`))return;
@@ -4738,11 +5683,37 @@ function submitQuickGive(){
   nos.forEach(no=>{
     _logs.push({id:genId(),batchId,t:nowStr(),no,k:type,v:0,c,note:note||type});
   });
+  recordAudit('快速給卡','card',`${type}｜每人＋${c} 張${note?'｜'+note:''}`,nos,c*nos.length,{batchId});
   sched('logs');scheduleSync();
-  toast(`✅ ${nos.length} 人各${c>0?'獲得':'扣除'} ${Math.abs(c)} 張`);
+  toast(`✅ ${nos.length} 人各獲得 ${c} 張`);
   document.getElementById('qg-note').value='';
   clearQgSel();
   renderGiveDetail();renderOverview();
+}
+
+function openDeductModal(singleNo){
+  const fromStudent=Number.isInteger(Number(singleNo))&&_nos.includes(Number(singleNo));
+  const nos=fromStudent?[Number(singleNo)]:[..._qgSel].sort((a,b)=>a-b);
+  if(!nos.length){toast('請先選取要扣卡的座號');return;}
+  _deductTargets=nos;
+  const target=document.getElementById('deduct-targets');if(target)target.textContent=`本次扣卡：${nos.map(n=>n+'號').join('、')}`;
+  document.getElementById('deduct-cards').value=1;document.getElementById('deduct-note').value='';
+  document.getElementById('deduct-modal').classList.add('show');
+}
+function submitQuickDeduct(){
+  const nos=[..._deductTargets].filter(n=>_nos.includes(n));
+  if(!nos.length){closeModal('deduct-modal');toast('找不到扣卡座號');return;}
+  const cards=Math.max(1,Math.min(99,parseInt(document.getElementById('deduct-cards').value)||0));
+  const note=document.getElementById('deduct-note').value.trim();
+  if(!note){toast('請填寫扣卡原因');document.getElementById('deduct-note').focus();return;}
+  if(!confirm(`確定扣除 ${nos.length} 人各 ${cards} 張？\n${nos.map(n=>n+'號').join('、')}\n原因：${note}`))return;
+  pushUndo('快速扣卡');const batchId='deduct:'+genId();
+  nos.forEach(no=>_logs.push({id:genId(),batchId,t:nowStr(),no,k:'調整',v:0,c:-cards,note:`扣卡：${note}`}));
+  recordAudit('扣除獎卡','card',`每人－${cards} 張｜${note}`,nos,-cards*nos.length,{batchId});
+  sched('logs');scheduleSync();closeModal('deduct-modal');
+  if(nos.length>1||_qgSel.size){clearQgSel();}
+  renderGiveDetail();renderOverview();if(_chartCur&&nos.includes(_chartCur.no))renderStudentDetail(_chartCur.no);
+  toast(`✅ 已扣除 ${nos.length} 人各 ${cards} 張`);
 }
 
 function renderGiveDetail(){
@@ -4772,6 +5743,7 @@ function addNoon(){
   const thr=_settings.threshold||300;
   pushUndo('新增午休扣點');
   _logs.push({id:genId(),t:nowStr(),no,k:'午休',v:thr,c:0,note:`${nt}${nn?' — '+nn:''}`,noonTime:nt});
+  recordAudit('新增午休扣點','data',`${nt}${nn?'｜'+nn:''}｜扣 ${thr} 點`,[no],0,{pointsDelta:-thr});
   sched('logs');scheduleSync();
   document.getElementById('noon-time').value='';
   document.getElementById('noon-note').value='';
@@ -4889,7 +5861,7 @@ function showScoreAlertModal(alerts){
 }
 function copyScoreAlertDraft(){
   if(!_scoreAlerts.length){toast('無資料可複製');return;}
-  const today=new Date().toISOString().slice(0,10);
+  const today=todayISO();
   const text=_scoreAlerts.map(a=>
     `${today}｜${a.no}號｜學習輔導｜${a.subj}成績驟降：本次${a.val}分，低於個人平均${a.avg}分（標準差${a.sd}），已關注並了解原因。`
   ).join('\n');
@@ -4939,12 +5911,68 @@ function renderScoreTable(){
 // ══ 折線圖 ══
 function showChart(no){
   const subjs=Object.keys(_scores).filter(s=>(_scores[s]||[]).length>0);
-  document.getElementById('chart-title').textContent=`${no}號 成績趨勢`;
+  _chartCur={no,subj:subjs[0]||''};
+  document.getElementById('chart-title').textContent=`${no}號 學生資訊`;
   document.getElementById('chart-subj-btns').innerHTML=subjs.map(s=>
     `<button class="btn-ghost btn-sm" onclick="drawChart(${no},'${s}')" style="font-size:11px">${s}</button>`
   ).join('');
-  if(subjs[0])drawChart(no,subjs[0]);
+  const canvas=document.getElementById('chart-canvas');
+  if(subjs[0]){canvas.style.display='';drawChart(no,subjs[0]);}
+  else canvas.style.display='none';
+  renderStudentDetail(no);
   document.getElementById('chart-modal').classList.add('show');
+}
+
+function recentStudentScores(no){
+  const rows=[];
+  Object.keys(_scores).forEach(subj=>(_scores[subj]||[]).forEach(e=>{
+    const value=e.nos&&e.nos[no];if(value===undefined||value===null||isNaN(value))return;
+    rows.push({subj,label:e.label||subj,date:e.date||'',value:Number(value),updated:Number(e._updatedAt)||0});
+  }));
+  return rows.sort((a,b)=>String(b.date).localeCompare(String(a.date))||b.updated-a.updated).slice(0,6);
+}
+function renderStudentDetail(no){
+  if(!_nos.includes(Number(no)))return;
+  no=Number(no);const rem=remPoints(no),cc=cardCounts(no),can=canRedeem(no);
+  const kpis=document.getElementById('student-kpis');
+  if(kpis)kpis.innerHTML=`
+    <div class="student-kpi"><small>剩餘點數</small><b>${rem}</b></div>
+    <div class="student-kpi"><small>淨持有卡</small><b>${cc.netHold}</b></div>
+    <div class="student-kpi"><small>可兌換</small><b>${can} 張</b></div>`;
+  const btn=document.getElementById('student-redeem-btn');if(btn){btn.disabled=can<1;btn.style.opacity=can<1?'.45':'1';}
+  const scoreHost=document.getElementById('student-recent-scores');const scores=recentStudentScores(no);
+  if(scoreHost)scoreHost.innerHTML=scores.length?scores.map(r=>`<div class="student-mini-row"><span>${esc(r.label)}</span><b style="color:${r.value<60?'var(--red)':'var(--accent)'}">${r.value}</b></div>`).join(''):'<div style="color:var(--text4)">尚無成績</div>';
+  const cardHost=document.getElementById('student-recent-cards');
+  const logs=[..._logs].filter(l=>Number(l.no)===no&&['幹部','廁所','特殊','調整','兌換'].includes(l.k)).reverse().slice(0,6);
+  let html=logs.map(l=>`<div class="student-mini-row"><span>${esc(l.note||l.k)}</span><b style="color:${Number(l.c)<0?'var(--red)':'var(--green)'}">${Number(l.c)>0?'+':''}${Number(l.c)||0}張</b></div>`).join('');
+  const exempt=Number(_exemptMap[no])||0;if(exempt)html+=`<div class="student-mini-row"><span>Venus OS 作業折抵</span><b style="color:var(--red)">-${exempt}張</b></div>`;
+  if(cardHost)cardHost.innerHTML=html||'<div style="color:var(--text4)">尚無獎卡紀錄</div>';
+}
+function studentQuickGive(cards){
+  const no=_chartCur&&Number(_chartCur.no);if(!_nos.includes(no))return;
+  cards=Math.max(1,Math.min(99,parseInt(cards)||1));pushUndo('學生快速給卡');
+  const batchId='student:'+genId();_logs.push({id:genId(),batchId,t:nowStr(),no,k:'特殊',v:0,c:cards,note:'學生視窗快速給卡'});
+  recordAudit('學生快速給卡','card',`＋${cards} 張`,[no],cards,{batchId});
+  sched('logs');scheduleSync();renderOverview();renderGiveDetail();renderStudentDetail(no);toast(`✅ ${no}號 ＋${cards} 張`);
+}
+function studentRedeemOne(){
+  const no=_chartCur&&Number(_chartCur.no);const thr=_settings.threshold||300;
+  if(!_nos.includes(no)||canRedeem(no)<1){toast('目前點數不足，無法兌換');return;}
+  if(!confirm(`確定為 ${no}號 兌換 1 張（扣 ${thr} 點）？`))return;
+  pushUndo('學生兌換一張');const batchId='student-redeem:'+genId();
+  _logs.push({id:genId(),batchId,t:nowStr(),no,k:'兌換',v:thr,c:1,note:`學生視窗兌換1張扣${thr}點`});
+  recordAudit('學生兌換獎卡','redeem',`扣 ${thr} 點，獲得 1 張`,[no],1,{pointsDelta:-thr,batchId});
+  sched('logs');scheduleSync();renderOverview();renderRedeem();renderStudentDetail(no);toast(`✅ ${no}號 已兌換 1 張`);
+}
+function undoStudentLast(){
+  const no=_chartCur&&Number(_chartCur.no);if(!_nos.includes(no))return;
+  const log=[..._logs].reverse().find(l=>Number(l.no)===no&&['幹部','廁所','特殊','調整','兌換'].includes(l.k));
+  if(!log){toast('這位學生沒有可撤銷的獎卡操作');return;}
+  if(!confirm(`撤銷 ${no}號 最近一筆「${log.note||log.k}」？`))return;
+  pushUndo('撤銷學生最近操作');const stamp=Date.now();putLogsInTrash([log],'撤銷學生最近操作',stamp);markLogsDeleted([log],stamp);
+  _logs=_logs.filter(l=>String(l.id)!==String(log.id));
+  recordAudit('撤銷學生最近操作','data',log.note||log.k,[no],-Number(log.c||0),{sourceLogId:log.id});
+  sched('logs');scheduleSync();renderOverview();renderGiveDetail();renderRedeem();renderStudentDetail(no);toast('✅ 已撤銷最近一筆操作');
 }
 
 const CHART_COLORS={'國習':'#2563EB','聽寫':'#7C3AED','考卷':'#DC2626','生測':'#16A34A','作文':'#0891B2','數習':'#EA580C','數綜':'#0D9488','數考':'#DB2777','段考':'#9333EA'};
@@ -5248,11 +6276,79 @@ function renderLog(){
 function delLog(id){
   if(!confirm('確定刪除這筆紀錄？'))return;
   pushUndo('刪除紀錄');
-  markLogsDeleted(_logs.filter(l=>String(l.id)===String(id)));
+  const items=_logs.filter(l=>String(l.id)===String(id));const stamp=Date.now();
+  putLogsInTrash(items,'刪除紀錄',stamp);markLogsDeleted(items,stamp);
   _logs=_logs.filter(l=>String(l.id)!==String(id));
+  if(items[0])recordAudit('刪除紀錄','data',items[0].note||items[0].k,[items[0].no],-Number(items[0].c||0));
   sched('logs');scheduleSync();renderLog();renderNoonList();renderOverview();renderGiveDetail();toast('已刪除');
 }
-function clearLogs(){pushUndo('清除全部紀錄');markLogsDeleted(_logs);_logs=[];sched('logs');scheduleSync();renderLog();renderOverview();renderGiveDetail();toast('已清除');}
+function clearLogs(){
+  pushUndo('清除全部紀錄');const items=[..._logs],stamp=Date.now();putLogsInTrash(items,'清除全部紀錄',stamp);markLogsDeleted(items,stamp);_logs=[];
+  recordAudit('清除全部紀錄','data',`共 ${items.length} 筆`,[...new Set(items.map(l=>l.no))],-items.reduce((a,l)=>a+Number(l.c||0),0));
+  sched('logs');scheduleSync();renderLog();renderOverview();renderGiveDetail();updateTrashCount();toast('已清除，項目已移到回收筒');
+}
+
+// ══ v3.1 操作流水帳 ══
+function auditKindIcon(kind){return({card:'⚡',redeem:'🎴',score:'📊',data:'♻️',class:'🎓'}[kind]||'🧾');}
+function renderAudit(){
+  const host=document.getElementById('audit-list');if(!host)return;
+  const noSel=document.getElementById('audit-no');if(noSel){const prev=noSel.value;noSel.innerHTML='<option value="">全部座號</option>'+_nos.map(n=>`<option value="${n}">${n}號</option>`).join('');if(_nos.includes(parseInt(prev)))noSel.value=prev;}
+  const kind=document.getElementById('audit-kind')?.value||'';const no=parseInt(document.getElementById('audit-no')?.value||'');
+  let items=[..._audit];if(kind)items=items.filter(a=>a.kind===kind);if(Number.isInteger(no))items=items.filter(a=>(a.seats||[]).includes(no));items.reverse();
+  host.innerHTML=items.length?items.slice(0,500).map(a=>{
+    const seats=(a.seats||[]).length?`｜座號 ${(a.seats||[]).join('、')}`:'';
+    const delta=Number(a.cardDelta)||0;const deltaText=delta?`｜卡片 ${delta>0?'+':''}${delta}`:'';
+    return`<div class="audit-row"><div class="audit-icon">${auditKindIcon(a.kind)}</div><div class="audit-main"><div class="audit-title">${esc(a.action)}</div><div class="audit-meta">${esc(a.t||new Date(a.at).toLocaleString('zh-TW',{hour12:false}))}｜${esc(a.actor||'本機使用者')}｜${esc(a.className||a.classId||'')}${seats}${deltaText}</div><div class="audit-detail">${esc(a.detail||'')}</div></div></div>`;
+  }).join(''):'<div class="empty">尚無符合條件的操作</div>';
+}
+function exportAuditCSV(){
+  const hdr=['時間','操作者','班級','學年度','操作','分類','座號','卡片增減','說明'];
+  const rows=[..._audit].reverse().map(a=>[a.t||new Date(a.at).toLocaleString('zh-TW',{hour12:false}),a.actor||'',a.className||a.classId||'',a.academicYear||'',a.action||'',a.kind||'',(a.seats||[]).join('、'),a.cardDelta||0,a.detail||'']);
+  const csv='\uFEFF'+[hdr,...rows].map(r=>r.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n');
+  dlText(csv,`操作流水帳_${todayISO()}.csv`,'text/csv;charset=utf-8');
+}
+
+// ══ v3.1 持久化回收筒 ══
+function updateTrashCount(){
+  const el=document.getElementById('trash-more-count');if(el)el.textContent=_trash.length?`${_trash.length} ›`:'›';
+}
+function renderTrash(){
+  const host=document.getElementById('trash-list');if(!host)return;updateTrashCount();
+  const items=[..._trash].sort((a,b)=>Number(b.deletedAt)-Number(a.deletedAt));
+  host.innerHTML=items.length?items.map(item=>{
+    const payload=item.payload||{};const isScore=item.kind==='score';
+    const detail=isScore?`${item.subj||''}｜${payload.label||item.label||''}｜${Object.keys(payload.nos||{}).length} 人`:`${payload.no?payload.no+'號｜':''}${payload.k||''}｜${payload.note||item.label||''}`;
+    return`<div class="trash-row"><div class="trash-icon">${isScore?'📊':'📝'}</div><div class="trash-main"><div class="trash-title">${esc(item.label||'已刪除項目')}</div><div class="trash-meta">${esc(item.deletedText||new Date(item.deletedAt).toLocaleString('zh-TW',{hour12:false}))}｜${esc(item.actor||'本機使用者')}</div><div class="trash-detail">${esc(detail)}</div></div><div class="trash-actions"><button class="btn-green btn-xs" onclick="restoreTrashItem('${item.id}')">還原</button><button class="btn-red btn-xs" onclick="deleteTrashItem('${item.id}')">永久刪除</button></div></div>`;
+  }).join(''):'<div class="empty">回收筒是空的</div>';
+}
+function restoreTrashItem(id){
+  const item=_trash.find(x=>String(x.id)===String(id));if(!item)return;
+  const stamp=Date.now();pushUndo('從回收筒還原');
+  if(item.kind==='score'){
+    const entry=cloneData(item.payload||{});const subj=item.subj||'其他';entry.id=item.entityId||scoreIdentity(subj,entry);entry._updatedAt=Math.max(stamp,(Number(_deleted.scores[entry.id])||0)+1);
+    if(!_scores[subj])_scores[subj]=[];const idx=_scores[subj].findIndex(e=>scoreIdentity(subj,e)===entry.id);
+    if(idx>=0){putScoreInTrash(subj,_scores[subj][idx],'還原前版本：'+(_scores[subj][idx].label||subj),stamp+1);entry._updatedAt=stamp+2;_scores[subj][idx]=entry;}
+    else _scores[subj].push(entry);
+  }else{
+    const log=cloneData(item.payload||{});log.id=item.entityId||logIdentity(log);log._updatedAt=Math.max(stamp,(Number(_deleted.logs[log.id])||0)+1);
+    if(!_logs.some(l=>logIdentity(l)===log.id))_logs.push(log);
+  }
+  markTrashDeleted([item],stamp);_trash=_trash.filter(x=>String(x.id)!==String(id));
+  const no=item.payload&&item.payload.no;recordAudit('從回收筒還原','data',item.label||item.kind,no?[no]:[],Number(item.payload&&item.payload.c)||0);
+  sched('all');scheduleSync();refreshVisiblePanel();renderTrash();toast('✅ 已還原');
+}
+function deleteTrashItem(id){
+  const item=_trash.find(x=>String(x.id)===String(id));if(!item)return;
+  if(!confirm(`永久刪除「${item.label||'此項目'}」？\n此動作之後無法從回收筒還原。`))return;
+  markTrashDeleted([item]);_trash=_trash.filter(x=>String(x.id)!==String(id));recordAudit('永久刪除回收項目','data',item.label||item.kind,[],0);
+  sched('all');scheduleSync();renderTrash();toast('已永久刪除');
+}
+function emptyTrash(){
+  if(!_trash.length){toast('回收筒已經是空的');return;}
+  if(!confirm(`永久清空回收筒內 ${_trash.length} 個項目？\n清空後無法還原。`))return;
+  const items=[..._trash];markTrashDeleted(items);_trash=[];recordAudit('永久清空回收筒','data',`共 ${items.length} 個項目`,[],0);
+  sched('all');scheduleSync();renderTrash();toast('回收筒已清空');
+}
 
 // ══ 設定 ══
 function renderSettings(){
@@ -5265,7 +6361,9 @@ function saveBasic(){
   const thr=parseInt(document.getElementById('set-thr').value);
   if(!Number.isFinite(thr)||thr<1||thr>100000){toast('換卡點數請輸入 1～100000');return;}
   pushUndo('修改換卡點數');
+  const before=_settings.threshold||300;
   _settings.threshold=thr;
+  recordAudit('修改換卡門檻','data',`${before} → ${thr} 點`,[],0);
   sched('settings');scheduleSync();
   toast('✅ 設定已儲存');
   updateNoonLabel();
@@ -5332,6 +6430,7 @@ function saveNos(){
   const wasEmpty=!_nos.length;
   if(!_draftNos.length&&!confirm('目前沒有選取任何座號，確定要儲存空名單嗎？'))return;
   pushUndo('修改座號名單');
+  const beforeNos=[..._nos];
   _nos=[..._draftNos].sort((a,b)=>a-b);
   ensureFixed();
   _fixed.toilet=_fixed.toilet.filter(n=>_nos.includes(n));
@@ -5339,6 +6438,7 @@ function saveNos(){
     Object.keys(_fixed[r]).forEach(n=>{if(!_nos.includes(parseInt(n)))delete _fixed[r][n];});
   });
   _qgSel.clear();
+  recordAudit('修改座號名單','class',`${beforeNos.length} 人 → ${_nos.length} 人`,_nos,0);
   sched(['nos','fixed']);scheduleSync();
   toast(`✅ 已儲存 ${_nos.length} 個座號`);
   renderOverview();
@@ -5362,19 +6462,19 @@ function renderStorageStatus(){
   const snap=currentSnapshot();
   const bytes=new Blob([JSON.stringify(snap)]).size;
   const scoreEntries=Object.values(_scores).reduce((sum,arr)=>sum+(Array.isArray(arr)?arr.length:0),0);
-  const deletedCount=Object.keys(_deleted.scores||{}).length+Object.keys(_deleted.logs||{}).length;
+  const deletedCount=Object.keys(_deleted.scores||{}).length+Object.keys(_deleted.logs||{}).length+Object.keys(_deleted.trash||{}).length;
   const modeLabel=_syncMode==='separate'?'獨立文件（最佳）':_syncMode==='legacy'?'相容模式':firebaseUidRef.current?'等待雲端確認':'僅本機';
   const size=bytes<1024?bytes+' B':(bytes/1024).toFixed(1)+' KB';
   const synced=_lastSyncedAt?new Date(_lastSyncedAt).toLocaleString('zh-TW',{hour12:false}):'尚未同步';
   const sizeWarn=bytes>750*1024?'<br><span style="color:var(--red);font-weight:700">⚠ 資料量偏大，請先建立封存快照</span>':'';
   el.innerHTML=`<b>${esc(curClassName()||_curClassId)}</b>｜學年度 ${esc(academicYearKey(_curClassId))}<br>`+
     `同步：${modeLabel}｜版本 r${_revision}｜${synced}<br>`+
-    `資料量：約 ${size}｜成績 ${scoreEntries} 次｜紀錄 ${_logs.length} 筆${deletedCount?`｜刪除保護 ${deletedCount} 筆`:''}${sizeWarn}`;
+    `資料量：約 ${size}｜成績 ${scoreEntries} 次｜紀錄 ${_logs.length} 筆｜回收 ${_trash.length}｜流水帳 ${_audit.length}${deletedCount?`｜刪除保護 ${deletedCount} 筆`:''}${sizeWarn}`;
 }
 
 function recoverySummary(raw){
   const c=snapshotCounts(raw);
-  return `座號 ${c.nos}｜成績欄 ${c.scoreEntries}｜成績值 ${c.scoreValues}｜紀錄 ${c.logs}`;
+  return `座號 ${c.nos}｜成績欄 ${c.scoreEntries}｜成績值 ${c.scoreValues}｜紀錄 ${c.logs}｜回收 ${c.trash}｜流水帳 ${c.audit}`;
 }
 
 function parseRecoveryDoc(doc){
@@ -5386,21 +6486,12 @@ function parseRecoveryDoc(doc){
 }
 
 async function readLocalRecoverySnapshot(classId){
-  const pfx=pfxFor(classId);
-  const keys=(await storeKeys()).filter(k=>k.startsWith(pfx));
-  const scoreKeys=keys.filter(k=>k.startsWith(pfx+'scores:'));
-  const logKeys=keys.filter(k=>k.startsWith(pfx+'logs:'));
-  const scoreParts=await Promise.all(scoreKeys.map(k=>storeGet(k)));
-  const logParts=await Promise.all(logKeys.map(k=>storeGet(k)));
-  const[v3,fixed,settings,nos,meta]=await Promise.all([
-    storeGet(pfx+'snapshot:v3'),storeGet(pfx+'fixed'),storeGet(pfx+'settings'),storeGet(pfx+'nos'),storeGet(pfx+'meta')
-  ]);
-  const legacy=normalizeSnapshot({
-    scores:mergeScores.apply(null,scoreParts),logs:mergeLogs.apply(null,logParts),
-    fixed:fixed||{cadre:{},toilet:[]},settings:{threshold:300,...(settings||{})},nos:Array.isArray(nos)?nos:[],
-    updatedAt:meta&&Number(meta.updatedAt)||0,revision:meta&&Number(meta.revision)||0
-  },meta&&Number(meta.updatedAt)||0);
-  return mergeVisibleSnapshots([v3,legacy])||v3||legacy;
+  const uid=localUid();
+  const committed=await readCommittedSnapshotV4(classId,uid);
+  const scoped=await readLegacyLocalParts(pfxFor(classId,uid));
+  const old=mayReadLegacyLocal(uid)?await readLegacyLocalParts(legacyPfxFor(classId)):null;
+  const parts=[committed,scoped&&scoped.snapshot,old&&old.snapshot].filter(Boolean);
+  return mergeVisibleSnapshots(parts)||committed||(scoped&&scoped.snapshot)||(old&&old.snapshot)||null;
 }
 
 function classIdsInLegacyDoc(data){
@@ -5433,9 +6524,14 @@ async function collectRecoveryCandidates(){
   // 本機若殘留相同班名但不同代碼，也列入候選（常見於班級代碼格式改版）。
   try{
     const localIds=new Set();
+    const uid=localUid();
     (await storeKeys()).forEach(k=>{
-      const m=k.match(/^vc:(.+):(?:snapshot:v3|scores:all|scores:\d{4}|logs:all|logs:\d{4}|fixed|settings|nos|meta)$/);
-      if(m&&m[1]&&m[1]!==classId&&related(m[1]))localIds.add(m[1]);
+      const scopedId=scopedClassIdFromKey(k,uid);
+      if(scopedId&&scopedId!==classId&&related(scopedId))localIds.add(scopedId);
+      if(mayReadLegacyLocal(uid)){
+        const m=k.match(/^vc:(.+):(?:snapshot:v3|scores:all|scores:\d{4}|logs:all|logs:\d{4}|fixed|settings|nos|meta)$/);
+        if(m&&m[1]&&m[1]!==classId&&related(m[1]))localIds.add(m[1]);
+      }
     });
     for(const id of localIds)add('本機相近班級代碼 '+id,await readLocalRecoverySnapshot(id),id,false);
   }catch(e){console.warn('Related local scan fail',e);}
@@ -5496,11 +6592,11 @@ async function diagnoseAndRecoverData(){
   let recovered=null;
   pool.forEach(c=>{
     const s=normalizeSnapshot(c.snapshot,c.snapshot.updatedAt);
-    s.deleted={scores:{},logs:{}};
+    s.deleted={scores:{},logs:{},trash:{}};
     recovered=recovered?mergeSnapshots(recovered,s):s;
   });
   if(!recovered||!hasVisibleData(recovered)){report.push('沒有可救援的成績、紀錄或座號。');showDiag('🛟 資料診斷',report.join('\n'));return;}
-  recovered.deleted={scores:{},logs:{}};
+  recovered.deleted={scores:{},logs:{},trash:{}};
   const current=currentSnapshot();
   report.push('');
   report.push('合併後：'+recoverySummary(recovered));
@@ -5516,7 +6612,7 @@ async function diagnoseAndRecoverData(){
     }
     pushUndo('資料診斷救援');
     replaceCurrentWithSnapshot(recovered);
-    await persistLocal(true);
+    if(!(await persistLocal(true)))throw new LocalWriteError('救援資料無法完成本機驗證');
     refreshVisiblePanel();renderStorageStatus();
     if(firebaseUidRef.current&&navigator.onLine)await doSync(true);
     toast('✅ 資料已找回並安全寫回目前班級',5000);
@@ -5558,7 +6654,7 @@ async function createBackupPackage(kind){
   const data=currentSnapshot();
   const checksum=await sha256Hex(JSON.stringify(data));
   return{
-    type:'venus-card-backup',schema:3,complete:true,kind:kind||'manual',appVersion:APP_VERSION,
+    type:'venus-card-backup',schema:5,complete:true,kind:kind||'manual',appVersion:APP_VERSION,
     exportedAt:new Date().toISOString(),classId:_curClassId,className:curClassName(),
     academicYear:academicYearKey(_curClassId),revision:_revision,sha256:checksum,data
   };
@@ -5574,26 +6670,96 @@ async function exportBackup(){
   toast('✅ 完整備份已下載');
 }
 
+async function saveAcademicArchiveCloud(backup){
+  if(!firebaseUidRef.current||!_db||!navigator.onLine||_syncMode!=='separate')return false;
+  try{
+    const id=new Date().toISOString().replace(/[:.]/g,'-');
+    await classCloudRef(firebaseUidRef.current,_curClassId).collection('archives').doc(id).set({
+      schema:5,classId:_curClassId,academicYear:academicYearKey(_curClassId),appVersion:APP_VERSION,
+      revision:_revision,sha256:backup.sha256||null,archivedAt:firebase.firestore.FieldValue.serverTimestamp(),
+      data:JSON.stringify(backup.data)
+    });
+    return true;
+  }catch(e){console.warn('Cloud archive unavailable',e);return false;}
+}
+
 async function archiveAcademicData(){
   if(!_curClassId){toast('請先選擇班級');return;}
   if(!confirm(`確定建立「${curClassName()||_curClassId}」學年度 ${academicYearKey(_curClassId)} 的封存快照？\n會下載完整 JSON，不會清除目前資料。`))return;
   if(firebaseUidRef.current&&navigator.onLine)await doSync(true);
   const backup=await createBackupPackage('archive');
   downloadBackupPackage(backup,'獎卡學年度封存');
-  let cloudSaved=false;
-  if(firebaseUidRef.current&&_db&&navigator.onLine&&_syncMode==='separate'){
-    try{
-      const id=new Date().toISOString().replace(/[:.]/g,'-');
-      await classCloudRef(firebaseUidRef.current,_curClassId).collection('archives').doc(id).set({
-        schema:3,classId:_curClassId,academicYear:academicYearKey(_curClassId),appVersion:APP_VERSION,
-        revision:_revision,sha256:backup.sha256||null,archivedAt:firebase.firestore.FieldValue.serverTimestamp(),
-        data:JSON.stringify(backup.data)
-      });
-      cloudSaved=true;
-    }catch(e){console.warn('Cloud archive unavailable',e);}
-  }
+  const cloudSaved=await saveAcademicArchiveCloud(backup);
+  recordAudit('建立學年度封存','class',`學年度 ${academicYearKey(_curClassId)}｜${cloudSaved?'本機＋雲端':'已下載本機封存'}`,[],0);
+  sched('all');scheduleSync();
   renderStorageStatus();
   toast(cloudSaved?'✅ 封存已下載並保存雲端快照':'✅ 封存已下載（雲端快照目前使用相容模式）',4200);
+}
+
+function openAcademicWizard(){
+  if(!_curClassId){toast('請先選擇班級');return;}
+  const currentYear=String(academicYearKey(_curClassId)||defaultAcademicYear());
+  const n=parseInt(currentYear);const next=Number.isFinite(n)?String(n+1):defaultAcademicYear();
+  document.getElementById('academic-new-name').value=curClassName()||'';
+  document.getElementById('academic-new-year').value=next;
+  document.getElementById('academic-copy-nos').checked=true;
+  document.getElementById('academic-copy-fixed').checked=true;
+  document.getElementById('academic-copy-settings').checked=true;
+  document.getElementById('academic-wizard-source').textContent=`來源：${curClassName()||_curClassId}｜學年度 ${currentYear}｜${isOsClass(_curClassId)?'Venus OS 唯讀班級':'Venus Card 班級'}`;
+  document.getElementById('academic-wizard-modal').classList.add('show');
+}
+
+async function runAcademicWizard(){
+  if(!_curClassId)return;
+  const sourceId=_curClassId,sourceName=curClassName()||sourceId;
+  const name=document.getElementById('academic-new-name').value.trim();
+  const year=document.getElementById('academic-new-year').value.trim();
+  if(!name){toast('請輸入新班級名稱');return;}
+  if(!year){toast('請輸入新學年度');return;}
+  if([..._osClasses,..._cardClasses].some(c=>String(c.className||c.name||c.id).trim()===name&&String(c.year||'')===year)){
+    toast('已有相同名稱與學年度的班級');return;
+  }
+  if(!confirm(`將先封存「${sourceName}」學年度 ${academicYearKey(sourceId)}，再建立「${name}」學年度 ${year}。\n\n新班不會帶入成績、舊紀錄或持卡數，確定繼續嗎？`))return;
+  const btn=document.getElementById('academic-wizard-submit');if(btn){btn.disabled=true;btn.textContent='正在封存…';}
+  try{
+    if(!(await persistLocal(true)))throw new LocalWriteError('目前班級尚未完成本機儲存');
+    if(firebaseUidRef.current&&navigator.onLine)await doSync(true);
+    const backup=await createBackupPackage('academic-migration');
+    downloadBackupPackage(backup,'獎卡學年度封存');
+    const cloudSaved=await saveAcademicArchiveCloud(backup);
+    const copyNos=document.getElementById('academic-copy-nos').checked;
+    const copyFixed=document.getElementById('academic-copy-fixed').checked;
+    const copySettings=document.getElementById('academic-copy-settings').checked;
+    const newId='card-'+genId(),stamp=Date.now();
+    const nos=copyNos?[..._nos]:[];
+    let fixed={cadre:{},leader:{},secretary:{},toilet:[]};
+    if(copyFixed&&nos.length){
+      fixed=cloneData(_fixed);
+      ROLE_KEYS.forEach(role=>{if(!fixed[role]||typeof fixed[role]!=='object'||Array.isArray(fixed[role]))fixed[role]={};Object.keys(fixed[role]).forEach(no=>{if(!nos.includes(parseInt(no)))delete fixed[role][no];});});
+      if(!Array.isArray(fixed.toilet))fixed.toilet=[];
+      fixed.toilet=(fixed.toilet||[]).filter(no=>nos.includes(Number(no)));
+    }
+    const settings=copySettings?{
+      threshold:Number(_settings.threshold)||300,
+      quickTemplates:cloneData(Array.isArray(_settings.quickTemplates)?_settings.quickTemplates:[])
+    }:{threshold:300};
+    const actor=actorInfo();
+    const migrationAudit={id:genId(),at:stamp,t:nowStr(),action:'建立新學年度班級',kind:'class',
+      detail:`由「${sourceName}」學年度 ${academicYearKey(sourceId)} 建立；未帶入成績、舊紀錄與持卡數`,
+      seats:[...nos],cardDelta:0,classId:newId,className:name,academicYear:year,...actor,_updatedAt:stamp};
+    const initial=normalizeSnapshot({scores:{},logs:[],trash:[],audit:[migrationAudit],fixed,settings,nos,
+      deleted:{scores:{},logs:{},trash:{}},fieldUpdatedAt:{fixed:stamp,settings:stamp,nos:stamp},updatedAt:stamp,lastSyncedAt:0,revision:0},stamp);
+    await writeLocalSnapshot(newId,initial);
+    _cardClasses.push({id:newId,className:name,year,school:(_classes.find(c=>c.id===sourceId)||{}).school||'',createdAt:stamp,archived:false,source:'venus-card'});
+    mergeClassSources();
+    if(!(await persistCardClassIndex())&&_storageBlocked)throw new LocalWriteError('新學年度班級索引無法保存');
+    recordAudit('完成新學年度轉換','class',`已封存 ${sourceName}，建立 ${name}（${year}）${cloudSaved?'，並保存雲端封存':''}`,[],0,{targetClassId:newId});
+    sched('all');await persistLocal(true);
+    closeModal('academic-wizard-modal');await switchClass(newId);
+    if(firebaseUidRef.current&&navigator.onLine)syncDetachedClass(firebaseUidRef.current,newId,initial).catch(e=>console.warn('New academic class sync fail',e));
+    toast(`✅ 已建立「${name}」學年度 ${year}；舊班資料完整保留`,5000);
+  }catch(e){console.warn('Academic migration fail',e);toast('年度轉換未完成：'+e.message,5000);}
+  finally{if(btn){btn.disabled=false;btn.textContent='封存並建立新年度';}}
 }
 
 function importBackup(input){
@@ -5617,7 +6783,9 @@ function importBackup(input){
       }else if(!confirm(`確定還原「${backup.className||curClassName()||'目前班級'}」的完整備份？\n目前資料會被替換，但可用畫面上的撤銷按鈕復原。`))return;
       pushUndo('還原完整備份');
       replaceCurrentWithSnapshot(d);
-      await persistLocal(true);scheduleSync();refreshVisiblePanel();
+      recordAudit('還原完整備份','data',backup.className||backup.classId||'備份檔',_nos,0);
+      if(!(await persistLocal(true)))throw new LocalWriteError('備份還原後無法完成本機驗證');
+      scheduleSync();refreshVisiblePanel();
       toast('✅ 完整備份已還原');
     }catch(err){toast('還原失敗：'+err.message,4000);}
     finally{input.value='';}
@@ -6546,20 +7714,20 @@ function fallbackCopy(text,successMsg){
 }
 
 // ══ 主題切換 ══
-const THEMES=['default','nerv','nebula','mucha'];
-const THEME_LABELS={default:'☀️ 日間',nerv:'🔴 NERV',nebula:'🌌 星雲',mucha:'❧ 慕夏・藍紫鳶尾'};
-let _theme=safeGet('vc2:theme')||'default';
+const THEMES=['odyssey','default','nerv','nebula','mucha'];
+const THEME_LABELS={odyssey:'🌘 日蝕奧德賽',default:'☀️ 日間',nerv:'🔴 NERV',nebula:'🌌 星雲',mucha:'❧ 慕夏・藍紫鳶尾'};
+let _theme=safeGet('vc2:theme')||'odyssey';
 
 function applyTheme(t){
   if(!THEMES.includes(t))t='default';
   _theme=t;
   document.documentElement.setAttribute('data-theme',t==='default'?'':t);
-  const edgeColors={default:'#FFFFFF',nerv:'#080200',nebula:'#04030E',mucha:'#F7F0E5'};
-  const metaColors={default:'#FFFFFF',nerv:'#120400',nebula:'#08051C',mucha:'#355A50'};
+  const edgeColors={odyssey:'#12151C',default:'#FFFFFF',nerv:'#080200',nebula:'#04030E',mucha:'#F7F0E5'};
+  const metaColors={odyssey:'#171A22',default:'#FFFFFF',nerv:'#120400',nebula:'#08051C',mucha:'#355A50'};
   const edge=edgeColors[t]||edgeColors.default;
   document.documentElement.style.backgroundColor=edge;
   document.body.style.backgroundColor=edge;
-  document.documentElement.style.colorScheme=(t==='nerv'||t==='nebula')?'dark':'light';
+  document.documentElement.style.colorScheme=(t==='nerv'||t==='nebula'||t==='odyssey')?'dark':'light';
   const themeMeta=document.querySelector('meta[name="theme-color"]');
   if(themeMeta)themeMeta.setAttribute('content',metaColors[t]||metaColors.default);
   const sel=document.getElementById('theme-select');
@@ -6587,6 +7755,7 @@ function renderAll(){
   renderOverview();
   renderScoreLog();
   renderGsList();
+  updateTrashCount();
 }
 
 // ══ 初始化 ══
@@ -6610,7 +7779,7 @@ function dismissUpdateBar(){
   if(bar)bar.remove();
 }
 function updatePendingWork(){
-  const items=[];
+  const items=[...classSwitchPendingWork()];
   if(_pendingXlsxImport)items.push('Excel 匯入尚未確認');
   if(_qgSel&&_qgSel.size)items.push(`快速給卡尚有 ${_qgSel.size} 位已選座號`);
   const qgNote=document.getElementById('qg-note');
@@ -6622,6 +7791,7 @@ function updatePendingWork(){
 }
 async function activateUpdate(){
   if(_swUpdateBusy)return;
+  if(_storageBlocked){showStorageFailure(new LocalWriteError(_storageErrMsg||'本機資料尚未完成驗證'));return;}
   const progress=document.getElementById('report-progress-modal');
   if(progress&&progress.classList.contains('show')){
     toast('報告正在產生，請完成或取消後再更新',3500);
@@ -6634,7 +7804,7 @@ async function activateUpdate(){
   if(btn){btn.disabled=true;btn.textContent='保存中…';btn.style.opacity='.7';}
   try{
     clearTimeout(_saveTimer);
-    await persistLocal(true);
+    if(!(await persistLocal(true)))throw new LocalWriteError('更新前本機資料驗證失敗');
     _swReloadRequested=true;
     if(btn)btn.textContent='更新中…';
     if(_waitingWorker){
@@ -6684,17 +7854,8 @@ async function activateUpdate(){
       }
     });
   }
-  // 嘗試讀上次使用的班級（本機暫存，僅供離線快速恢復）
-  const lastClass=safeGet('vc2:lastClass');
-  if(lastClass){
-    await loadClass(lastClass);
-    // chip-text 稍後會在 loadFromFirestore 讀到 _classes 後正確顯示班級名稱
-    // 這裡先顯示 ID 避免空白
-    const chipEl=document.getElementById('chip-text');
-    if(chipEl&&chipEl.textContent==='選擇班級')chipEl.textContent=lastClass;
-  }else{
-    renderAll();
-  }
+  // v3.0 必須先由 Firebase 確認 UID，才可讀取該帳號的班級資料。
+  renderAll();
   // Firebase（登入後會自動從 Firestore 讀取 Venus OS 的班級清單與分組）
   initFirebase();
   // 離線
