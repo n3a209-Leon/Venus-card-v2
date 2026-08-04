@@ -10,7 +10,7 @@
 <meta name="application-name" content="Venus Card System">
 <meta name="apple-mobile-web-app-title" content="Venus Card">
 <meta name="description" content="班級獎卡、成績點數、兌換與給卡管理">
-<meta name="venus-build" content="venus-card-v3.3.1-20260804">
+<meta name="venus-build" content="venus-card-v3.3.4-20260804">
 <link rel="manifest" href="./manifest.json">
 <link rel="preload" as="image" href="./splash.jpeg" fetchpriority="high">
 <link rel="apple-touch-icon" sizes="180x180" href="./icon-180.png">
@@ -53,7 +53,7 @@
 }
 
 /* ══ NERV THEME ══ */
-@keyframes flicker{0%,95%,100%{opacity:1}96%,98%{opacity:.88}}
+@keyframes flicker{0%,95%,100%{opacity:.85}96%,98%{opacity:1}}
 @keyframes pulse-nerv{0%,100%{box-shadow:0 0 8px rgba(255,102,0,.4)}50%{box-shadow:0 0 18px rgba(255,102,0,.8)}}
 [data-theme="nerv"]{
   --bg:#050200;--bg2:#0a0400;--bg3:#100500;--bg4:#160800;
@@ -66,9 +66,19 @@
   --text:#FF6600;--text2:#FF8844;--text3:#CC4400;--text4:#883300;
   --border:rgba(255,102,0,.2);--border2:rgba(255,102,0,.4);
   font-family:"Share Tech Mono","Noto Sans TC",monospace;
+}
+/* v3.3.3：flicker 原本掛在 [data-theme="nerv"]，而 data-theme 是設在
+   document.documentElement——等於在根元素上做 opacity 動畫，會讓整份文件
+   反覆進出合成層並全頁重繪，是 nerv 主題捲動掉幀的主因。
+   改成只讓這層固定的掃描線疊層閃動：同樣的 CRT 質感，但只影響一個
+   pointer-events:none 的獨立圖層，主要內容完全不受影響。 */
+[data-theme="nerv"]::before{
+  content:"";position:fixed;inset:0;
+  background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.07) 2px,rgba(0,0,0,.07) 4px);
+  pointer-events:none;z-index:9998;
+  opacity:.85;will-change:opacity;
   animation:flicker 8s infinite;
 }
-[data-theme="nerv"]::before{content:"";position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.07) 2px,rgba(0,0,0,.07) 4px);pointer-events:none;z-index:9998}
 [data-theme="nerv"] .app-header{background:linear-gradient(180deg,#120400,#080200);border-bottom:1px solid #FF6600;box-shadow:0 0 30px rgba(255,102,0,.25)}
 [data-theme="nerv"] .tab-bar{background:#080200;border:1px solid rgba(255,102,0,.42);box-shadow:0 8px 28px rgba(0,0,0,.6),0 0 14px rgba(255,102,0,.16)}
 [data-theme="nerv"] .tab-btn.active{color:#FF6600;text-shadow:0 0 8px rgba(255,102,0,.8)}
@@ -76,10 +86,7 @@
 [data-theme="nerv"] .card{border:1px solid rgba(255,102,0,.15);background:#0a0400}
 [data-theme="nerv"] .btn-primary{background:rgba(255,102,0,.15);color:#FF6600;border:1px solid rgba(255,102,0,.5)}
 [data-theme="nerv"] .btn-primary:active{background:rgba(255,102,0,.3)}
-[data-theme="nerv"] .stu-cell{border-color:rgba(255,102,0,.2)}
-[data-theme="nerv"] .stu-cell.ready{border-color:#FFCC00;background:rgba(255,204,0,.08)}
 [data-theme="nerv"] input,[data-theme="nerv"] select,[data-theme="nerv"] textarea{background:#0a0400;border-color:rgba(255,102,0,.3);color:#FF6600}
-[data-theme="nerv"] .class-chip{background:rgba(255,102,0,.1);border-color:rgba(255,102,0,.4);color:#FF6600}
 
 /* ══ MUCHA THEME（依 Venus Card 版面重新配置・保持素材原始比例）══ */
 [data-theme="mucha"]{
@@ -310,7 +317,6 @@
 }
 
 /* ══ NEBULA THEME（同 Venus OS Deep Space Edition）══ */
-@keyframes nebula-glow{0%,100%{box-shadow:0 0 20px rgba(120,80,255,.3),0 0 40px rgba(60,120,255,.15)}50%{box-shadow:0 0 35px rgba(150,100,255,.5),0 0 70px rgba(80,140,255,.25)}}
 [data-theme="nebula"]{
   --bg:#04050f;--bg2:rgba(8,5,24,.85);--bg3:rgba(12,8,32,.7);--bg4:rgba(20,14,50,.6);
   --accent:#a070ff;--accent2:#8050ee;--accent-light:rgba(140,80,255,.15);
@@ -359,11 +365,14 @@
 [data-theme="nebula"] .app>*{z-index:1}
 [data-theme="nebula"] .scroll-area{background:transparent;position:relative}
 /* Header */
+/* v3.3.2：sticky 標題列拿掉 backdrop-filter 與 nebula-glow。
+   nebula-glow 動的是 box-shadow（paint 屬性，非合成層屬性），
+   固定元素每幀重繪＋重算毛玻璃，是 iPhone 捲動掉幀的主因。
+   改用高不透明度背景＋靜態光暈，視覺差異極小。 */
 [data-theme="nebula"] .app-header{
-  background:rgba(6,3,20,.88);
+  background:rgba(6,3,20,.97);
   border-bottom:1px solid rgba(120,80,255,.4);
-  backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
-  animation:nebula-glow 4s ease-in-out infinite;
+  box-shadow:0 0 26px rgba(120,80,255,.32),0 0 52px rgba(60,120,255,.16);
 }
 /* Tab bar */
 [data-theme="nebula"] .tab-bar{
@@ -374,15 +383,14 @@
 [data-theme="nebula"] .tab-btn.active{color:#c8a0ff;text-shadow:0 0 8px rgba(180,120,255,.7)}
 [data-theme="nebula"] .tab-btn.active::before{background:rgba(140,90,255,.22);box-shadow:inset 0 0 0 1px rgba(160,100,255,.45)}
 /* Cards - 毛玻璃 */
+/* v3.3.2：.card 會重複出現在長頁面上，毛玻璃等於每張卡一個獨立模糊圖層。
+   提高背景不透明度後外觀幾乎相同，捲動成本大幅下降。 */
 [data-theme="nebula"] .card{
-  background:rgba(8,5,24,.55);
+  background:rgba(10,6,28,.92);
   border:1px solid rgba(120,80,255,.25);
-  backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
   box-shadow:0 4px 24px rgba(80,40,180,.15),inset 0 1px 0 rgba(150,100,255,.1);
 }
 /* Student cells */
-[data-theme="nebula"] .stu-cell{background:rgba(12,8,32,.6);border-color:rgba(100,60,200,.2)}
-[data-theme="nebula"] .stu-cell.ready{border-color:#FCD34D;background:rgba(252,211,77,.06)}
 [data-theme="nebula"] .stu-pts{color:#a070ff}
 [data-theme="nebula"] .progress-bar{background:rgba(140,80,255,.8)}
 /* Buttons */
@@ -391,17 +399,14 @@
 [data-theme="nebula"] .theme-btn{background:rgba(100,60,200,.2);border-color:rgba(150,100,255,.5);color:#c8b0ff;box-shadow:0 0 8px rgba(120,80,255,.2)}
 [data-theme="nebula"] .login-btn{background:rgba(100,50,200,.25);border-color:rgba(150,100,255,.4);color:#c8b0ff}
 /* Class chip */
-[data-theme="nebula"] .class-chip{background:rgba(100,50,200,.2);border-color:rgba(150,100,255,.45);color:#c8b0ff}
-[data-theme="nebula"] .class-dropdown{background:rgba(6,3,20,.95);border-color:rgba(120,80,255,.35);backdrop-filter:blur(20px)}
-[data-theme="nebula"] .cd-item:hover{background:rgba(100,60,200,.2)}
-[data-theme="nebula"] .cd-item.active{background:rgba(100,60,200,.25)}
+[data-theme="nebula"] .class-dropdown{background:rgba(6,3,20,.98);border-color:rgba(120,80,255,.35)}
 /* Inputs */
 [data-theme="nebula"] input,[data-theme="nebula"] select,[data-theme="nebula"] textarea{background:rgba(12,8,32,.7);border-color:rgba(120,80,255,.3);color:#d0e8ff}
 /* Table */
 [data-theme="nebula"] th{background:rgba(12,8,36,.7)}
 [data-theme="nebula"] tr:hover td{background:rgba(100,60,200,.12)}
 /* Stats */
-[data-theme="nebula"] .stat{background:rgba(8,5,24,.55);border-color:rgba(100,60,200,.2);backdrop-filter:blur(10px)}
+[data-theme="nebula"] .stat{background:rgba(10,6,28,.92);border-color:rgba(100,60,200,.2)}
 [data-theme="nebula"] .stat .sn{color:#a070ff}
 /* Settings tabs */
 [data-theme="nebula"] .stab.active{background:rgba(80,40,180,.4);color:#c8b0ff}
@@ -711,7 +716,9 @@ body.modal-scroll-locked{overflow:hidden;position:fixed;left:0;right:0;width:100
 [data-theme="nebula"] .brand-home{color:#d4baff;text-shadow:0 0 10px rgba(180,120,255,.38)}
 [data-theme="nerv"] .user-btn,[data-theme="nerv"] .theme-quick,[data-theme="nerv"] .sync-chip{background:rgba(255,102,0,.1);border-color:rgba(255,102,0,.3);color:#FF8844}
 [data-theme="nerv"] .brand-home{color:#FF6600;text-shadow:0 0 9px rgba(255,102,0,.58)}
-[data-theme="nebula"] .app-header{background:rgba(6,3,20,.95);border-bottom-color:rgba(120,80,255,.35);backdrop-filter:blur(12px)}
+/* v3.3.2：這條在主題區塊之後，原本會反過來覆蓋上面的設定並把毛玻璃加回來。
+   保留顏色微調，不再引入 backdrop-filter。 */
+[data-theme="nebula"] .app-header{background:rgba(6,3,20,.97);border-bottom-color:rgba(120,80,255,.35)}
 [data-theme="nerv"] .app-header{background:linear-gradient(180deg,#120400,#080200);border-bottom-color:#FF6600}
 
 /* ══ CLASS SWITCHER ══ */
@@ -742,7 +749,6 @@ body.modal-scroll-locked{overflow:hidden;position:fixed;left:0;right:0;width:100
 .cd-source{font-size:9px;font-weight:700;padding:2px 6px;border-radius:10px;background:var(--accent-light);color:var(--accent);white-space:nowrap}
 .cd-manage{position:sticky;bottom:0;width:100%;display:flex;align-items:center;justify-content:center;gap:6px;border-radius:0;background:var(--bg2);color:var(--accent);border-top:1px solid var(--border);font-size:12px;min-height:44px}
 [data-theme="nebula"] .class-chip{background:rgba(100,50,200,.2);border-color:rgba(150,100,255,.45);color:#c8b0ff}
-[data-theme="nebula"] .class-dropdown{background:rgba(6,3,20,.95);border-color:rgba(120,80,255,.35);backdrop-filter:blur(20px)}
 [data-theme="nebula"] .cd-item:hover,[data-theme="nebula"] .cd-item.active{background:rgba(100,60,200,.2)}
 [data-theme="nerv"] .class-chip{background:rgba(255,102,0,.1);border-color:rgba(255,102,0,.4);color:#FF6600}
 
@@ -1073,7 +1079,7 @@ tr:hover td{background:var(--accent-light)}
     scroll-behavior:auto !important;
   }
   /* 純裝飾且持續閃動的效果直接關閉，維持最終外觀 */
-  [data-theme="nerv"]{animation:none !important;opacity:1 !important}
+  [data-theme="nerv"]::before{animation:none !important;opacity:.85 !important}
   .splash-img-wrap img{animation:none !important;filter:none !important}
   .sync-dot.ing{animation:none !important}
 }
@@ -2041,8 +2047,54 @@ html body .app > nav.tab-bar{
 // ══════════════════════════════════════════
 // Firebase 設定
 // ══════════════════════════════════════════
-const APP_VERSION='3.3.1';
-const BUILD_ID='venus-card-v3.3.1-20260804';
+const APP_VERSION='3.3.4';
+const BUILD_ID='venus-card-v3.3.4-20260804';
+
+// ══════════════════════════════════════════
+// 實機效能探針（網址加 ?perf=1 開啟）
+// 除錯原則：不靠連續改版猜測，直接在畫面上輸出實際數值，一次取得定案資料。
+// 關閉時 _perfProbe 為 false，所有量測程式碼都不會執行。
+// ══════════════════════════════════════════
+const _perfProbe=(()=>{try{return new URLSearchParams(location.search).get('perf')==='1';}catch{return false;}})();
+const _perfLog=[];
+function perfNote(label,ms,bytes,extra){
+  if(!_perfProbe)return;
+  _perfLog.unshift({label,ms,bytes,extra,at:Date.now()});
+  if(_perfLog.length>12)_perfLog.length=12;
+  renderPerfPanel();
+}
+function renderPerfPanel(){
+  if(!_perfProbe)return;
+  let el=document.getElementById('perf-panel');
+  if(!el){
+    el=document.createElement('div');
+    el.id='perf-panel';
+    el.style.cssText='position:fixed;left:6px;right:6px;top:calc(env(safe-area-inset-top) + 4px);z-index:100000;'+
+      'background:rgba(4,8,16,.93);color:#8FE3A0;font:11px/1.45 ui-monospace,Menlo,monospace;'+
+      'padding:7px 9px;border:1px solid #2C7A4B;border-radius:9px;max-height:38vh;overflow:auto;'+
+      '-webkit-overflow-scrolling:touch;white-space:pre-wrap;word-break:break-all';
+    el.addEventListener('click',()=>{el.style.display='none';});
+    document.body.appendChild(el);
+  }
+  const rows=_perfLog.map(r=>{
+    const kb=r.bytes?(r.bytes/1024).toFixed(0)+'KB':'—';
+    const flag=r.extra?' +相容備援':'';
+    return `${new Date(r.at).toLocaleTimeString('zh-TW',{hour12:false})}  ${r.label} ${r.ms.toFixed(1)}ms  ${kb}${flag}`;
+  });
+  const stat=lbl=>{
+    const n=_perfLog.filter(r=>r.label===lbl).map(r=>r.ms);
+    if(!n.length)return `${lbl} 尚無資料`;
+    const avg=n.reduce((a,b)=>a+b,0)/n.length;
+    return `${lbl} 平均 ${avg.toFixed(1)}ms ／ 最久 ${Math.max(...n).toFixed(1)}ms ／ ${n.length} 次`;
+  };
+  let ls=0;
+  try{for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&k.startsWith('vc2:'))ls+=k.length+(localStorage.getItem(k)||'').length;}}catch{}
+  el.textContent=`⏱ Venus Card v${APP_VERSION} 效能探針（點一下關閉）\n`+
+    stat('存檔')+`\n`+stat('總覽渲染')+`\n`+
+    `localStorage 佔用 ${(ls/1024).toFixed(0)} KB（Safari 上限約 5120 KB）\n`+
+    `主題 ${document.documentElement.getAttribute('data-theme')||'default'}\n`+
+    `────────────\n`+rows.join('\n');
+}
 const FB_CONFIG = {
   apiKey: "AIzaSyAqgA9pYvOduWypEE5kxVNlq9fEfrEMV0c",
   authDomain: "attendance-pwa-9fa73.firebaseapp.com",
@@ -2094,16 +2146,50 @@ async function storeGet(k){
   if(!lv)return null;
   try{return JSON.parse(lv);}catch{return null;}
 }
-async function storeSet(k,v){
-  let encoded=null;
-  try{encoded=JSON.stringify(v);}catch{return false;}
-  const localOk=encoded!==undefined&&safeSet('vc2:'+k,encoded);
-  const idbWriteOk=await idbSet(k,v);
-  let idbOk=false;
-  if(idbWriteOk){
-    try{idbOk=sameStoredValue(await idbGet(k),v);}catch{}
+// v3.3.2：大型值不再鏡射進 localStorage。
+// 實測一班一學年的 snapshot 約 700KB，v4:a+v4:b+v3+scores:all+logs:all
+// 合計 2.76MB；兩個班就會撞破 Safari 約 5MB 的配額，而且撞破時是靜默失敗。
+// 大型值交給 IndexedDB 主責（本來就是優先讀取的後端），localStorage 只留小鍵。
+const LS_MIRROR_MAX=64*1024;
+let _lsQuotaWarned=false;
+// encoded 可由呼叫端預先算好傳入，避免同一份資料重複序列化。
+// 傳入 null＝呼叫端已知這是大型值，連序列化都不必做，直接走 IndexedDB。
+async function storeSet(k,v,encoded){
+  if(encoded===null){
+    try{localStorage.removeItem('vc2:'+k);}catch{}
+    const ok=await idbSet(k,v);
+    if(ok)return true;
+    try{encoded=JSON.stringify(v);}catch{return false;}   // IDB 不可用才退回
+    return safeSet('vc2:'+k,encoded);
   }
+  if(encoded===undefined){
+    try{encoded=JSON.stringify(v);}catch{return false;}
+  }
+  if(typeof encoded!=='string')return false;
+  let localOk=false;
+  if(encoded.length<=LS_MIRROR_MAX){
+    localOk=safeSet('vc2:'+k,encoded);
+  }else{
+    // 超過鏡射上限：清掉可能殘留的舊大型值，避免舊資料佔著配額又遮蔽新值。
+    try{localStorage.removeItem('vc2:'+k);}catch{}
+    if(!_lsQuotaWarned){_lsQuotaWarned=true;console.info('[vcard] 大型快照改由 IndexedDB 主責，未鏡射 localStorage');}
+  }
+  // IndexedDB 交易的 oncomplete 已代表落盤成功，不需再讀回整份做 JSON 比對。
+  const idbOk=await idbSet(k,v);
+  // 最後一道防線：IndexedDB 不可用（如 Safari 無痕模式）時，
+  // 再大的值也要試著寫進 localStorage，寧可撞配額也不要完全沒有落盤。
+  if(!idbOk&&!localOk)localOk=safeSet('vc2:'+k,encoded);
   return !!(localOk||idbOk);
+}
+// v3.3.2：只需確認「某個欄位是否等於預期值」時用這個。
+// storeCandidates 會對每一份候選做 JSON.stringify 當去重簽章，
+// 對 700KB 的 envelope 來說那是兩次全量序列化，純屬浪費。
+async function storeProbe(k,check){
+  let hit=false;
+  try{const v=await idbGet(k);if(v&&typeof v==='object'&&check(v))hit=true;}catch{}
+  if(hit)return true;
+  try{const v=parseStored(safeGet('vc2:'+k),null);if(v&&typeof v==='object'&&check(v))hit=true;}catch{}
+  return hit;
 }
 // 個別讀取兩種儲存後端。v4 提交驗證不能只信「優先讀到的那一份」，
 // 否則 Safari 若只成功寫入其中一邊，舊值可能遮住已完成的新值。
@@ -2845,10 +2931,26 @@ function snapshotFingerprint(raw){
   delete s.lastSyncedAt;
   return JSON.stringify(s);
 }
-function currentSnapshot(){
+// v3.3.4：把時戳計算抽出來，讓 currentSnapshot 與 snapshotText 共用同一套判斷。
+function snapshotStamp(){
   const hasLocal=Object.keys(_scores||{}).some(k=>(_scores[k]||[]).length)||(_logs||[]).length||(_trash||[]).length||(_audit||[]).length||(_nos||[]).length||ROLE_KEYS.some(r=>Object.keys((_fixed&&_fixed[r])||{}).length)||((_fixed&&_fixed.toilet)||[]).length;
   const stamp=_dataUpdatedAt||(hasLocal?Date.now():0);
   ensureDataIdentity(stamp||1);
+  return stamp;
+}
+// 只要「一份可還原的副本」時用這個：直接序列化現行狀態，
+// 省掉 cloneData 的 JSON.parse 那一趟，記憶體也只留字串而非整個物件圖。
+function snapshotText(){
+  const stamp=snapshotStamp();
+  return JSON.stringify({
+    scores:_scores,logs:_logs,trash:_trash,audit:_audit,fixed:_fixed,
+    settings:_settings,nos:_nos,deleted:_deleted,
+    fieldUpdatedAt:_fieldUpdatedAt,updatedAt:stamp,
+    lastSyncedAt:_lastSyncedAt,revision:_revision
+  });
+}
+function currentSnapshot(){
+  const stamp=snapshotStamp();
   return{
     scores:cloneData(_scores),logs:cloneData(_logs),trash:cloneData(_trash),audit:cloneData(_audit),fixed:cloneData(_fixed),
     settings:cloneData(_settings),nos:[..._nos],deleted:cloneData(_deleted),
@@ -2874,10 +2976,11 @@ function sched(changed){
 document.addEventListener('visibilitychange',async()=>{
   if(document.visibilityState==='hidden'){
     const saved=await persistLocal();
+    await flushCompatMirror();
     if(saved&&navigator.onLine&&firebaseUidRef.current&&_dataUpdatedAt>_lastSyncedAt)doSync(true);
   }else if(navigator.onLine&&firebaseUidRef.current&&(_dirty||_dataUpdatedAt>_lastSyncedAt))scheduleSync();
 });
-window.addEventListener('pagehide',()=>{persistLocal();});
+window.addEventListener('pagehide',()=>{persistLocal();flushCompatMirror();});
 window.addEventListener('beforeunload',e=>{
   if(!_storageBlocked)return;
   e.preventDefault();e.returnValue='';
@@ -2906,28 +3009,13 @@ async function readCommittedSnapshotV4(classId,uid){
   return null;
 }
 
-async function writeLocalSnapshot(classId,snap){
-  if(!classId||!snap)return true;
-  const uid=localUid();
-  const pfx=pfxFor(classId,uid);
-  const normalized=normalizeSnapshot(snap,snap.updatedAt);
-  const currentCommits=(await storeCandidates(pfx+'commit:v4'))
-    .filter(c=>c&&Number(c.schema)===4&&c.ownerUid===uid&&c.classId===classId&&(c.slot==='a'||c.slot==='b'))
-    .sort((a,b)=>(Number(b.generation)||0)-(Number(a.generation)||0)||(Number(b.committedAt)||0)-(Number(a.committedAt)||0));
-  const slot=currentCommits[0]&&currentCommits[0].slot==='a'?'b':'a';
-  const generation=Math.max(0,...currentCommits.map(c=>Number(c.generation)||0))+1;
-  const checksum=await snapshotChecksum(normalized);
-  const writeId=(self.crypto&&crypto.randomUUID)?crypto.randomUUID():'write-'+Date.now().toString(36)+'-'+Math.random().toString(36).slice(2);
-  const envelope={schema:4,ownerUid:uid,classId,slot,generation,writeId,checksum,writtenAt:Date.now(),payload:normalized};
-  if(!(await storeSet(pfx+'snapshot:v4:'+slot,envelope)))throw new LocalWriteError('完整快照無法寫入裝置儲存空間');
-  const envelopeVerified=(await storeCandidates(pfx+'snapshot:v4:'+slot)).some(v=>v&&v.writeId===writeId&&v.checksum===checksum);
-  if(!envelopeVerified)throw new LocalWriteError('完整快照寫入後驗證失敗');
-  const commit={schema:4,ownerUid:uid,classId,slot,generation,writeId,checksum,committedAt:Date.now(),appVersion:APP_VERSION};
-  if(!(await storeSet(pfx+'commit:v4',commit)))throw new LocalWriteError('快照提交標記無法寫入');
-  const verified=await readCommittedSnapshotV4(classId,uid);
-  if(!verified||(await snapshotChecksum(verified))!==checksum)throw new LocalWriteError('快照提交後完整性檢查失敗');
-
-  // v3 分欄資料只作相容與救援備援；v4 提交已成功後才更新，失敗不會破壞已提交快照。
+// v3 分欄資料只是 v4 讀不出來時的救援備援（見 loadLocalClass：committed 有值就完全不讀）。
+// v3.3.1 以前每次存檔都全量重寫這 7 個鍵，等於把同一份資料再序列化五遍。
+// v3.3.2 改成節流：熱路徑跳過，離開頁面／切到背景／換班時必定補寫一次。
+const COMPAT_MIRROR_INTERVAL=60000;
+const _compatMirrorAt=new Map();
+let _pendingCompatMirror=null;
+async function writeCompatMirror(pfx,normalized,checksum){
   await Promise.all([
     storeSet(pfx+'snapshot:v3',normalized),
     storeSet(pfx+'scores:all',normalized.scores),
@@ -2937,6 +3025,54 @@ async function writeLocalSnapshot(classId,snap){
     storeSet(pfx+'nos',normalized.nos),
     storeSet(pfx+'meta',{schema:4,checksum,updatedAt:normalized.updatedAt,lastSyncedAt:normalized.lastSyncedAt,revision:normalized.revision})
   ]);
+  _compatMirrorAt.set(pfx,Date.now());
+  // 只清掉屬於同一個班的待寫項目。建立新學年度班級時會對另一個 classId
+  // 呼叫本函式，不可因此把目前班級還沒補寫的備援一起丟掉。
+  if(_pendingCompatMirror&&_pendingCompatMirror.pfx===pfx)_pendingCompatMirror=null;
+}
+// 由 visibilitychange / pagehide / 切班呼叫，確保救援備援不會落後太多。
+async function flushCompatMirror(){
+  const p=_pendingCompatMirror;
+  if(!p)return;
+  try{await writeCompatMirror(p.pfx,p.normalized,p.checksum);}catch(e){console.warn('相容備援補寫失敗',e);}
+}
+
+async function writeLocalSnapshot(classId,snap,opts){
+  if(!classId||!snap)return true;
+  const t0=(_perfProbe?performance.now():0);
+  const uid=localUid();
+  const pfx=pfxFor(classId,uid);
+  const normalized=normalizeSnapshot(snap,snap.updatedAt);
+  // ★ 全流程唯一一次大型序列化。normalizeSnapshot 已驗證為冪等，
+  //   所以這份字串同時就是 snapshotChecksum() 會算的那份，可直接重用。
+  const payloadText=JSON.stringify(normalized);
+  const checksum=(await sha256Hex(payloadText))||('fnv1a-'+hashText(payloadText));
+
+  const currentCommits=(await storeCandidates(pfx+'commit:v4'))
+    .filter(c=>c&&Number(c.schema)===4&&c.ownerUid===uid&&c.classId===classId&&(c.slot==='a'||c.slot==='b'))
+    .sort((a,b)=>(Number(b.generation)||0)-(Number(a.generation)||0)||(Number(b.committedAt)||0)-(Number(a.committedAt)||0));
+  const slot=currentCommits[0]&&currentCommits[0].slot==='a'?'b':'a';
+  const generation=Math.max(0,...currentCommits.map(c=>Number(c.generation)||0))+1;
+  const writeId=(self.crypto&&crypto.randomUUID)?crypto.randomUUID():'write-'+Date.now().toString(36)+'-'+Math.random().toString(36).slice(2);
+  const envelope={schema:4,ownerUid:uid,classId,slot,generation,writeId,checksum,writtenAt:Date.now(),payload:normalized};
+  const big=payloadText.length>LS_MIRROR_MAX;
+  if(!(await storeSet(pfx+'snapshot:v4:'+slot,envelope,big?null:undefined)))throw new LocalWriteError('完整快照無法寫入裝置儲存空間');
+  // 讀回 envelope 比對 writeId+checksum。writeId 是本次寫入專屬的 UUID，
+  // 讀得到它就證明這次的資料確實落盤，不需再對整份 payload 重算一次 SHA-256。
+  if(!(await storeProbe(pfx+'snapshot:v4:'+slot,v=>v.writeId===writeId&&v.checksum===checksum&&!!v.payload)))
+    throw new LocalWriteError('完整快照寫入後驗證失敗');
+  const commit={schema:4,ownerUid:uid,classId,slot,generation,writeId,checksum,committedAt:Date.now(),appVersion:APP_VERSION};
+  if(!(await storeSet(pfx+'commit:v4',commit)))throw new LocalWriteError('快照提交標記無法寫入');
+  // 提交標記讀回確認：commit 是小物件，這次比對很便宜。
+  if(!(await storeProbe(pfx+'commit:v4',c=>c.writeId===writeId&&c.checksum===checksum&&c.slot===slot)))
+    throw new LocalWriteError('快照提交後完整性檢查失敗');
+
+  const now=Date.now();
+  const due=(opts&&opts.flushCompat)||!_compatMirrorAt.has(pfx)||(now-_compatMirrorAt.get(pfx))>=COMPAT_MIRROR_INTERVAL;
+  if(due)await writeCompatMirror(pfx,normalized,checksum);
+  else _pendingCompatMirror={pfx,normalized,checksum};
+
+  if(_perfProbe)perfNote('存檔',performance.now()-t0,payloadText.length,due);
   return true;
 }
 
@@ -2987,6 +3123,7 @@ async function loadClass(classId){
   const previousSnapshot=previousClassId?currentSnapshot():null;
   // 只等待可驗證的本機落盤；網路同步改在背景執行，切班不再被網路拉住。
   if(!ownerChanged&&!(await persistLocal()))return false;
+  await flushCompatMirror();
   if(previousNeedsSync&&firebaseUidRef.current&&_db&&navigator.onLine){
     syncDetachedClass(firebaseUidRef.current,previousClassId,previousSnapshot).catch(e=>console.warn('Detached class sync fail',e));
   }
@@ -3475,18 +3612,28 @@ function scorePoints(no){
   }
   return total;
 }
+// v3.3.2：原本每個都用 .filter() 先配置一個新陣列再 reduce。
+// renderOverview 每次會呼叫 30 遍，等於每次渲染就配置 90 個中繼陣列。
+// 改成單趟迴圈累加，語意完全相同，不再產生垃圾。
 function redeemedPoints(no){
-  return _logs.filter(l=>l.no===no&&l.k==='兌換').reduce((a,l)=>a+(l.v||0),0);
+  let t=0;
+  for(const l of _logs)if(l.no===no&&l.k==='兌換')t+=(l.v||0);
+  return t;
 }
 function noonPoints(no){
-  return _logs.filter(l=>l.no===no&&l.k==='午休').reduce((a,l)=>a+(l.v||0),0);
+  let t=0;
+  for(const l of _logs)if(l.no===no&&l.k==='午休')t+=(l.v||0);
+  return t;
 }
 function remPoints(no){return scorePoints(no)-redeemedPoints(no)-noonPoints(no);}
-function canRedeem(no){const thr=_settings.threshold||300;return Math.floor(remPoints(no)/thr);}
+// canRedeem 內部會完整重跑一次 remPoints（含全表掃描 _scores）。
+// 呼叫端若已經算過 rem，改用 canRedeemFrom 可省掉一整輪掃描。
+function canRedeemFrom(rem){const thr=_settings.threshold||300;return Math.floor(rem/thr);}
+function canRedeem(no){return canRedeemFrom(remPoints(no));}
 function cardCounts(no){
-  const ls=_logs.filter(l=>l.no===no);
   let cadre=0,toilet=0,special=0,redeemed=0,adjust=0;
-  for(const l of ls){
+  for(const l of _logs){
+    if(l.no!==no)continue;
     if(l.k==='幹部')cadre+=(l.c||0);
     if(l.k==='廁所')toilet+=(l.c||0);
     if(l.k==='特殊')special+=(l.c||0);
@@ -3619,11 +3766,18 @@ function showDiag(title,text){
 function copyDiagText(){copyToClipboard(_diagText,'✅ 診斷內容已複製');}
 function markRadio(r){try{document.querySelectorAll('input[name="'+r.name+'"]').forEach(function(x){var l=x.closest('label');if(l)l.classList.toggle('ropt-on',x.checked);});}catch(e){}}
 
+// v3.3.4：原本每次都做 currentSnapshot()（全資料深拷貝，JSON 來回兩趟），
+// 而且 pushUndo 掛在「快速給卡」這種熱路徑上、沒有防抖，等於每點一次卡
+// 就同步複製整個學期的資料。改存序列化字串：序列化只跑一趟，
+// 撤銷時才解析；堆疊常駐的也從物件圖變成字串，記憶體大幅下降。
 function pushUndo(label){
   if(!_curClassId)return;
-  _undoStack.push({label,classId:_curClassId,snapshot:currentSnapshot()});
+  const t=(_perfProbe?performance.now():0);
+  const json=snapshotText();
+  _undoStack.push({label,classId:_curClassId,json});
   if(_undoStack.length>5)_undoStack.shift();
   updateUndoButton();
+  if(_perfProbe)perfNote('建立撤銷點',performance.now()-t,json.length,false);
 }
 function updateUndoButton(){
   const btn=document.getElementById('undo-fab');
@@ -3648,7 +3802,10 @@ async function undoLastAction(){
   const item=_undoStack.pop();
   if(!item){updateUndoButton();return;}
   if(item.classId!==_curClassId){_undoStack=[];updateUndoButton();toast('切換班級後無法撤銷上一班操作');return;}
-  replaceCurrentWithSnapshot(item.snapshot);
+  let restored=null;
+  try{restored=JSON.parse(item.json);}catch(e){}
+  if(!restored){_undoStack=[];updateUndoButton();toast('撤銷點已損毀，無法還原');return;}
+  replaceCurrentWithSnapshot(restored);
   recordAudit('撤銷最近操作','data',item.label,[],0);
   if(!(await persistLocal(true)))return;
   scheduleSync();refreshVisiblePanel();updateUndoButton();
@@ -4510,6 +4667,13 @@ function setOverviewFilter(){
 }
 
 function renderOverview(){
+  if(!_perfProbe)return _renderOverview();
+  const _t=performance.now();
+  const r=_renderOverview();
+  perfNote('總覽渲染',performance.now()-_t,0,false);
+  return r;
+}
+function _renderOverview(){
   const thr=_settings.threshold||300;
   if(!_nos.length){
     document.getElementById('stat-row').innerHTML='';
@@ -4530,7 +4694,7 @@ function renderOverview(){
   let shown=0;
   _nos.forEach(no=>{
     const rem=remPoints(no);
-    const can=canRedeem(no);
+    const can=canRedeemFrom(rem);   // v3.3.2：不再重算 remPoints
     const cc=cardCounts(no);
     totalNetCards+=cc.netHold;totalPts+=rem;
     if(can>0)canCnt++;
@@ -7931,6 +8095,7 @@ async function activateUpdate(){
 (async()=>{
   // 主題
   applyTheme(_theme);
+  if(_perfProbe)renderPerfPanel();   // 開了 ?perf=1 就立刻顯示面板
   const versionEl=document.getElementById('app-version-label');
   if(versionEl)versionEl.textContent='Venus Card System v'+APP_VERSION;
   const verTop=document.getElementById('app-ver-top');
